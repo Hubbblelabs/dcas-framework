@@ -1,214 +1,255 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Header } from "@/components/layout/Header";
-import { ArrowRight, BarChart2, Users, Anchor, Target } from "lucide-react";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { dcasColors } from "@/lib/dcas/scoring"
+
+const dcasTypes = {
+  D: { name: "Driver", desc: "Results-oriented", detail: "individuals who are direct, decisive, and focused on achieving goals. They thrive under pressure.", tags: ["Leader", "Decisive", "Direct"], colorClass: "red" },
+  C: { name: "Connector", desc: "People-oriented", detail: "individuals who are enthusiastic, optimistic, and love collaboration. They excel at inspiring others.", tags: ["Inspiring", "Social", "Creative"], colorClass: "amber" },
+  A: { name: "Anchor", desc: "Stability-oriented", detail: "individuals who are patient, reliable, and team-focused. They create harmony and consistency.", tags: ["Reliable", "Patient", "Supportive"], colorClass: "emerald" },
+  S: { name: "Strategist", desc: "Quality-oriented", detail: "individuals who are analytical, precise, and systematic. They ensure accuracy and high standards.", tags: ["Analytical", "Precise", "Systematic"], colorClass: "blue" },
+} as const;
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+    <div className="min-h-screen min-h-dvh bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      {/* Hero Section */}
+      <header className="relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-gradient-to-br from-red-500/10 to-orange-500/10 blur-3xl animate-float" />
+          <div className="absolute top-10 -left-20 sm:top-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/10 blur-3xl animate-float stagger-2" />
+          <div className="absolute bottom-0 right-1/4 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 blur-3xl animate-float stagger-3" />
+          <div className="absolute bottom-10 left-1/4 sm:bottom-20 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-gradient-to-br from-yellow-500/10 to-amber-500/10 blur-3xl animate-float stagger-4" />
+        </div>
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-24 md:py-32 px-4 text-center bg-linear-to-b from-slate-50 to-white overflow-hidden relative">
-          <div className="absolute inset-0 bg-grid-slate-100/50 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10" />
-          <div className="container mx-auto max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20">
-              CBMF™ Framework
+        {/* Navigation */}
+        <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold shadow-lg text-sm sm:text-base">
+              D
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
-              Understand how you work. <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-violet-600">
-                Choose where you belong.
+            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+              DCAS Assessment
+            </span>
+          </div>
+          <Link href="/assessment">
+            <Button variant="outline" className="rounded-full px-4 sm:px-6 text-sm sm:text-base btn-press">
+              <span className="hidden sm:inline">Start Assessment</span>
+              <span className="sm:hidden">Start</span>
+            </Button>
+          </Link>
+        </nav>
+
+        {/* Hero Content */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-20 lg:py-32">
+          <div className="mx-auto max-w-4xl text-center">
+            {/* Badge */}
+            <div className="mb-6 sm:mb-8 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 animate-fade-in">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
               </span>
+              Behavioural Assessment for Students
+            </div>
+
+            {/* Main heading */}
+            <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white animate-fade-in-up leading-tight">
+              Discover Your{" "}
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+                DCAS Personality
+              </span>
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>& Career Direction
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Discover your dominant behavioural tendencies with the DCAS (Driver, Connector, Anchor, Strategist) Assessment. Gain clarity on your role-fit and career path in just 10 minutes.
+
+            <p className="mx-auto mb-8 sm:mb-10 max-w-2xl text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed animate-fade-in-up stagger-1 px-2">
+              Take our comprehensive 30-question assessment to understand your behavioral style,
+              unlock your strengths, and discover career paths that align with your natural tendencies.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
-              <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full shadow-xl shadow-primary/25 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
-                <Link href="/assessment">
-                  Start Assessment <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-slate-50">
-                <Link href="#how-it-works">
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up stagger-2">
+              <Link href="/assessment" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 w-full sm:w-auto btn-press"
+                >
+                  <span className="relative z-10">Start Assessment</span>
+                  <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                </Button>
+              </Link>
+              <a href="#learn-more" className="w-full sm:w-auto">
+                <Button variant="ghost" size="lg" className="rounded-full px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg w-full sm:w-auto btn-press">
                   Learn More
-                </Link>
-              </Button>
+                </Button>
+              </a>
             </div>
 
-            <div className="pt-12 flex justify-center items-center gap-8 text-sm font-medium text-slate-500">
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-slate-900">30</span>
-                <span>Questions</span>
+            {/* Stats */}
+            <div className="mt-12 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-8 border-t border-slate-200 dark:border-slate-800 pt-8 sm:pt-10 animate-fade-in-up stagger-3">
+              <div className="text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">30</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Questions</p>
               </div>
-              <div className="w-px h-8 bg-slate-200" />
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-slate-900">4</span>
-                <span>Personality Styles</span>
+              <div className="text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">4</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Personality Styles</p>
               </div>
-              <div className="w-px h-8 bg-slate-200" />
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-slate-900">12</span>
-                <span>Career Matches</span>
+              <div className="text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">12</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Career Matches</p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section - The Four Styles */}
-        <section className="py-24 bg-white relative">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">The Four DCAS Personality Styles</h2>
-              <p className="text-lg text-slate-600">Understanding these behavioral patterns helps you leverage your strengths and work effectively with others.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <FeatureCard
-                icon={<Target className="h-8 w-8 text-red-600" />}
-                title="Driver"
-                description="Results-oriented, decisive, and competitive leader. They thrive under pressure."
-                color="bg-red-50 border-red-100 hover:border-red-200"
-                iconBg="bg-white text-red-600"
-              />
-              <FeatureCard
-                icon={<Users className="h-8 w-8 text-yellow-600" />}
-                title="Connector"
-                description="Social, enthusiastic, and persuasive communicator. They excel at inspiring others."
-                color="bg-yellow-50 border-yellow-100 hover:border-yellow-200"
-                iconBg="bg-white text-yellow-600"
-              />
-              <FeatureCard
-                icon={<Anchor className="h-8 w-8 text-green-600" />}
-                title="Anchor"
-                description="Supportive, stable, and consistent team player. They create harmony and consistency."
-                color="bg-green-50 border-green-100 hover:border-green-200"
-                iconBg="bg-white text-green-600"
-              />
-              <FeatureCard
-                icon={<BarChart2 className="h-8 w-8 text-blue-600" />}
-                title="Strategist"
-                description="Analytical, detail-oriented, and structured thinker. They ensure accuracy and high standards."
-                color="bg-blue-50 border-blue-100 hover:border-blue-200"
-                iconBg="bg-white text-blue-600"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works Section */}
-        <section id="how-it-works" className="py-24 bg-slate-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">How It Works</h2>
-              <p className="text-lg text-slate-600">Complete the assessment in three simple steps and receive your personalized results.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <StepCard
-                number="01"
-                title="Take the Assessment"
-                description="Answer 30 carefully crafted questions about your preferences and behaviors in various situations."
-              />
-              <StepCard
-                number="02"
-                title="Get Your Profile"
-                description="Receive instant results with detailed insights about your personality type and behavioral tendencies."
-              />
-              <StepCard
-                number="03"
-                title="Explore Careers"
-                description="Discover career paths that align with your strengths and download a comprehensive report."
-              />
-            </div>
-
-            <div className="mt-12 text-center">
-              <Button asChild size="lg" className="h-12 px-8 text-base rounded-full">
-                <Link href="/assessment">
-                  Begin Your Journey <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Who Is This For Section */}
-        <section className="py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Who Is This For?</h2>
-              <p className="text-lg text-slate-600">Our DCAS assessment is designed for students and educational professionals seeking career clarity.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <AudienceCard
-                title="High School Students"
-                description="Discover your strengths before choosing college majors and future career paths."
-              />
-              <AudienceCard
-                title="College Students"
-                description="Align your career aspirations with your natural behavioral tendencies for better job fit."
-              />
-              <AudienceCard
-                title="Career Counselors"
-                description="Use data-driven insights to guide students toward fulfilling career choices."
-              />
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      <footer className="py-12 bg-slate-900 text-slate-400 text-sm border-t border-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-white text-lg tracking-tight">DCAS Framework</span>
-            </div>
-            <p>© {new Date().getFullYear()} DCAS Assessment. Based on CBMF™.</p>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
             </div>
           </div>
         </div>
+      </header>
+
+      {/* DCAS Types Section */}
+      <section id="learn-more" className="py-16 sm:py-20 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4 animate-fade-in">
+              The Four DCAS Personality Styles
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 px-2">
+              Understanding these behavioral patterns helps you leverage your strengths and work effectively with others.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {(["D", "C", "A", "S"] as const).map((type, idx) => {
+              const info = dcasTypes[type];
+              const stagger = idx === 0 ? "" : idx === 1 ? "stagger-1" : idx === 2 ? "stagger-2" : "stagger-3";
+              const colorMap: Record<string, { bg: string; textAccent: string; tagBg: string; tagText: string; gradientFrom: string }> = {
+                red: { bg: "from-red-500/5", textAccent: "text-red-600 dark:text-red-400", tagBg: "bg-red-100 dark:bg-red-900/30", tagText: "text-red-700 dark:text-red-300", gradientFrom: "from-red-500/5" },
+                amber: { bg: "from-amber-500/5", textAccent: "text-amber-600 dark:text-amber-400", tagBg: "bg-amber-100 dark:bg-amber-900/30", tagText: "text-amber-700 dark:text-amber-300", gradientFrom: "from-amber-500/5" },
+                emerald: { bg: "from-emerald-500/5", textAccent: "text-emerald-600 dark:text-emerald-400", tagBg: "bg-emerald-100 dark:bg-emerald-900/30", tagText: "text-emerald-700 dark:text-emerald-300", gradientFrom: "from-emerald-500/5" },
+                blue: { bg: "from-blue-500/5", textAccent: "text-blue-600 dark:text-blue-400", tagBg: "bg-blue-100 dark:bg-blue-900/30", tagText: "text-blue-700 dark:text-blue-300", gradientFrom: "from-blue-500/5" },
+              };
+              const c = colorMap[info.colorClass];
+              return (
+                <Card key={type} className={`group relative overflow-hidden border-0 bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl card-hover animate-fade-in-up ${stagger}`}>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${c.gradientFrom} to-transparent`} />
+                  <CardContent className="relative p-5 sm:p-6">
+                    <div
+                      className="mb-3 sm:mb-4 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl text-xl sm:text-2xl font-bold text-white shadow-lg"
+                      style={{ backgroundColor: dcasColors[type].primary }}
+                    >
+                      {type}
+                    </div>
+                    <h3 className="mb-2 text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{info.name}</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <span className={`font-medium ${c.textAccent}`}>{info.desc}</span> {info.detail}
+                    </p>
+                    <div className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2">
+                      {info.tags.map((tag) => (
+                        <span key={tag} className={`rounded-full ${c.tagBg} px-2.5 sm:px-3 py-0.5 sm:py-1 text-xs font-medium ${c.tagText}`}>{tag}</span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 sm:py-20 lg:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4">
+              How It Works
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 px-2">
+              Complete the assessment in three simple steps and receive your personalized results.
+            </p>
+          </div>
+
+          <div className="grid gap-8 sm:gap-10 md:grid-cols-3 relative">
+            <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
+
+            {[
+              { num: 1, title: "Take the Assessment", desc: "Answer 30 carefully crafted questions about your preferences and behaviors in various situations.", gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
+              { num: 2, title: "Get Your Profile", desc: "Receive instant results with detailed insights about your personality type and behavioral tendencies.", gradient: "from-purple-500 to-pink-600", shadow: "shadow-purple-500/30" },
+              { num: 3, title: "Explore Careers", desc: "Discover career paths that align with your strengths and download a comprehensive report.", gradient: "from-pink-500 to-rose-600", shadow: "shadow-pink-500/30" },
+            ].map((step, idx) => (
+              <div key={step.num} className={`relative animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>
+                <div className="relative flex flex-col items-center text-center">
+                  <div className={`mb-4 sm:mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-2xl bg-gradient-to-br ${step.gradient} text-2xl sm:text-3xl font-bold text-white shadow-lg ${step.shadow} animate-float ${idx > 0 ? `stagger-${idx + 1}` : ""}`}>
+                    {step.num}
+                  </div>
+                  <h3 className="mb-2 text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xs">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 sm:mt-16 text-center">
+            <Link href="/assessment">
+              <Button
+                size="lg"
+                className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 btn-press"
+              >
+                Begin Your Journey
+                <span className="ml-2">→</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Target Audience Section */}
+      <section className="py-16 sm:py-20 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4">
+              Who Is This For?
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 px-2">
+              Our DCAS assessment is designed for students and educational professionals seeking career clarity.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 md:grid-cols-3">
+            {[
+              { emoji: "🎓", title: "High School Students", desc: "Discover your strengths before choosing college majors and future career paths.", gradient: "from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50", iconGradient: "from-indigo-500 to-purple-600" },
+              { emoji: "📚", title: "College Students", desc: "Align your career aspirations with your natural behavioral tendencies for better job fit.", gradient: "from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50", iconGradient: "from-purple-500 to-pink-600" },
+              { emoji: "🧭", title: "Career Counselors", desc: "Use data-driven insights to guide students toward fulfilling career choices.", gradient: "from-pink-50 to-rose-50 dark:from-pink-950/50 dark:to-rose-950/50", iconGradient: "from-pink-500 to-rose-600" },
+            ].map((item, idx) => (
+              <Card key={item.title} className={`border-0 bg-gradient-to-br ${item.gradient} shadow-lg card-hover animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>
+                <CardContent className="p-6 sm:p-8 text-center">
+                  <div className={`mx-auto mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.iconGradient} text-2xl sm:text-3xl shadow-lg`}>
+                    {item.emoji}
+                  </div>
+                  <h3 className="mb-2 text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">{item.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 sm:py-12 safe-area-inset">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">
+                D
+              </div>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">DCAS Assessment</span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 text-center sm:text-right">
+              © {new Date().getFullYear()} DCAS Behavioural Assessment. All rights reserved.
+            </p>
+          </div>
+        </div>
       </footer>
-    </div>
-  );
-}
-
-function FeatureCard({ icon, title, description, color, iconBg }: { icon: React.ReactNode, title: string, description: string, color?: string, iconBg?: string }) {
-  return (
-    <div className={`p-8 rounded-2xl border transition-all duration-300 hover:shadow-lg ${color || 'bg-slate-50 border-slate-100'}`}>
-      <div className={`mb-6 p-4 rounded-xl w-fit shadow-sm ring-1 ring-inset ring-black/5 ${iconBg || 'bg-white'}`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-      <p className="text-slate-600 leading-relaxed">{description}</p>
-    </div>
-  );
-}
-
-function StepCard({ number, title, description }: { number: string, title: string, description: string }) {
-  return (
-    <div className="relative p-6 rounded-2xl bg-white border border-slate-100 hover:border-slate-200 transition-colors">
-      <div className="text-6xl font-black text-slate-100 absolute -top-4 -right-2 select-none pointer-events-none">
-        {number}
-      </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-3 relative z-10">{title}</h3>
-      <p className="text-slate-600 relative z-10">{description}</p>
-    </div>
-  )
-}
-
-function AudienceCard({ title, description }: { title: string, description: string }) {
-  return (
-    <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 text-center hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300">
-      <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-      <p className="text-slate-600">{description}</p>
     </div>
   )
 }

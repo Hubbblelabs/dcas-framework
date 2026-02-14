@@ -1,0 +1,64 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import {
+    LayoutDashboard,
+    Users,
+    FileQuestion,
+    ClipboardList,
+    BarChart,
+    Settings,
+    LogOut,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
+
+const sidebarItems = [
+    { title: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
+    { title: "Cohorts & Users", href: "/admin/cohorts", icon: Users },
+    { title: "Question Bank", href: "/admin/questions", icon: FileQuestion },
+    { title: "Assessments", href: "/admin/assessments", icon: ClipboardList },
+    { title: "Reports", href: "/admin/reports", icon: BarChart },
+    { title: "DCAS Configuration", href: "/admin/dcas-configuration", icon: Settings },
+];
+
+export function AdminSidebar({ className, onClose }: { className?: string; onClose?: () => void }) {
+    const pathname = usePathname();
+
+    return (
+        <div className={cn("flex h-screen w-64 flex-col border-r border-white/10 bg-[#0a0a0a]", className)}>
+            <div className="flex h-16 items-center border-b border-white/10 px-6 font-semibold text-white">
+                <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+                    DCAS Admin
+                </div>
+            </div>
+            <div className="flex-1 overflow-auto py-6">
+                <nav className="grid items-start px-4 text-sm font-medium">
+                    {sidebarItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={onClose}
+                            className={cn(
+                                "flex items-center gap-3 rounded-lg px-3 py-2 text-white/60 transition-all hover:text-white hover:bg-white/5",
+                                pathname === item.href && "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300"
+                            )}
+                        >
+                            <item.icon className="h-4 w-4" />
+                            {item.title}
+                        </Link>
+                    ))}
+                </nav>
+            </div>
+            <div className="mt-auto border-t border-white/10 p-4">
+                <Button variant="ghost" className="w-full justify-start gap-3 text-white/60 hover:text-destructive hover:bg-destructive/10" onClick={() => signOut({ callbackUrl: "/" })}>
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                </Button>
+            </div>
+        </div>
+    );
+}
