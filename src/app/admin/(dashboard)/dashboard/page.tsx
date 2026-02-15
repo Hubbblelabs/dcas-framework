@@ -30,10 +30,10 @@ interface DashboardStats {
 }
 
 const DCAS_COLORS = {
-    D: { bg: "bg-red-500", text: "text-red-600", light: "bg-red-100 dark:bg-red-950/30" },
-    C: { bg: "bg-yellow-500", text: "text-yellow-600", light: "bg-yellow-100 dark:bg-yellow-950/30" },
-    A: { bg: "bg-green-500", text: "text-green-600", light: "bg-green-100 dark:bg-green-950/30" },
-    S: { bg: "bg-blue-500", text: "text-blue-600", light: "bg-blue-100 dark:bg-blue-950/30" },
+    D: { bg: "bg-red-500", text: "text-red-600", light: "bg-red-100" },
+    C: { bg: "bg-yellow-500", text: "text-yellow-600", light: "bg-yellow-100" },
+    A: { bg: "bg-green-500", text: "text-green-600", light: "bg-green-100" },
+    S: { bg: "bg-blue-500", text: "text-blue-600", light: "bg-blue-100" },
 };
 
 export default function DashboardPage() {
@@ -97,14 +97,14 @@ export default function DashboardPage() {
             </div>
 
             {stats.liveAssessment && (
-                <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 dark:border-green-800">
+                <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
                     <CardContent className="py-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-green-500 rounded-lg"><Zap className="h-5 w-5 text-white" /></div>
                                 <div>
-                                    <p className="font-semibold text-green-800 dark:text-green-200">Live Assessment</p>
-                                    <p className="text-sm text-green-600 dark:text-green-400">{stats.liveAssessment.name} • {stats.liveAssessment.questionCount} questions</p>
+                                    <p className="font-semibold text-green-800">Live Assessment</p>
+                                    <p className="text-sm text-green-600">{stats.liveAssessment.name} • {stats.liveAssessment.questionCount} questions</p>
                                 </div>
                             </div>
                             <Badge className="bg-green-500 animate-pulse"><span className="mr-1">●</span> Active</Badge>

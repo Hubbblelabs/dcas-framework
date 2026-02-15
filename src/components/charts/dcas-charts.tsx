@@ -115,8 +115,8 @@ export function DCASRadarChart({ scores }: DCASChartProps) {
                         stroke="url(#radarGradient)"
                         fill="url(#radarFillGradient)"
                         strokeWidth={3}
-                        dot={{ r: 6, fill: 'white', stroke: 'url(#radarGradient)', strokeWidth: 2 }}
-                        activeDot={{ r: 8, fill: 'hsl(var(--primary))', stroke: 'white', strokeWidth: 2 }}
+                        dot={{ r: 6, fill: 'hsl(var(--card))', stroke: 'url(#radarGradient)', strokeWidth: 2 }}
+                        activeDot={{ r: 8, fill: 'hsl(var(--primary))', stroke: 'hsl(var(--card))', strokeWidth: 2 }}
                     />
                     <Tooltip
                         contentStyle={{

@@ -10,6 +10,7 @@ import { DCASBarChart, DCASRadarChart, ScoreCard } from "@/components/charts/dca
 import { DCASScores, DCASType, dcasColors, defaultDCASNames, getScoreLevel } from "@/lib/dcas/scoring"
 import { interpretations, getCombinedProfileDescription } from "@/lib/dcas/interpretations"
 import { getCareerRecommendations } from "@/lib/dcas/careers"
+import { ModeToggle } from "@/components/theme-toggle"
 
 export default function ResultsPage() {
     const router = useRouter()
@@ -77,7 +78,7 @@ export default function ResultsPage() {
                 <div className="absolute bottom-0 -left-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full blur-3xl opacity-20" style={{ backgroundColor: dcasColors[secondaryType].primary }} />
             </div>
 
-            <header className="relative z-10 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg sticky top-0">
+            <header className="relative z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg sticky top-0">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center gap-2">
@@ -85,6 +86,13 @@ export default function ResultsPage() {
                             <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base hidden sm:inline">DCAS Assessment</span>
                         </Link>
                         <div className="flex items-center gap-2 sm:gap-3">
+                            <ModeToggle />
+                            <Link href={`/report/${sessionId}`}>
+                                <Button variant="outline" className="rounded-full text-sm btn-press gap-2 border-indigo-200 dark:border-indigo-800">
+                                    <span>📥</span>
+                                    <span className="hidden sm:inline">Detailed Report</span>
+                                </Button>
+                            </Link>
                             <Link href="/assessment">
                                 <Button variant="ghost" className="rounded-full text-sm btn-press">Retake</Button>
                             </Link>
@@ -185,7 +193,7 @@ export default function ResultsPage() {
                                                 <div className="text-right">
                                                     <span className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{scores[type]}</span>
                                                     <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400"> / 30</span>
-                                                    <p className="text-xs text-slate-500 hidden sm:block">{level}</p>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">{level}</p>
                                                 </div>
                                             </div>
                                             <div className="h-1.5 sm:h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">

@@ -10,6 +10,7 @@ import { DCASBarChart } from "@/components/charts/dcas-charts"
 import { DCASScores, DCASType, dcasColors, defaultDCASNames, getScoreLevel } from "@/lib/dcas/scoring"
 import { interpretations, getCombinedProfileDescription } from "@/lib/dcas/interpretations"
 import { getCareerRecommendations, careersByType } from "@/lib/dcas/careers"
+import { ModeToggle } from "@/components/theme-toggle"
 
 export default function ReportPage() {
     const router = useRouter()
@@ -138,6 +139,7 @@ export default function ReportPage() {
                                 <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base hidden sm:inline">DCAS Assessment</span>
                             </Link>
                             <div className="flex items-center gap-2 sm:gap-3">
+                                <ModeToggle />
                                 <Button variant="outline" className="rounded-full gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 btn-press border-indigo-200 dark:border-indigo-800" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                                     {isGeneratingPdf ? (<><span className="animate-spin">⏳</span><span className="hidden sm:inline">Generating...</span><span className="sm:hidden">Wait</span></>) : (<><span>📥</span><span className="hidden sm:inline">Download PDF</span><span className="sm:hidden">PDF</span></>)}
                                 </Button>
@@ -157,7 +159,7 @@ export default function ReportPage() {
                         </div>
                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">DCAS Behavioural Assessment Report</h1>
                         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Comprehensive Behavioural Analysis & Career Guidance</p>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-3 sm:mt-4">Generated on {currentDate}</p>
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-3 sm:mt-4">Generated on {currentDate}</p>
                     </div>
 
                     {/* 1. Profile Overview */}
@@ -180,7 +182,7 @@ export default function ReportPage() {
                                             <Badge className="mb-2 text-xs" style={{ backgroundColor: dcasColors[type].light, color: dcasColors[type].primary }}>{label}</Badge>
                                             <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{defaultDCASNames[type]}</h3>
                                             <p className="text-lg sm:text-2xl font-bold" style={{ color: dcasColors[type].primary }}>{scores[type]} / 30</p>
-                                            <p className="text-xs sm:text-sm text-slate-500">{getScoreLevel(scores[type], 30)}</p>
+                                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">{getScoreLevel(scores[type], 30)}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -229,7 +231,7 @@ export default function ReportPage() {
                                                         </td>
                                                         <td className="text-center py-2 sm:py-3 font-bold text-xs sm:text-sm" style={{ color: dcasColors[type].primary }}>{scores[type]} / 30</td>
                                                         <td className="text-center py-2 sm:py-3 hidden sm:table-cell"><Badge variant="outline" className="text-xs">{getScoreLevel(scores[type], 30)}</Badge></td>
-                                                        <td className="text-right py-2 sm:py-3 text-slate-500 text-xs sm:text-sm">#{index + 1}</td>
+                                                        <td className="text-right py-2 sm:py-3 text-slate-500 dark:text-slate-400 text-xs sm:text-sm">#{index + 1}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -334,7 +336,7 @@ export default function ReportPage() {
                                     <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm" style={{ backgroundColor: dcasColors[type].primary }}>{type}</div>
                                     <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
                                         {defaultDCASNames[type]} Careers
-                                        <span className="ml-2 text-xs sm:text-sm font-normal text-slate-500">({typeIndex === 0 ? "Primary" : typeIndex === 1 ? "Secondary" : "Tertiary"})</span>
+                                        <span className="ml-2 text-xs sm:text-sm font-normal text-slate-500 dark:text-slate-400">({typeIndex === 0 ? "Primary" : typeIndex === 1 ? "Secondary" : "Tertiary"})</span>
                                     </h3>
                                 </div>
                                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -391,10 +393,10 @@ export default function ReportPage() {
 
                     {/* Footer */}
                     <div className="text-center pt-6 sm:pt-8 border-t border-slate-200 dark:border-slate-800">
-                        <p className="text-xs sm:text-sm text-slate-500 mb-3 sm:mb-4 px-2">
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-3 sm:mb-4 px-2">
                             This report is generated based on your DCAS assessment responses. Results are for career guidance purposes and should be used alongside other career exploration tools.
                         </p>
-                        <p className="text-xs text-slate-400">© {new Date().getFullYear()} DCAS Behavioural Assessment | Generated on {currentDate}</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">© {new Date().getFullYear()} DCAS Behavioural Assessment | Generated on {currentDate}</p>
                     </div>
 
                     {/* Print CTA */}

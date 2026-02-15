@@ -28,8 +28,8 @@ export function AdminSidebar({ className, onClose }: { className?: string; onClo
     const pathname = usePathname();
 
     return (
-        <div className={cn("flex h-screen w-64 flex-col border-r border-white/10 bg-[#0a0a0a]", className)}>
-            <div className="flex h-16 items-center border-b border-white/10 px-6 font-semibold text-white">
+        <div className={cn("flex h-screen w-64 flex-col border-r border-[#1e1e1e] bg-[#0a0a0a]", className)} style={{ borderColor: "#1e1e1e" }}>
+            <div className="flex h-16 items-center border-b border-[#1e1e1e] px-6 font-semibold text-white" style={{ borderColor: "#1e1e1e" }}>
                 <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                     DCAS Admin
@@ -53,7 +53,7 @@ export function AdminSidebar({ className, onClose }: { className?: string; onClo
                     ))}
                 </nav>
             </div>
-            <div className="mt-auto border-t border-white/10 p-4">
+            <div className="mt-auto border-t border-[#1e1e1e] p-4" style={{ borderColor: "#1e1e1e" }}>
                 <Button variant="ghost" className="w-full justify-start gap-3 text-white/60 hover:text-destructive hover:bg-destructive/10" onClick={() => signOut({ callbackUrl: "/" })}>
                     <LogOut className="h-4 w-4" />
                     Sign Out

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { ModeToggle } from "@/components/theme-toggle"
 
 interface AuthGateProps {
     onAuthenticated: (userId: string, user: any) => void;
@@ -49,6 +50,10 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-linear-to-br from-indigo-500/10 to-purple-500/10 blur-3xl" />
                 <div className="absolute bottom-0 -left-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-linear-to-br from-emerald-500/10 to-teal-500/10 blur-3xl" />
+            </div>
+
+            <div className="fixed top-4 right-4 z-20">
+                <ModeToggle />
             </div>
 
             <Card className="w-full max-w-md border-0 shadow-2xl relative z-10 animate-in fade-in zoom-in duration-500">

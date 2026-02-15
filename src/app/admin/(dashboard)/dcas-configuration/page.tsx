@@ -50,10 +50,10 @@ export default function DCASConfigurationPage() {
     if (loading) return <div className="flex justify-center items-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
     const typeConfigs: { type: DCASType; label: string; colorText: string; bgClass: string; placeholder: string; description: string }[] = [
-        { type: "D", label: "D - Driver", colorText: "text-red-500", bgClass: "bg-red-50/50 dark:bg-red-950/10", placeholder: "e.g. Driver", description: "Active, forceful, and result-oriented." },
-        { type: "C", label: "C - Connector", colorText: "text-amber-500", bgClass: "bg-amber-50/50 dark:bg-amber-950/10", placeholder: "e.g. Connector", description: "Outgoing, enthusiastic, and people-oriented." },
-        { type: "A", label: "A - Anchor", colorText: "text-emerald-500", bgClass: "bg-emerald-50/50 dark:bg-emerald-950/10", placeholder: "e.g. Anchor", description: "Patient, humble, and team-oriented." },
-        { type: "S", label: "S - Strategist", colorText: "text-blue-500", bgClass: "bg-blue-50/50 dark:bg-blue-950/10", placeholder: "e.g. Strategist", description: "Analytical, precise, and detail-oriented." },
+        { type: "D", label: "D - Driver", colorText: "text-red-500", bgClass: "bg-red-50/50", placeholder: "e.g. Driver", description: "Active, forceful, and result-oriented." },
+        { type: "C", label: "C - Connector", colorText: "text-amber-500", bgClass: "bg-amber-50/50", placeholder: "e.g. Connector", description: "Outgoing, enthusiastic, and people-oriented." },
+        { type: "A", label: "A - Anchor", colorText: "text-emerald-500", bgClass: "bg-emerald-50/50", placeholder: "e.g. Anchor", description: "Patient, humble, and team-oriented." },
+        { type: "S", label: "S - Strategist", colorText: "text-blue-500", bgClass: "bg-blue-50/50", placeholder: "e.g. Strategist", description: "Analytical, precise, and detail-oriented." },
     ];
 
     return (

@@ -93,7 +93,7 @@ export default function CohortsPage() {
                                             <TableCell className="text-muted-foreground">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="sm" onClick={() => { setEditingUser(u); setIsEditOpen(true); }}><Pencil className="h-4 w-4 text-green-600 dark:text-green-400" /></Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => { setEditingUser(u); setIsEditOpen(true); }}><Pencil className="h-4 w-4 text-green-600" /></Button>
                                                     <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteUser(u)}><Trash2 className="h-4 w-4" /></Button>
                                                 </div>
                                             </TableCell>
@@ -110,7 +110,7 @@ export default function CohortsPage() {
             <EditUserDialog user={editingUser} open={isEditOpen} onOpenChange={setIsEditOpen} onSave={handleSaveUser} />
             <AlertDialog open={!!deleteUser} onOpenChange={(open) => !open && setDeleteUser(null)}>
                 <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete User</AlertDialogTitle><AlertDialogDescription>Are you sure you want to delete &quot;{deleteUser?.name}&quot;? This cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                <AlertDialogFooter><AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleConfirmDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">{isDeleting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</> : "Delete"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                    <AlertDialogFooter><AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleConfirmDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">{isDeleting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</> : "Delete"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
             </AlertDialog>
         </div>
     );

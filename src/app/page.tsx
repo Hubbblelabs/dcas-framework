@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { dcasColors } from "@/lib/dcas/scoring"
+import { ModeToggle } from "@/components/theme-toggle"
 
 const dcasTypes = {
   D: { name: "Driver", desc: "Results-oriented", detail: "individuals who are direct, decisive, and focused on achieving goals. They thrive under pressure.", tags: ["Leader", "Decisive", "Direct"], colorClass: "red" },
@@ -33,12 +34,15 @@ export default function Home() {
               DCAS Assessment
             </span>
           </div>
-          <Link href="/assessment">
-            <Button variant="outline" className="rounded-full px-4 sm:px-6 text-sm sm:text-base btn-press">
-              <span className="hidden sm:inline">Start Assessment</span>
-              <span className="sm:hidden">Start</span>
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ModeToggle />
+            <Link href="/assessment">
+              <Button variant="outline" className="rounded-full px-4 sm:px-6 text-sm sm:text-base btn-press">
+                <span className="hidden sm:inline">Start Assessment</span>
+                <span className="sm:hidden">Start</span>
+              </Button>
+            </Link>
+          </div>
         </nav>
 
         {/* Hero Content */}

@@ -356,7 +356,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                                 <span>←</span>
                                 <span className="hidden sm:inline">Previous</span>
                             </Button>
-                            <div className="sm:hidden text-xs text-slate-500">{currentQuestion + 1}/{totalQuestions}</div>
+                            <div className="sm:hidden text-xs text-slate-500 dark:text-slate-400">{currentQuestion + 1}/{totalQuestions}</div>
                             <div className="hidden sm:flex gap-1">
                                 {dcasQuestions.slice(Math.max(0, currentQuestion - 2), Math.min(totalQuestions, currentQuestion + 3)).map((_, idx) => {
                                     const actualIdx = Math.max(0, currentQuestion - 2) + idx
@@ -382,7 +382,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 </Card>
 
                 <div className="mt-4 sm:mt-6 text-center">
-                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 px-2">
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 px-2">
                         💡 Choose the option that best describes your natural tendency
                     </p>
                 </div>

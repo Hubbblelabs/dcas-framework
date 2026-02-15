@@ -75,7 +75,7 @@ export default function QuestionsPage() {
                                             <TableCell className="align-top"><Badge className={q.active ? "bg-green-500" : "bg-gray-500"}>{q.active ? "Active" : "Inactive"}</Badge></TableCell>
                                             <TableCell className="text-right align-top">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="sm" onClick={() => handleEdit(q)}><Pencil className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" /><span className="hidden sm:inline text-green-600 dark:text-green-400">Edit</span></Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => handleEdit(q)}><Pencil className="mr-2 h-4 w-4 text-green-600" /><span className="hidden sm:inline text-green-600">Edit</span></Button>
                                                     <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteQuestion(q)}><Trash2 className="h-4 w-4" /></Button>
                                                 </div>
                                             </TableCell>
@@ -92,7 +92,7 @@ export default function QuestionsPage() {
             <EditQuestionDialog question={editingQuestion} open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} onSave={handleSaveQuestion} />
             <AlertDialog open={!!deleteQuestion} onOpenChange={(open) => !open && setDeleteQuestion(null)}>
                 <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete Question</AlertDialogTitle><AlertDialogDescription>Are you sure? This cannot be undone.{deleteQuestion && <span className="block mt-2 font-medium text-foreground">&quot;{deleteQuestion.text}&quot;</span>}</AlertDialogDescription></AlertDialogHeader>
-                <AlertDialogFooter><AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleConfirmDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">{isDeleting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</> : "Delete"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                    <AlertDialogFooter><AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleConfirmDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">{isDeleting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</> : "Delete"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
             </AlertDialog>
         </div>
     );
