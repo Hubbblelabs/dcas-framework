@@ -13,24 +13,24 @@ const dcasTypes = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen min-h-dvh bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Hero Section */}
       <header className="relative overflow-hidden">
         {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-gradient-to-br from-red-500/10 to-orange-500/10 blur-3xl animate-float" />
-          <div className="absolute top-10 -left-20 sm:top-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/10 blur-3xl animate-float stagger-2" />
-          <div className="absolute bottom-0 right-1/4 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 blur-3xl animate-float stagger-3" />
-          <div className="absolute bottom-10 left-1/4 sm:bottom-20 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-gradient-to-br from-yellow-500/10 to-amber-500/10 blur-3xl animate-float stagger-4" />
+          <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-linear-to-br from-red-500/10 to-orange-500/10 blur-3xl animate-float" />
+          <div className="absolute top-10 -left-20 sm:top-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full bg-linear-to-br from-blue-500/10 to-cyan-500/10 blur-3xl animate-float stagger-2" />
+          <div className="absolute bottom-0 right-1/4 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-linear-to-br from-green-500/10 to-emerald-500/10 blur-3xl animate-float stagger-3" />
+          <div className="absolute bottom-10 left-1/4 sm:bottom-20 h-30 w-30 sm:h-60 sm:w-60 rounded-full bg-linear-to-br from-yellow-500/10 to-amber-500/10 blur-3xl animate-float stagger-4" />
         </div>
 
         {/* Navigation */}
         <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold shadow-lg text-sm sm:text-base">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-white font-bold shadow-lg text-sm sm:text-base">
               D
             </div>
-            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+            <span className="text-lg sm:text-xl font-bold bg-linear-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
               DCAS Assessment
             </span>
           </div>
@@ -60,7 +60,7 @@ export default function Home() {
             {/* Main heading */}
             <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white animate-fade-in-up leading-tight">
               Discover Your{" "}
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+              <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
                 DCAS Personality
               </span>
               <br className="hidden sm:block" />
@@ -77,11 +77,11 @@ export default function Home() {
               <Link href="/assessment" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 w-full sm:w-auto btn-press"
+                  className="group relative overflow-hidden rounded-full bg-linear-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 w-full sm:w-auto btn-press"
                 >
                   <span className="relative z-10">Start Assessment</span>
                   <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 -z-10 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity group-hover:opacity-100" />
                 </Button>
               </Link>
               <a href="#learn-more" className="w-full sm:w-auto">
@@ -135,7 +135,7 @@ export default function Home() {
               const c = colorMap[info.colorClass];
               return (
                 <Card key={type} className={`group relative overflow-hidden border-0 bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl card-hover animate-fade-in-up ${stagger}`}>
-                  <div className={`absolute inset-0 bg-gradient-to-br ${c.gradientFrom} to-transparent`} />
+                  <div className={`absolute inset-0 bg-linear-to-br ${c.gradientFrom} to-transparent`} />
                   <CardContent className="relative p-5 sm:p-6">
                     <div
                       className="mb-3 sm:mb-4 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl text-xl sm:text-2xl font-bold text-white shadow-lg"
@@ -161,7 +161,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 sm:py-20 lg:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+      <section className="py-16 sm:py-20 lg:py-32 bg-linear-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4">
@@ -173,7 +173,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-8 sm:gap-10 md:grid-cols-3 relative">
-            <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
+            <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
 
             {[
               { num: 1, title: "Take the Assessment", desc: "Answer 30 carefully crafted questions about your preferences and behaviors in various situations.", gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
@@ -182,7 +182,7 @@ export default function Home() {
             ].map((step, idx) => (
               <div key={step.num} className={`relative animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>
                 <div className="relative flex flex-col items-center text-center">
-                  <div className={`mb-4 sm:mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-2xl bg-gradient-to-br ${step.gradient} text-2xl sm:text-3xl font-bold text-white shadow-lg ${step.shadow} animate-float ${idx > 0 ? `stagger-${idx + 1}` : ""}`}>
+                  <div className={`mb-4 sm:mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-2xl bg-linear-to-br ${step.gradient} text-2xl sm:text-3xl font-bold text-white shadow-lg ${step.shadow} animate-float ${idx > 0 ? `stagger-${idx + 1}` : ""}`}>
                     {step.num}
                   </div>
                   <h3 className="mb-2 text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{step.title}</h3>
@@ -196,7 +196,7 @@ export default function Home() {
             <Link href="/assessment">
               <Button
                 size="lg"
-                className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 btn-press"
+                className="rounded-full bg-linear-to-r from-indigo-600 to-purple-600 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-semibold shadow-lg shadow-indigo-500/25 btn-press"
               >
                 Begin Your Journey
                 <span className="ml-2">→</span>
@@ -224,9 +224,9 @@ export default function Home() {
               { emoji: "📚", title: "College Students", desc: "Align your career aspirations with your natural behavioral tendencies for better job fit.", gradient: "from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50", iconGradient: "from-purple-500 to-pink-600" },
               { emoji: "🧭", title: "Career Counselors", desc: "Use data-driven insights to guide students toward fulfilling career choices.", gradient: "from-pink-50 to-rose-50 dark:from-pink-950/50 dark:to-rose-950/50", iconGradient: "from-pink-500 to-rose-600" },
             ].map((item, idx) => (
-              <Card key={item.title} className={`border-0 bg-gradient-to-br ${item.gradient} shadow-lg card-hover animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>
+              <Card key={item.title} className={`border-0 bg-linear-to-br ${item.gradient} shadow-lg card-hover animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>
                 <CardContent className="p-6 sm:p-8 text-center">
-                  <div className={`mx-auto mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.iconGradient} text-2xl sm:text-3xl shadow-lg`}>
+                  <div className={`mx-auto mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-linear-to-br ${item.iconGradient} text-2xl sm:text-3xl shadow-lg`}>
                     {item.emoji}
                   </div>
                   <h3 className="mb-2 text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{item.title}</h3>
@@ -243,7 +243,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">
                 D
               </div>
               <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">DCAS Assessment</span>

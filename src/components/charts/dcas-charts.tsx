@@ -88,7 +88,7 @@ export function DCASRadarChart({ scores }: DCASChartProps) {
     return (
         <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-48 h-48 rounded-full bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 blur-2xl" />
+                <div className="w-48 h-48 rounded-full bg-linear-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 blur-2xl" />
             </div>
             <ResponsiveContainer width="100%" height={350}>
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>

@@ -40,8 +40,8 @@ export default function AdminLoginPage() {
             {/* Left Column */}
             <div className="hidden lg:flex w-1/2 relative bg-black overflow-hidden flex-col justify-between p-12 border-r border-white/5">
                 <div className="absolute inset-0 z-0 opacity-40">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900/50 via-[#0a0a0a] to-[#0a0a0a]" />
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-900/50 via-[#0a0a0a] to-[#0a0a0a]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px]" />
                 </div>
                 <div className="relative z-10 flex flex-col h-full justify-between">
                     <div>
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
                     </div>
                     <div className="max-w-md">
                         <h2 className="text-5xl font-bold mb-6 tracking-tight">
-                            Welcome <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Back.</span>
+                            Welcome <br /> <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500">Back.</span>
                         </h2>
                         <p className="text-lg text-white/50 font-light leading-relaxed">
                             Secure access to the DCAS assessment management system. Monitor, analyze, and manage your cohorts effectively.
@@ -93,7 +93,7 @@ export default function AdminLoginPage() {
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 {error && (
                                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-start gap-3">
-                                        <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                                        <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
                                         <p className="text-sm text-red-200">{error}</p>
                                     </div>
                                 )}
@@ -109,16 +109,6 @@ export default function AdminLoginPage() {
                                     {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing in...</>) : "Sign In"}
                                 </Button>
                             </form>
-                            <div className="mt-8 pt-6 border-t border-white/5">
-                                <div className="bg-cyan-950/20 border border-cyan-500/10 rounded-lg p-4">
-                                    <p className="text-xs text-cyan-200/80 mb-2 uppercase tracking-wider font-mono">Demo Access</p>
-                                    <div className="flex items-center gap-4 text-xs text-cyan-100 font-mono">
-                                        <span>admin@dcas.com</span>
-                                        <span className="w-px h-3 bg-cyan-500/30"></span>
-                                        <span>admin123</span>
-                                    </div>
-                                </div>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>
