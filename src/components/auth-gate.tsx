@@ -67,15 +67,15 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
                     <CardContent className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+                            <Input id="name" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder="john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                            <Input id="email" type="email" placeholder="Your Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                            <Input id="phone" type="tel" placeholder="Your Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
                         </div>
                         {error && (
                             <div className="text-sm text-red-500 text-center font-medium">
