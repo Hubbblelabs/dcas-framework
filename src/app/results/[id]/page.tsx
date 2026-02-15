@@ -56,7 +56,7 @@ export default function ResultsPage() {
 
     if (!isLoaded || !scores) {
         return (
-            <div className="min-h-screen min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <div className="text-center px-4">
                     <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Loading your results...</p>
@@ -72,17 +72,17 @@ export default function ResultsPage() {
     const profileDesc = getCombinedProfileDescription(primaryType, secondaryType)
 
     return (
-        <div className="min-h-screen min-h-dvh bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full blur-3xl opacity-30" style={{ backgroundColor: dcasColors[primaryType].primary }} />
                 <div className="absolute bottom-0 -left-20 sm:-left-40 h-40 w-40 sm:h-80 sm:w-80 rounded-full blur-3xl opacity-20" style={{ backgroundColor: dcasColors[secondaryType].primary }} />
             </div>
 
-            <header className="relative z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg sticky top-0">
+            <header className="relative z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg top-0">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">D</div>
+                            <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">D</div>
                             <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base hidden sm:inline">DCAS Assessment</span>
                         </Link>
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -280,7 +280,7 @@ export default function ResultsPage() {
 
                 {/* CTA */}
                 <div className="text-center">
-                    <Card className="border-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-2xl animate-fade-in-up">
+                    <Card className="border-0 bg-linear-to-r from-indigo-500 to-purple-600 text-white shadow-2xl animate-fade-in-up">
                         <CardContent className="p-6 sm:p-8">
                             <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Want to Retake?</h3>
                             <p className="text-indigo-100 mb-4 sm:mb-6 max-w-2xl mx-auto text-sm sm:text-base px-2">

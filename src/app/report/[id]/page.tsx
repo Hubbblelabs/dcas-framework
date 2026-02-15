@@ -97,7 +97,7 @@ export default function ReportPage() {
 
     if (!isLoaded || !scores) {
         return (
-            <div className="min-h-screen min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <div className="text-center px-4">
                     <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Loading your report...</p>
@@ -130,12 +130,12 @@ export default function ReportPage() {
                 }
             `}</style>
 
-            <div className="min-h-screen min-h-dvh bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-                <header className="no-print relative z-10 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg sticky top-0">
+            <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                <header className="no-print relative z-10 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg top-0">
                     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-3 sm:py-4">
                         <div className="flex items-center justify-between">
                             <Link href="/" className="flex items-center gap-2">
-                                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">D</div>
+                                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs sm:text-sm font-bold text-white">D</div>
                                 <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base hidden sm:inline">DCAS Assessment</span>
                             </Link>
                             <div className="flex items-center gap-2 sm:gap-3">
@@ -155,7 +155,7 @@ export default function ReportPage() {
                     {/* Report Header */}
                     <div className="text-center mb-8 sm:mb-12 pb-6 sm:pb-8 border-b border-slate-200 dark:border-slate-800 animate-fade-in">
                         <div className="inline-flex items-center justify-center gap-3 mb-4 sm:mb-6">
-                            <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-xl sm:text-2xl font-bold text-white shadow-lg">D</div>
+                            <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-xl sm:text-2xl font-bold text-white shadow-lg">D</div>
                         </div>
                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">DCAS Behavioural Assessment Report</h1>
                         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Comprehensive Behavioural Analysis & Career Guidance</p>
@@ -365,7 +365,7 @@ export default function ReportPage() {
                             <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm sm:text-base">7</span>
                             Action Plan for Growth
                         </h2>
-                        <Card className="border-0 shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+                        <Card className="border-0 shadow-xl bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
                             <CardContent className="p-4 sm:p-6 lg:p-8">
                                 <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mb-4 sm:mb-6">
                                     Based on your {defaultDCASNames[primaryType]} profile, here&apos;s a personalized action plan to maximize your strengths and address development areas:
@@ -401,7 +401,7 @@ export default function ReportPage() {
 
                     {/* Print CTA */}
                     <div className="no-print mt-8 sm:mt-12 text-center safe-area-inset">
-                        <Card className="border-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-2xl">
+                        <Card className="border-0 bg-linear-to-r from-indigo-500 to-purple-600 text-white shadow-2xl">
                             <CardContent className="p-6 sm:p-8">
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Save Your Report</h3>
                                 <p className="text-indigo-100 mb-4 sm:mb-6 max-w-2xl mx-auto text-sm sm:text-base px-2">

@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 import { User } from "@/lib/models/User";
 import { interpretations, getCombinedProfileDescription } from "@/lib/dcas/interpretations";
 import { DCASType, defaultDCASNames } from "@/lib/dcas/scoring";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || "smtp.hostinger.com",
+    port: parseInt(process.env.SMTP_PORT || "465"),
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
 
 export async function POST(req: Request) {
     try {
@@ -32,14 +40,14 @@ export async function POST(req: Request) {
 
         const { subject, html } = generateEmailContent(user, session);
 
-        const data = await resend.emails.send({
-            from: 'DCAS Assessment <onboarding@resend.dev>', // Or verify domain later
-            to: [user.email],
+        const info = await transporter.sendMail({
+            from: process.env.SMTP_FROM || '"DCAS Assessment" <no-reply@dcas-assessment.com>',
+            to: user.email,
             subject: subject,
             html: html,
         });
 
-        return NextResponse.json(data);
+        return NextResponse.json({ id: info.messageId });
 
     } catch (error) {
         console.error("Email send error:", error);
