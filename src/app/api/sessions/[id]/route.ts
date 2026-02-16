@@ -24,8 +24,6 @@ export async function GET(
     const { id } = await params;
 
     // Ensure models registered
-    if (!Question) console.log("Question model loading...");
-    if (!User) console.log("User model loading...");
 
     const session = await Session.findById(id)
       .populate("template_id")
@@ -41,7 +39,6 @@ export async function GET(
 
     let questions: any[] = [];
     if (session.assigned_questions && session.assigned_questions.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       questions = session.assigned_questions.map((q: any) => {
         const questionObj = q.toObject ? q.toObject() : q;
         return { ...questionObj, options: shuffleArray(questionObj.options) };
@@ -106,7 +103,6 @@ export async function POST(
 
     if (action === "save_answer") {
       const existingIdx = session.responses.findIndex(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (r: any) => r.question_id.toString() === questionId,
       );
 
@@ -118,7 +114,6 @@ export async function POST(
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const selectedOption = question.options.find(
         (o: any) => o.label === answer,
       );
@@ -143,7 +138,6 @@ export async function POST(
       return NextResponse.json({ success: true });
     } else if (action === "complete") {
       const counts = { D: 0, C: 0, A: 0, S: 0 };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       session.responses.forEach((r: any) => {
         if (
           r.dcas_type &&

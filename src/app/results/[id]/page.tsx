@@ -45,6 +45,7 @@ export default function ResultsPage() {
       const storedScores = sessionStorage.getItem("dcasScores");
       const storedRankedTypes = sessionStorage.getItem("dcasRankedTypes");
       if (storedScores && storedRankedTypes) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setScores(JSON.parse(storedScores));
         setRankedTypes(JSON.parse(storedRankedTypes));
         setIsLoaded(true);

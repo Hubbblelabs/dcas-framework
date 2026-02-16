@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "node scripts/seed.js",
     "seed-admin": "node scripts/seed-admin.js",
-    "generate-hash": "node scripts/generate-hash.js"
+    "generate-hash": "node scripts/generate-hash.js",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -47,7 +48,7 @@
     "@types/nodemailer": "^7.0.10",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^10.0.0",
+    "eslint": "^9.39.2",
     "eslint-config-next": "16.1.6",
     "globals": "^17.3.0",
     "prettier": "^3.8.1",

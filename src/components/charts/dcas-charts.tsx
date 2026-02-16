@@ -249,7 +249,6 @@ export function DCASRadarChart({ scores }: DCASChartProps) {
             formatter={(value, _name, props) => {
               const numValue = typeof value === "number" ? value : 0;
               const percentage = Math.round((numValue / 30) * 100);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const payload = (props as any).payload;
               return [
                 `${numValue} / 30 (${percentage}%)`,

@@ -46,6 +46,7 @@ export function PreviewAssessmentDialog({
 
   useEffect(() => {
     if (open && assessment) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(true);
       fetch(`/api/assessments/${assessment._id}`)
         .then((r) => r.json())

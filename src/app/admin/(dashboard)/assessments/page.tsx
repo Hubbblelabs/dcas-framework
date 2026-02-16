@@ -29,7 +29,7 @@ interface AssessmentTemplate {
   _id: string;
   name: string;
   description: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   questions: any[];
   isLive: boolean;
   settings: {
