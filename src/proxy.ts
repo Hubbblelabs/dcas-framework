@@ -35,12 +35,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ---------------------------------------------------
-  // BLOCK /admin from non-admin subdomains
-  // ---------------------------------------------------
-  if (pathname.startsWith("/admin") && !isAdminSubdomain) {
-    return new NextResponse("Not Found", { status: 404 });
-  }
 
   // ---------------------------------------------------
   // Rewrite admin subdomain → /admin
