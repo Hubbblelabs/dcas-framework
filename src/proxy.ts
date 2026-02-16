@@ -3,30 +3,59 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host = request.headers.get("host") || "";
 
-  const isAdminSubdomain =
-    host.startsWith("admin.") ||
-    host.startsWith("admin.localhost"); // for local dev
+  /**
+   * Expected patterns:
+   * admin.tenant.site.com
+   * tenant.site.com
+   */
 
-  // -----------------------------
-  // Rewrite admin subdomain
-  // -----------------------------
+  const hostParts = host.split(".");
+
+  const isLocalhost = host.includes("localhost");
+
+  let isAdminSubdomain = false;
+  let tenant: string | null = null;
+
+  if (isLocalhost) {
+    // admin.tenant.localhost:3000
+    const localParts = host.split(".");
+    if (localParts[0] === "admin") {
+      isAdminSubdomain = true;
+      tenant = localParts[1];
+    }
+  } else {
+    // admin.tenant.site.com
+    if (hostParts.length >= 4 && hostParts[0] === "admin") {
+      isAdminSubdomain = true;
+      tenant = hostParts[1];
+    }
+  }
+
+  // ---------------------------------------------------
+  // BLOCK /admin from non-admin subdomains
+  // ---------------------------------------------------
+  if (pathname.startsWith("/admin") && !isAdminSubdomain) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
+  // ---------------------------------------------------
+  // Rewrite admin subdomain → /admin
+  // ---------------------------------------------------
   if (isAdminSubdomain && !pathname.startsWith("/admin")) {
     const url = request.nextUrl.clone();
     url.pathname = `/admin${pathname}`;
+    url.searchParams.set("tenant", tenant || "");
     return NextResponse.rewrite(url);
   }
 
-  // -----------------------------
-  //  Protect admin routes
-  // -----------------------------
-  if (
-    (isAdminSubdomain || pathname.startsWith("/admin")) &&
-    !pathname.startsWith("/admin/login")
-  ) {
+  // ---------------------------------------------------
+  // Protect admin routes
+  // ---------------------------------------------------
+  if (isAdminSubdomain && !pathname.startsWith("/admin/login")) {
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
@@ -44,13 +73,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     Match all routes except:
-     - _next (static files)
-     - api (next-auth api)
-     - favicon
-    */
-    "/((?!_next|api|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next|api|favicon.ico).*)"],
 };
