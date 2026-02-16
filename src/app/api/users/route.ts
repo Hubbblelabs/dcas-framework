@@ -7,8 +7,17 @@ import { authOptions } from "../auth/[...nextauth]/route";
 export async function GET() {
   try {
     await connectToDatabase();
-    const users = await User.find({ role: "student" }).sort({ createdAt: -1 });
-    return NextResponse.json(users);
+    const users = await User.find({ role: "student" })
+      .sort({ created_at: -1 })
+      .lean();
+    
+    const formattedUsers = users.map((u: any) => ({
+      ...u,
+      createdAt: u.created_at,
+      id: u._id,
+    }));
+    
+    return NextResponse.json(formattedUsers);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
@@ -50,8 +59,13 @@ export async function PUT(request: Request) {
       _id,
       { $set: updateData },
       { new: true },
-    );
-    return NextResponse.json(updatedUser);
+    ).lean();
+    
+    return NextResponse.json({
+      ...updatedUser,
+      createdAt: updatedUser?.created_at,
+      id: updatedUser?._id,
+    });
   } catch (error) {
     console.error("Error updating user:", error);
     return NextResponse.json(
