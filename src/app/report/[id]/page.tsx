@@ -20,6 +20,17 @@ import {
 } from "@/lib/dcas/interpretations";
 import { getCareerRecommendations, careersByType } from "@/lib/dcas/careers";
 import { ModeToggle } from "@/components/theme-toggle";
+import {
+  Loader2,
+  Download,
+  ArrowLeft,
+  Dumbbell,
+  Target,
+  MessageCircle,
+  AlertTriangle,
+  Pin,
+} from "lucide-react";
+import { CareerIcon } from "@/components/career-icon";
 
 export default function ReportPage() {
   const router = useRouter();
@@ -184,13 +195,13 @@ export default function ReportPage() {
                 >
                   {isGeneratingPdf ? (
                     <>
-                      <span className="animate-spin">⏳</span>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       <span className="hidden sm:inline">Generating...</span>
                       <span className="sm:hidden">Wait</span>
                     </>
                   ) : (
                     <>
-                      <span>📥</span>
+                      <Download className="mr-2 h-4 w-4" />
                       <span className="hidden sm:inline">Download PDF</span>
                       <span className="sm:hidden">PDF</span>
                     </>
@@ -201,7 +212,7 @@ export default function ReportPage() {
                     variant="ghost"
                     className="btn-press gap-1 rounded-full text-xs sm:text-sm"
                   >
-                    <span>←</span>
+                    <ArrowLeft className="h-4 w-4" />
                     <span className="hidden sm:inline">Results</span>
                     <span className="sm:hidden">Back</span>
                   </Button>
@@ -413,9 +424,7 @@ export default function ReportPage() {
                 <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
                   <div>
                     <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base dark:text-white">
-                      <span className="text-lg text-emerald-500 sm:text-xl">
-                        💪
-                      </span>{" "}
+                      <Dumbbell className="h-5 w-5 text-emerald-500 sm:h-6 sm:w-6" />{" "}
                       Core Strengths
                     </h4>
                     <ul className="space-y-2 sm:space-y-3">
@@ -431,9 +440,7 @@ export default function ReportPage() {
                   </div>
                   <div>
                     <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base dark:text-white">
-                      <span className="text-lg text-blue-500 sm:text-xl">
-                        🎯
-                      </span>{" "}
+                      <Target className="h-5 w-5 text-blue-500 sm:h-6 sm:w-6" />{" "}
                       Key Traits
                     </h4>
                     <ul className="space-y-2 sm:space-y-3">
@@ -464,8 +471,8 @@ export default function ReportPage() {
               <Card className="border-0 shadow-xl">
                 <CardHeader className="px-4 py-4 sm:px-6">
                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                    <span className="text-lg sm:text-xl">💬</span> Communication
-                    Style
+                    <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />{" "}
+                    Communication Style
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
@@ -477,7 +484,7 @@ export default function ReportPage() {
               <Card className="border-0 shadow-xl">
                 <CardHeader className="px-4 py-4 sm:px-6">
                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                    <span className="text-lg sm:text-xl">⚠️</span> Stress
+                    <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6" /> Stress
                     Response
                   </CardTitle>
                 </CardHeader>
@@ -511,9 +518,7 @@ export default function ReportPage() {
                       key={index}
                       className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 sm:gap-3 sm:p-4 dark:border-amber-800 dark:bg-amber-950/20"
                     >
-                      <span className="shrink-0 text-base text-amber-500 sm:text-lg">
-                        📌
-                      </span>
+                      <Pin className="h-5 w-5 shrink-0 text-amber-500 sm:h-6 sm:w-6" />
                       <span className="text-xs text-slate-700 sm:text-sm dark:text-slate-300">
                         {area}
                       </span>
@@ -565,9 +570,10 @@ export default function ReportPage() {
                       <Card key={index} className="border shadow-sm">
                         <CardContent className="p-3 sm:p-5">
                           <div className="mb-2 flex items-center gap-2 sm:mb-3 sm:gap-3">
-                            <span className="text-xl sm:text-2xl">
-                              {career.icon}
-                            </span>
+                            <CareerIcon
+                              name={career.icon}
+                              className="h-6 w-6 text-slate-700 dark:text-slate-300"
+                            />
                             <h4 className="text-sm font-semibold text-slate-900 sm:text-base dark:text-white">
                               {career.title}
                             </h4>
@@ -699,10 +705,13 @@ export default function ReportPage() {
                 >
                   {isGeneratingPdf ? (
                     <>
-                      <span className="animate-spin">⏳</span>Generating PDF...
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
+                      Generating PDF...
                     </>
                   ) : (
-                    <>📥 Download PDF</>
+                    <>
+                      <Download className="mr-2 h-5 w-5" /> Download PDF
+                    </>
                   )}
                 </Button>
               </CardContent>

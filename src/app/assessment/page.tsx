@@ -17,6 +17,15 @@ import {
 } from "@/lib/dcas/scoring";
 import { AuthGate } from "@/components/auth-gate";
 import { ModeToggle } from "@/components/theme-toggle";
+import {
+  CheckCircle,
+  AlertTriangle,
+  Lightbulb,
+  ChevronDown,
+  X,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 export default function AssessmentPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -192,8 +201,8 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       <div className="safe-area-inset flex min-h-dvh items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 px-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <Card className="animate-scale-in w-full max-w-md border-0 shadow-2xl">
           <CardContent className="p-6 text-center sm:p-8">
-            <div className="animate-float mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-emerald-600 text-3xl shadow-lg shadow-emerald-500/30 sm:mb-6 sm:h-20 sm:w-20 sm:text-4xl">
-              ✓
+            <div className="animate-float mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30 sm:mb-6 sm:h-20 sm:w-20">
+              <CheckCircle className="h-8 w-8 text-white sm:h-10 sm:w-10" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-slate-900 sm:mb-3 sm:text-2xl dark:text-white">
               Assessment Complete!
@@ -236,8 +245,8 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       <div className="safe-area-inset flex min-h-dvh items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 px-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <Card className="animate-scale-in w-full max-w-md border-0 shadow-2xl">
           <CardContent className="p-6 text-center sm:p-8">
-            <div className="animate-float mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-3xl shadow-lg shadow-amber-500/30 sm:mb-6 sm:h-20 sm:w-20 sm:text-4xl">
-              ⚠️
+            <div className="animate-float mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30 sm:mb-6 sm:h-20 sm:w-20">
+              <AlertTriangle className="h-8 w-8 text-white sm:h-10 sm:w-10" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-slate-900 sm:mb-3 sm:text-2xl dark:text-white">
               Questions Incomplete
@@ -342,7 +351,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                   size="sm"
                   className="h-8 w-8 rounded-full p-0"
                 >
-                  ✕
+                  <X className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -439,7 +448,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 disabled={currentQuestion === 0}
                 className="btn-press gap-1 px-3 text-sm sm:gap-2 sm:px-4 sm:text-base"
               >
-                <span>←</span>
+                <ArrowLeft className="h-4 w-4" />
                 <span className="hidden sm:inline">Previous</span>
               </Button>
               <div className="text-xs text-slate-500 sm:hidden dark:text-slate-400">
@@ -472,15 +481,16 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 <span className="sm:hidden">
                   {isLastQuestion ? "Done" : "Next"}
                 </span>
-                <span>→</span>
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
 
         <div className="mt-4 text-center sm:mt-6">
-          <p className="px-2 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-            💡 Choose the option that best describes your natural tendency
+          <p className="flex items-center justify-center gap-2 px-2 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
+            <Lightbulb className="h-4 w-4 text-amber-500" />
+            Choose the option that best describes your natural tendency
           </p>
         </div>
 
@@ -488,9 +498,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
           <details className="group">
             <summary className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600 sm:text-sm dark:text-slate-400">
               <span>Question Navigator</span>
-              <span className="text-xs transition-transform group-open:rotate-180">
-                ▼
-              </span>
+              <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
             </summary>
             <div className="mt-3 grid grid-cols-6 gap-1.5 sm:mt-4 sm:grid-cols-10 sm:gap-2">
               {dcasQuestions.map((q, idx) => (

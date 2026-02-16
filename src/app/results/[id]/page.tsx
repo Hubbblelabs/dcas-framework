@@ -30,6 +30,8 @@ import {
 } from "@/lib/dcas/interpretations";
 import { getCareerRecommendations } from "@/lib/dcas/careers";
 import { ModeToggle } from "@/components/theme-toggle";
+import { CareerIcon } from "@/components/career-icon";
+import { Download, ArrowRight, Sparkles } from "lucide-react";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -132,7 +134,7 @@ export default function ResultsPage() {
                   variant="outline"
                   className="btn-press gap-2 rounded-full border-indigo-200 text-sm dark:border-indigo-800"
                 >
-                  <span>📥</span>
+                  <Download className="h-4 w-4" />
                   <span className="hidden sm:inline">Detailed Report</span>
                 </Button>
               </Link>
@@ -372,7 +374,7 @@ export default function ResultsPage() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="mb-3 flex items-start justify-between sm:mb-4">
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-lg sm:h-14 sm:w-14 sm:text-2xl"
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg sm:h-14 sm:w-14"
                       style={{
                         backgroundColor:
                           dcasColors[
@@ -382,7 +384,18 @@ export default function ResultsPage() {
                           ].light,
                       }}
                     >
-                      {career.icon}
+                      <CareerIcon
+                        name={career.icon}
+                        className="h-6 w-6 sm:h-7 sm:w-7"
+                        style={{
+                          color:
+                            dcasColors[
+                              career.source === "primary"
+                                ? primaryType
+                                : secondaryType
+                            ].primary,
+                        }}
+                      />
                     </div>
                     <Badge
                       className="rounded-full text-xs"
@@ -450,7 +463,8 @@ export default function ResultsPage() {
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
                 <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900 sm:mb-3 sm:text-base dark:text-white">
-                  <span className="text-emerald-500">✦</span> Core Strengths
+                  <Sparkles className="h-4 w-4 text-emerald-500" /> Core
+                  Strengths
                 </h4>
                 <ul className="space-y-1.5 sm:space-y-2">
                   {primaryInterp.strengths.slice(0, 4).map((s, i) => (
@@ -466,7 +480,8 @@ export default function ResultsPage() {
               </div>
               <div>
                 <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900 sm:mb-3 sm:text-base dark:text-white">
-                  <span className="text-amber-500">✦</span> Development Areas
+                  <Sparkles className="h-4 w-4 text-amber-500" /> Development
+                  Areas
                 </h4>
                 <ul className="space-y-1.5 sm:space-y-2">
                   {primaryInterp.developmentAreas.slice(0, 4).map((a, i) => (
@@ -500,7 +515,7 @@ export default function ResultsPage() {
                   size="lg"
                   className="btn-press rounded-full bg-white px-6 py-5 text-base font-semibold text-indigo-600 shadow-lg hover:bg-indigo-50 sm:px-8 sm:py-6 sm:text-lg"
                 >
-                  Retake Assessment <span className="ml-2">→</span>
+                  Retake Assessment <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
             </CardContent>

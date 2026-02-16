@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { dcasColors } from "@/lib/dcas/scoring";
 import { ModeToggle } from "@/components/theme-toggle";
+import { GraduationCap, BookOpen, Compass, ArrowRight } from "lucide-react";
 
 const dcasTypes = {
   D: {
@@ -113,7 +114,7 @@ export default function Home() {
                 >
                   <span className="relative z-10">Start Assessment</span>
                   <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                    →
+                    <ArrowRight className="h-5 w-5" />
                   </span>
                   <div className="absolute inset-0 -z-10 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity group-hover:opacity-100" />
                 </Button>
@@ -333,7 +334,7 @@ export default function Home() {
                 className="btn-press rounded-full bg-linear-to-r from-indigo-600 to-purple-600 px-6 py-5 text-base font-semibold shadow-lg shadow-indigo-500/25 sm:px-8 sm:py-6 sm:text-lg"
               >
                 Begin Your Journey
-                <span className="ml-2">→</span>
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -356,7 +357,9 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:gap-8">
             {[
               {
-                emoji: "🎓",
+                icon: (
+                  <GraduationCap className="h-8 w-8 text-white sm:h-9 sm:w-9" />
+                ),
                 title: "High School Students",
                 desc: "Discover your strengths before choosing college majors and future career paths.",
                 gradient:
@@ -364,7 +367,7 @@ export default function Home() {
                 iconGradient: "from-indigo-500 to-purple-600",
               },
               {
-                emoji: "📚",
+                icon: <BookOpen className="h-8 w-8 text-white sm:h-9 sm:w-9" />,
                 title: "College Students",
                 desc: "Align your career aspirations with your natural behavioral tendencies for better job fit.",
                 gradient:
@@ -372,7 +375,7 @@ export default function Home() {
                 iconGradient: "from-purple-500 to-pink-600",
               },
               {
-                emoji: "🧭",
+                icon: <Compass className="h-8 w-8 text-white sm:h-9 sm:w-9" />,
                 title: "Career Counselors",
                 desc: "Use data-driven insights to guide students toward fulfilling career choices.",
                 gradient:
@@ -386,9 +389,9 @@ export default function Home() {
               >
                 <CardContent className="p-6 text-center sm:p-8">
                   <div
-                    className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br sm:h-16 sm:w-16 ${item.iconGradient} text-2xl shadow-lg sm:text-3xl`}
+                    className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br sm:h-16 sm:w-16 ${item.iconGradient} shadow-lg`}
                   >
-                    {item.emoji}
+                    {item.icon}
                   </div>
                   <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl dark:text-white">
                     {item.title}
