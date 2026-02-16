@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
 
         const updatedSetting = await Settings.findOneAndUpdate(
             { key: SETTINGS_KEYS.DCAS_NAMES },
-            { key: SETTINGS_KEYS.DCAS_NAMES, value: body, description: "Custom names for DCAS personality types" },
+            { key: SETTINGS_KEYS.DCAS_NAMES, value: body, description: "Custom names for DCAS behavioural types" },
             { upsert: true, new: true }
         );
 

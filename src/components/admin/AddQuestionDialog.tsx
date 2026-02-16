@@ -97,7 +97,7 @@ export function AddQuestionDialog({ open, onOpenChange, onSave }: AddQuestionDia
                                 </Select>
                             </div>
                         ))}
-                        <p className="text-xs text-muted-foreground">Each option should map to a DCAS personality type.</p>
+                        <p className="text-xs text-muted-foreground">Each option should map to a DCAS behavioural type.</p>
                     </div>
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50 mt-4">

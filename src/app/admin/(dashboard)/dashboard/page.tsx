@@ -69,7 +69,7 @@ export default function DashboardPage() {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center justify-center min-h-100">
             <div className="flex items-center gap-3 text-muted-foreground"><RefreshCw className="h-6 w-6 animate-spin" /><span>Loading dashboard...</span></div>
         </div>
     );
@@ -136,7 +136,7 @@ export default function DashboardPage() {
                 <Card className="lg:col-span-2">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" />DCAS Type Distribution</CardTitle>
-                        <CardDescription>Personality type distribution across all completed assessments</CardDescription>
+                        <CardDescription>Behavioural type distribution across all completed assessments</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">

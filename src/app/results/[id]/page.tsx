@@ -111,7 +111,7 @@ export default function ResultsPage() {
                         Assessment Complete
                     </div>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4">
-                        Your DCAS Personality Profile
+                        Your DCAS Behavioural Profile
                     </h1>
                     <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-2">
                         Based on your responses, we&apos;ve identified your behavioral tendencies and career alignment.
@@ -238,12 +238,12 @@ export default function ResultsPage() {
                     </div>
                 </div>
 
-                {/* Personality Summary */}
+                {/* Behavioural Summary */}
                 <Card className="border-0 shadow-xl mb-8 sm:mb-12 animate-fade-in-up">
                     <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
                         <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
                             <span className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-base sm:text-lg font-bold text-white" style={{ backgroundColor: dcasColors[primaryType].primary }}>{primaryType}</span>
-                            Personality Summary
+                            Behavioural Summary
                         </CardTitle>
                         <CardDescription className="text-xs sm:text-sm">Understanding your {defaultDCASNames[primaryType]} profile</CardDescription>
                     </CardHeader>

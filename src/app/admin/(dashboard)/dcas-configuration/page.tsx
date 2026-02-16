@@ -47,7 +47,7 @@ export default function DCASConfigurationPage() {
     const handleNameChange = (type: DCASType, value: string) => setNames((prev) => ({ ...prev, [type]: value }));
     const handleSymbolChange = (type: DCASType, value: string) => setSymbols((prev) => ({ ...prev, [type]: value }));
 
-    if (loading) return <div className="flex justify-center items-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
+    if (loading) return <div className="flex justify-center items-center min-h-100"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
     const typeConfigs: { type: DCASType; label: string; colorText: string; bgClass: string; placeholder: string; description: string }[] = [
         { type: "D", label: "D - Driver", colorText: "text-red-500", bgClass: "bg-red-50/50", placeholder: "e.g. Driver", description: "Active, forceful, and result-oriented." },
@@ -59,7 +59,7 @@ export default function DCASConfigurationPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div><h1 className="text-3xl font-bold tracking-tight">DCAS Configuration</h1><p className="text-muted-foreground">Customize the names and symbols of DCAS personality types</p></div>
+                <div><h1 className="text-3xl font-bold tracking-tight">DCAS Configuration</h1><p className="text-muted-foreground">Customize the names and symbols of DCAS behavioural types</p></div>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={fetchConfig} disabled={saving}><RefreshCw className="mr-2 h-4 w-4" />Refresh</Button>
                     <Button onClick={handleSave} disabled={saving}>

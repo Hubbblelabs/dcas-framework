@@ -183,7 +183,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                             Assessment Complete!
                         </h2>
                         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mb-6 sm:mb-8">
-                            You&apos;ve answered all 30 questions. Ready to discover your DCAS personality profile?
+                            You&apos;ve answered all 30 questions. Ready to discover your DCAS behavioural profile?
                         </p>
                         <div className="flex flex-col gap-3">
                             <Button
@@ -333,14 +333,14 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                                         value={option.type}
                                         className={`transition-all duration-200 p-3 sm:p-4 ${selectedOption === option.type ? "ring-2 ring-offset-2 ring-offset-background" : ""}`}
                                         style={{
-                                            borderColor: selectedOption === option.type ? dcasColors[option.type].primary : undefined,
-                                            backgroundColor: selectedOption === option.type ? `${dcasColors[option.type].light}50` : undefined,
+                                            borderColor: selectedOption === option.type ? "#6366f1" : undefined, // Indigo-500
+                                            backgroundColor: selectedOption === option.type ? "#e0e7ff50" : undefined, // Indigo-100 with opacity
                                         }}
                                     >
                                         <div className="flex items-center gap-2 sm:gap-3">
                                             <span
                                                 className="font-semibold text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 rounded shrink-0"
-                                                style={{ backgroundColor: dcasColors[option.type].light, color: dcasColors[option.type].primary }}
+                                                style={{ backgroundColor: "#f1f5f9", color: "#475569" }} // Slate-100, Slate-600
                                             >
                                                 {String.fromCharCode(65 + index)}
                                             </span>

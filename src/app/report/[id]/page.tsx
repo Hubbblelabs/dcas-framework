@@ -242,11 +242,11 @@ export default function ReportPage() {
                         </div>
                     </section>
 
-                    {/* 3. Personality Description */}
+                    {/* 3. Behaviourial Description */}
                     <section className="mb-8 sm:mb-12 print-break animate-fade-in-up stagger-2">
                         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
                             <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm sm:text-base">3</span>
-                            Personality Description
+                            Behavioural Description
                         </h2>
                         <Card className="border-0 shadow-xl">
                             <CardContent className="p-4 sm:p-6 lg:p-8">

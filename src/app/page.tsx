@@ -61,7 +61,7 @@ export default function Home() {
             <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white animate-fade-in-up leading-tight">
               Discover Your{" "}
               <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
-                DCAS Personality
+                DCAS Behavioural
               </span>
               <br className="hidden sm:block" />
               <span className="sm:hidden"> </span>& Career Direction
@@ -99,7 +99,7 @@ export default function Home() {
               </div>
               <div className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">4</p>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Personality Styles</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Behavioural Styles</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">12</p>
@@ -115,7 +115,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4 animate-fade-in">
-              The Four DCAS Personality Styles
+              The Four DCAS Behavioural Styles
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 px-2">
               Understanding these behavioral patterns helps you leverage your strengths and work effectively with others.
@@ -177,7 +177,7 @@ export default function Home() {
 
             {[
               { num: 1, title: "Take the Assessment", desc: "Answer 30 carefully crafted questions about your preferences and behaviors in various situations.", gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
-              { num: 2, title: "Get Your Profile", desc: "Receive instant results with detailed insights about your personality type and behavioral tendencies.", gradient: "from-purple-500 to-pink-600", shadow: "shadow-purple-500/30" },
+              { num: 2, title: "Get Your Profile", desc: "Receive instant results with detailed insights about your behaviour and career direction", gradient: "from-purple-500 to-pink-600", shadow: "shadow-purple-500/30" },
               { num: 3, title: "Explore Careers", desc: "Discover career paths that align with your strengths and download a comprehensive report.", gradient: "from-pink-500 to-rose-600", shadow: "shadow-pink-500/30" },
             ].map((step, idx) => (
               <div key={step.num} className={`relative animate-fade-in-up ${idx > 0 ? `stagger-${idx}` : ""}`}>

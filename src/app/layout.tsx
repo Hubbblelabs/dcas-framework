@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DCAS Behavioural Assessment",
     description:
-      "Discover your DCAS personality type and find your ideal career path",
+      "Discover your DCAS behavioural type and find your ideal career path",
     type: "website",
   },
   appleWebApp: {
