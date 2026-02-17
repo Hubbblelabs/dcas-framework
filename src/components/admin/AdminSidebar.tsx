@@ -59,7 +59,7 @@ export function AdminSidebar({
       <div
         className="flex h-16 items-center border-b border-slate-200 px-6 font-semibold text-slate-900 dark:border-[#1e1e1e] dark:text-white"
       >
-        <Logo size="sm" showText textClassName="text-slate-900 dark:text-white text-base" />
+        <Logo size="md" showText textClassName="text-slate-900 dark:text-white text-base" iconClassName="rounded-full" />
       </div>
       <div className="flex-1 overflow-auto py-6">
         <nav className="grid items-start px-4 text-sm font-medium">

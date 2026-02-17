@@ -512,10 +512,23 @@ export default function ResultsPage() {
 
       <footer className="safe-area-inset relative z-10 mt-8 border-t border-slate-200 py-6 sm:mt-12 sm:py-8 dark:border-slate-800">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6">
-          <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            © {new Date().getFullYear()} DCAS Behavioural Assessment. Results
-            are for guidance purposes only.
-          </p>
+          <div className="flex flex-col items-center justify-center gap-1">
+            <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+              © {new Date().getFullYear()} DCAS Behavioural Assessment. Results
+              are for guidance purposes only.
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-500">
+              Designed and developed by{" "}
+              <a
+                href="https://teammistake.com"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium hover:text-slate-900 dark:hover:text-slate-300"
+              >
+                TeamMistake
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

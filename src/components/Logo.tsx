@@ -22,7 +22,8 @@ export function Logo({
   size = "md",
   showText = false,
   textClassName,
-}: LogoProps) {
+  iconClassName,
+}: LogoProps & { iconClassName?: string }) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -46,6 +47,7 @@ export function Logo({
           className={cn(
             sizeClass,
             "flex items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white shadow-lg sm:text-base",
+            iconClassName
           )}
         >
           D
@@ -70,16 +72,18 @@ export function Logo({
         <Image
           src={logoUrl}
           alt="Logo"
-          width={40}
-          height={40}
-          className={cn(sizeClass, "rounded-xl object-contain")}
+          width={64}
+          height={64}
+          className={cn(sizeClass, "rounded-xl object-contain", iconClassName)}
           unoptimized
+          onError={() => setLogoUrl(null)}
         />
       ) : (
         <div
           className={cn(
             sizeClass,
             "flex items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white shadow-lg sm:text-base",
+            iconClassName
           )}
         >
           D

@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { GraduationCap, BookOpen, Compass, ArrowRight } from "lucide-react";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
+import { Logo } from "@/components/Logo";
 
 async function getDCASConfig() {
   try {
@@ -87,14 +88,12 @@ export default async function Home() {
 
         {/* Navigation */}
         <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 sm:py-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white shadow-lg sm:h-10 sm:w-10 sm:text-base">
-              D
-            </div>
-            <span className="bg-linear-to-r from-slate-800 to-slate-600 bg-clip-text text-lg font-bold text-transparent sm:text-xl dark:from-white dark:to-slate-300">
-              DCAS Assessment
-            </span>
-          </div>
+          <Logo
+            size="md"
+            showText
+            textClassName="bg-linear-to-r from-slate-800 to-slate-600 bg-clip-text text-lg font-bold text-transparent sm:text-xl dark:from-white dark:to-slate-300"
+            iconClassName="rounded-full"
+          />
           <div className="flex items-center gap-2">
             <ModeToggle />
             <Link href="/assessment">
@@ -442,18 +441,28 @@ export default async function Home() {
       <footer className="safe-area-inset border-t border-slate-200 py-8 sm:py-12 dark:border-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm">
-                D
-              </div>
-              <span className="text-sm font-semibold text-slate-900 sm:text-base dark:text-white">
-                DCAS Assessment
-              </span>
+            <Logo
+              size="sm"
+              showText
+              textClassName="text-sm font-semibold text-slate-900 sm:text-base dark:text-white"
+            />
+            <div className="flex flex-col items-center sm:items-end gap-1">
+              <p className="text-center text-xs text-slate-600 sm:text-right sm:text-sm dark:text-slate-400">
+                © {new Date().getFullYear()} DCAS Behavioural Assessment. All
+                rights reserved.
+              </p>
+              <p className="text-center text-xs text-slate-500 sm:text-right dark:text-slate-500">
+                Designed and developed by{" "}
+                <a
+                  href="https://teammistake.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium hover:text-slate-900 dark:hover:text-slate-300"
+                >
+                  TeamMistake
+                </a>
+              </p>
             </div>
-            <p className="text-center text-xs text-slate-600 sm:text-right sm:text-sm dark:text-slate-400">
-              © {new Date().getFullYear()} DCAS Behavioural Assessment. All
-              rights reserved.
-            </p>
           </div>
         </div>
       </footer>

@@ -31,6 +31,7 @@ import {
   Pin,
 } from "lucide-react";
 import { CareerIcon } from "@/components/career-icon";
+import { Logo } from "@/components/Logo";
 
 export default function ReportPage() {
   const router = useRouter();
@@ -178,12 +179,11 @@ export default function ReportPage() {
           <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm">
-                  D
-                </div>
-                <span className="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white">
-                  DCAS Assessment
-                </span>
+                <Logo
+                  size="sm"
+                  showText
+                  textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white"
+                />
               </Link>
               <div className="flex items-center gap-2 sm:gap-3">
                 <ModeToggle />
@@ -229,9 +229,10 @@ export default function ReportPage() {
           {/* Report Header */}
           <div className="animate-fade-in mb-8 border-b border-slate-200 pb-6 text-center sm:mb-12 sm:pb-8 dark:border-slate-800">
             <div className="mb-4 inline-flex items-center justify-center gap-3 sm:mb-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-xl font-bold text-white shadow-lg sm:h-16 sm:w-16 sm:text-2xl">
-                D
-              </div>
+              <Logo
+                size="lg"
+                iconClassName="h-12 w-12 rounded-2xl text-xl font-bold sm:h-16 sm:w-16 sm:text-2xl"
+              />
             </div>
             <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl dark:text-white">
               DCAS Behavioural Assessment Report
