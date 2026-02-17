@@ -12,9 +12,9 @@ import {
   DCASType,
   calculateScores,
   getRankedTypes,
-  dcasColors,
   defaultDCASNames,
 } from "@/lib/dcas/scoring";
+import { useDCASConfig } from "@/hooks/useDCASConfig";
 import { AuthGate } from "@/components/auth-gate";
 import { ModeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/Logo";
@@ -45,6 +45,7 @@ export default function AssessmentPage() {
 }
 
 function AssessmentContent({ userId }: { userId: string | null }) {
+  const { dcasColors } = useDCASConfig();
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, DCASType>>({});

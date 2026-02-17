@@ -1,6 +1,6 @@
 "use client";
 
-import { DCASScores, dcasColors, defaultDCASNames } from "@/lib/dcas/scoring";
+import { DCASScores, dcasColors as defaultDcasColors, defaultDCASNames, DCASType } from "@/lib/dcas/scoring";
 import {
   BarChart,
   Bar,
@@ -19,32 +19,34 @@ import {
 
 interface DCASChartProps {
   scores: DCASScores;
+  colors?: Record<DCASType, { primary: string; light: string; bg: string }>;
+  names?: Record<DCASType, string>;
 }
 
-export function DCASBarChart({ scores }: DCASChartProps) {
+export function DCASBarChart({ scores, colors = defaultDcasColors, names = defaultDCASNames }: DCASChartProps) {
   const data = [
     {
-      name: defaultDCASNames.D,
+      name: names.D,
       value: scores.D,
-      color: dcasColors.D.primary,
+      color: colors.D.primary,
       shortName: "D",
     },
     {
-      name: defaultDCASNames.C,
+      name: names.C,
       value: scores.C,
-      color: dcasColors.C.primary,
+      color: colors.C.primary,
       shortName: "C",
     },
     {
-      name: defaultDCASNames.A,
+      name: names.A,
       value: scores.A,
-      color: dcasColors.A.primary,
+      color: colors.A.primary,
       shortName: "A",
     },
     {
-      name: defaultDCASNames.S,
+      name: names.S,
       value: scores.S,
-      color: dcasColors.S.primary,
+      color: colors.S.primary,
       shortName: "S",
     },
   ];
@@ -89,35 +91,35 @@ export function DCASBarChart({ scores }: DCASChartProps) {
   );
 }
 
-export function DCASRadarChart({ scores }: DCASChartProps) {
+export function DCASRadarChart({ scores, colors = defaultDcasColors, names = defaultDCASNames }: DCASChartProps) {
   const data = [
     {
       subject: "D",
-      fullName: defaultDCASNames.D,
+      fullName: names.D,
       value: scores.D,
       fullMark: 30,
-      color: dcasColors.D.primary,
+      color: colors.D.primary,
     },
     {
       subject: "C",
-      fullName: defaultDCASNames.C,
+      fullName: names.C,
       value: scores.C,
       fullMark: 30,
-      color: dcasColors.C.primary,
+      color: colors.C.primary,
     },
     {
       subject: "A",
-      fullName: defaultDCASNames.A,
+      fullName: names.A,
       value: scores.A,
       fullMark: 30,
-      color: dcasColors.A.primary,
+      color: colors.A.primary,
     },
     {
       subject: "S",
-      fullName: defaultDCASNames.S,
+      fullName: names.S,
       value: scores.S,
       fullMark: 30,
-      color: dcasColors.S.primary,
+      color: colors.S.primary,
     },
   ];
 
@@ -159,44 +161,44 @@ export function DCASRadarChart({ scores }: DCASChartProps) {
             <linearGradient id="radarGradient" x1="0" y1="0" x2="1" y2="1">
               <stop
                 offset="0%"
-                stopColor={dcasColors.D.primary}
+                stopColor={colors.D.primary}
                 stopOpacity={0.8}
               />
               <stop
                 offset="33%"
-                stopColor={dcasColors.C.primary}
+                stopColor={colors.C.primary}
                 stopOpacity={0.8}
               />
               <stop
                 offset="66%"
-                stopColor={dcasColors.A.primary}
+                stopColor={colors.A.primary}
                 stopOpacity={0.8}
               />
               <stop
                 offset="100%"
-                stopColor={dcasColors.S.primary}
+                stopColor={colors.S.primary}
                 stopOpacity={0.8}
               />
             </linearGradient>
             <linearGradient id="radarFillGradient" x1="0" y1="0" x2="1" y2="1">
               <stop
                 offset="0%"
-                stopColor={dcasColors.D.primary}
+                stopColor={colors.D.primary}
                 stopOpacity={0.3}
               />
               <stop
                 offset="33%"
-                stopColor={dcasColors.C.primary}
+                stopColor={colors.C.primary}
                 stopOpacity={0.3}
               />
               <stop
                 offset="66%"
-                stopColor={dcasColors.A.primary}
+                stopColor={colors.A.primary}
                 stopOpacity={0.3}
               />
               <stop
                 offset="100%"
-                stopColor={dcasColors.S.primary}
+                stopColor={colors.S.primary}
                 stopOpacity={0.3}
               />
             </linearGradient>
@@ -279,10 +281,12 @@ interface ScoreCardProps {
   type: "D" | "C" | "A" | "S";
   score: number;
   maxScore?: number;
+  colors?: Record<DCASType, { primary: string; light: string; bg: string }>;
+  names?: Record<DCASType, string>;
 }
 
-export function ScoreCard({ type, score, maxScore = 30 }: ScoreCardProps) {
-  const config = { ...dcasColors[type], name: defaultDCASNames[type] };
+export function ScoreCard({ type, score, maxScore = 30, colors = defaultDcasColors, names = defaultDCASNames }: ScoreCardProps) {
+  const config = { ...colors[type], name: names[type] };
   const percentage = (score / maxScore) * 100;
 
   let level: string;

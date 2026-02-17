@@ -10,8 +10,6 @@ import { DCASBarChart } from "@/components/charts/dcas-charts";
 import {
   DCASScores,
   DCASType,
-  dcasColors,
-  defaultDCASNames,
   getScoreLevel,
 } from "@/lib/dcas/scoring";
 import {
@@ -32,8 +30,10 @@ import {
 } from "lucide-react";
 import { CareerIcon } from "@/components/career-icon";
 import { Logo } from "@/components/Logo";
+import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 export default function ReportPage() {
+  const { dcasColors, dcasNames } = useDCASConfig();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -284,7 +284,7 @@ export default function ReportPage() {
                         {label}
                       </Badge>
                       <h3 className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
-                        {defaultDCASNames[type]}
+                        {dcasNames[type]}
                       </h3>
                       <p
                         className="text-lg font-bold sm:text-2xl"
@@ -319,7 +319,7 @@ export default function ReportPage() {
                 </CardHeader>
                 <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
                   <div className="w-full overflow-x-auto">
-                    <DCASBarChart scores={scores} />
+                    <DCASBarChart scores={scores} colors={dcasColors} names={dcasNames} />
                   </div>
                 </CardContent>
               </Card>
@@ -365,7 +365,7 @@ export default function ReportPage() {
                                   {type}
                                 </div>
                                 <span className="text-xs text-slate-700 sm:text-sm dark:text-slate-300">
-                                  {defaultDCASNames[type]}
+                                  {dcasNames[type]}
                                 </span>
                               </div>
                             </td>
@@ -412,7 +412,7 @@ export default function ReportPage() {
                   </div>
                   <div className="text-center sm:text-left">
                     <h3 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
-                      {defaultDCASNames[primaryType]}
+                      {dcasNames[primaryType]}
                     </h3>
                     <p className="text-sm text-slate-600 sm:text-base dark:text-slate-400">
                       {primaryInterp.traits.join(" · ")}
@@ -552,7 +552,7 @@ export default function ReportPage() {
                     {type}
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
-                    {defaultDCASNames[type]} Careers
+                    {dcasNames[type]} Careers
                     <span className="ml-2 text-xs font-normal text-slate-500 sm:text-sm dark:text-slate-400">
                       (
                       {typeIndex === 0
@@ -612,7 +612,7 @@ export default function ReportPage() {
             <Card className="border-0 bg-linear-to-br from-indigo-50 to-purple-50 shadow-xl dark:from-indigo-950/30 dark:to-purple-950/30">
               <CardContent className="p-4 sm:p-6 lg:p-8">
                 <p className="mb-4 text-xs text-slate-700 sm:mb-6 sm:text-sm dark:text-slate-300">
-                  Based on your {defaultDCASNames[primaryType]} profile,
+                  Based on your {dcasNames[primaryType]} profile,
                   here&apos;s a personalized action plan to maximize your
                   strengths and address development areas:
                 </p>
@@ -622,13 +622,13 @@ export default function ReportPage() {
                       num: 1,
                       color: "bg-emerald-500",
                       title: "Leverage Your Strengths",
-                      desc: `Your ${defaultDCASNames[primaryType].toLowerCase()} trait is your superpower. Seek opportunities where ${primaryInterp.strengths[0]?.toLowerCase()} is valued.`,
+                      desc: `Your ${dcasNames[primaryType].toLowerCase()} trait is your superpower. Seek opportunities where ${primaryInterp.strengths[0]?.toLowerCase()} is valued.`,
                     },
                     {
                       num: 2,
                       color: "bg-blue-500",
                       title: "Build Complementary Skills",
-                      desc: `Focus on developing skills from your secondary type (${defaultDCASNames[secondaryType]}). This will make you more versatile in team settings and leadership roles.`,
+                      desc: `Focus on developing skills from your secondary type (${dcasNames[secondaryType]}). This will make you more versatile in team settings and leadership roles.`,
                     },
                     {
                       num: 3,
