@@ -11,6 +11,7 @@ export async function GET() {
     }
     return NextResponse.json({
       shuffle_options: liveTemplate.settings?.shuffle_options || false,
+      shuffle_questions: liveTemplate.settings?.shuffle_questions || false,
     });
   } catch {
     return NextResponse.json({ shuffle_options: false });

@@ -34,6 +34,7 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    console.log("Submitting assessment user:", { name, email, phone, batch, institution });
 
     try {
       const res = await fetch("/api/assessment/user", {

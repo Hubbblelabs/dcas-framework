@@ -55,20 +55,28 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [shuffledQuestions, setShuffledQuestions] = useState(dcasQuestions);
 
-  const question = dcasQuestions[currentQuestion];
-  const totalQuestions = dcasQuestions.length;
+  const question = shuffledQuestions[currentQuestion];
+  const totalQuestions = shuffledQuestions.length;
   const answeredCount = Object.keys(answers).length;
   const progress = (answeredCount / totalQuestions) * 100;
   const displayAnsweredCount =
     answeredCount + (selectedOption && !answers[question.id] ? 1 : 0);
 
-  // Fetch shuffle_options setting from live template
+  // Fetch settings from live template
   useEffect(() => {
     fetch("/api/assessment/settings")
       .then((r) => r.json())
       .then((data) => {
         if (data?.shuffle_options) setShuffleOptions(true);
+        if (data?.shuffle_questions) {
+            setShuffleQuestions(true);
+            // Simple random shuffle for questions
+            const shuffled = [...dcasQuestions].sort(() => Math.random() - 0.5);
+            setShuffledQuestions(shuffled);
+        }
       })
       .catch(() => {});
   }, []);
@@ -297,7 +305,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 Unanswered questions:
               </p>
               <div className="flex flex-wrap justify-center gap-2">
-                {dcasQuestions.map((q, idx) => {
+                {shuffledQuestions.map((q, idx) => {
                   const isAnswered =
                     answers[q.id] || (q.id === question.id && selectedOption);
                   if (isAnswered) return null;
@@ -319,7 +327,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={() => {
-                  const firstUnanswered = dcasQuestions.findIndex(
+                  const firstUnanswered = shuffledQuestions.findIndex(
                     (q) =>
                       !answers[q.id] &&
                       (q.id !== question.id || !selectedOption),
@@ -454,12 +462,6 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                     }}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <span
-                        className="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold sm:px-2 sm:text-sm"
-                        style={{ backgroundColor: "#f1f5f9", color: "#475569" }} // Slate-100, Slate-600
-                      >
-                        {String.fromCharCode(65 + index)}
-                      </span>
                       <span className="text-sm text-slate-700 sm:text-base dark:text-slate-300">
                         {option.text}
                       </span>
@@ -483,7 +485,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 {currentQuestion + 1}/{totalQuestions}
               </div>
               <div className="hidden gap-1 sm:flex">
-                {dcasQuestions
+                {shuffledQuestions
                   .slice(
                     Math.max(0, currentQuestion - 2),
                     Math.min(totalQuestions, currentQuestion + 3),
@@ -529,7 +531,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
             </summary>
             <div className="mt-3 grid grid-cols-6 gap-1.5 sm:mt-4 sm:grid-cols-10 sm:gap-2">
-              {dcasQuestions.map((q, idx) => (
+              {shuffledQuestions.map((q, idx) => (
                 <button
                   key={q.id}
                   onClick={() => setCurrentQuestion(idx)}

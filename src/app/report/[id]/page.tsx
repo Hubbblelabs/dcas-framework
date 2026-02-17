@@ -88,42 +88,48 @@ export default function ReportPage() {
     if (!reportRef.current) return;
     setIsGeneratingPdf(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
+      // Dynamic imports to avoid SSR issues
+      const { toPng } = await import("html-to-image");
       const { jsPDF } = await import("jspdf");
+
       const noPrintElements = document.querySelectorAll(".no-print");
       noPrintElements.forEach(
         (el) => ((el as HTMLElement).style.display = "none"),
       );
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
+
+      const dataUrl = await toPng(reportRef.current, {
+        quality: 0.95,
         backgroundColor: "#ffffff",
       });
+
       noPrintElements.forEach((el) => ((el as HTMLElement).style.display = ""));
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgProps = pdf.getImageProperties(dataUrl);
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const scaledImgHeight = (canvas.height * pdfWidth) / canvas.width;
-      let heightLeft = scaledImgHeight;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      let heightLeft = pdfHeight;
       let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, scaledImgHeight);
-      heightLeft -= pdfHeight;
+
+      // First page
+      pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      // Subsequent pages
       while (heightLeft > 0) {
-        position = heightLeft - scaledImgHeight;
+        position -= pageHeight; // Move image up by one page height
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, scaledImgHeight);
-        heightLeft -= pdfHeight;
+        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
       }
+
       const date = new Date().toISOString().split("T")[0];
       pdf.save(`DCAS-Behavioural-Report-${date}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
+      // Fallback to browser print if image generation fails
       window.print();
     } finally {
       setIsGeneratingPdf(false);

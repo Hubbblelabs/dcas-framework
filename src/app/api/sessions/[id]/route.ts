@@ -169,6 +169,19 @@ export async function POST(
       session.completed_at = new Date();
       await session.save();
 
+      // Embed result into user document for fast reads
+      if (session.user_id) {
+        await User.findByIdAndUpdate(session.user_id, {
+          $set: {
+            result: {
+              session_id: session._id,
+              score: session.score,
+              completed_at: session.completed_at,
+            },
+          },
+        });
+      }
+
       return NextResponse.json({ success: true, result: session.score });
     }
 

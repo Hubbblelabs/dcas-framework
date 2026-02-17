@@ -79,6 +79,7 @@ export function EditAssessmentDialog({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
 
   useEffect(() => {
     if (open && assessment) {
@@ -101,6 +102,7 @@ export function EditAssessmentDialog({
       );
       setSelectedQuestions(qIds);
       setShuffleOptions(assessment.settings?.shuffle_options || false);
+      setShuffleQuestions(assessment.settings?.shuffle_questions || false);
     }
   }, [open, assessment]);
 
@@ -128,7 +130,7 @@ export function EditAssessmentDialog({
           questions: selectionMethod === "manual" ? selectedQuestions : [],
           selection_method: selectionMethod,
           question_count: questionCount,
-          settings: { ...assessment.settings, language, time_limit: timeLimit, shuffle_options: shuffleOptions },
+          settings: { ...assessment.settings, language, time_limit: timeLimit, shuffle_options: shuffleOptions, shuffle_questions: shuffleQuestions },
           isLive,
         }),
       });
@@ -256,6 +258,22 @@ export function EditAssessmentDialog({
               id="edit-shuffleOptions"
               checked={shuffleOptions}
               onCheckedChange={setShuffleOptions}
+            />
+          </div>
+
+          <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <Label htmlFor="edit-shuffleQuestions" className="text-sm font-medium">
+                Shuffle Questions
+              </Label>
+              <p className="text-muted-foreground text-xs">
+                Randomize the order of questions for each assessment
+              </p>
+            </div>
+            <Switch
+              id="edit-shuffleQuestions"
+              checked={shuffleQuestions}
+              onCheckedChange={setShuffleQuestions}
             />
           </div>
 

@@ -88,19 +88,18 @@ export function PreviewAssessmentDialog({
               <h3 className="text-lg font-semibold">{current.text}</h3>
               <RadioGroup className="space-y-3">
                 {current.options?.map((opt) => (
-                  <div
-                    key={opt.label}
-                    className="flex items-start space-x-3 rounded-lg border p-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900"
-                  >
-                    <RadioGroupItem
-                      value={opt.label}
-                      id={`preview-${opt.label}`}
-                      disabled
-                    />
-                    <Label
-                      htmlFor={`preview-${opt.label}`}
-                      className="flex-1 cursor-pointer font-normal"
+                    <div
+                      key={opt.label}
+                      className="flex items-start space-x-3 rounded-lg border p-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900 pointer-events-none"
                     >
+                      <RadioGroupItem
+                        value={opt.label}
+                        id={`preview-${opt.label}`}
+                      />
+                      <Label
+                        htmlFor={`preview-${opt.label}`}
+                        className="flex-1 cursor-pointer font-normal"
+                      >
                       <span className="mr-2 font-bold">{opt.label}.</span>
                       {opt.text}
                     </Label>

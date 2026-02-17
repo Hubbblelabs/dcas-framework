@@ -18,11 +18,11 @@ export default function AdminLayout({
   return (
     <SessionProvider>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-        <div className="flex min-h-screen w-full bg-white dark:bg-[#0a0a0a]">
+        <div className="flex min-h-screen w-full bg-white dark:bg-background">
           <AdminSidebar className="hidden md:flex" />
           <div className="flex h-screen flex-1 flex-col overflow-hidden">
             <header
-              className="flex items-center justify-between border-b border-slate-200 bg-white p-4 text-slate-900 dark:border-[#1e1e1e] dark:bg-[#0a0a0a] dark:text-white md:hidden"
+              className="flex items-center justify-between border-b border-slate-200 bg-white p-4 text-slate-900 dark:border-slate-800 dark:bg-background/95 backdrop-blur-sm dark:text-white md:hidden"
             >
               <Logo size="sm" showText textClassName="text-slate-900 dark:text-white text-base" />
               <Button

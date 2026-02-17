@@ -73,16 +73,31 @@ export async function POST(req: Request) {
         templateId = template?._id;
       }
 
+      const completedAt = new Date();
+
       // Create session
       const session = await Session.create({
         user_id: user?._id,
         template_id: templateId,
         status: "completed",
         started_at: new Date(),
-        completed_at: new Date(),
+        completed_at: completedAt,
         responses: body.responses,
         score: body.score,
       });
+
+      // Embed result into user document for fast reads
+      if (user) {
+        await User.findByIdAndUpdate(user._id, {
+          $set: {
+            result: {
+              session_id: session._id,
+              score: body.score,
+              completed_at: completedAt,
+            },
+          },
+        });
+      }
 
       return NextResponse.json({
         sessionId: session._id,
@@ -102,7 +117,8 @@ export async function POST(req: Request) {
         name: studentName,
         email: email || `guest_${Date.now()}@example.com`,
         role: "student",
-        meta: { extra: { institution } },
+        institution: institution || undefined,
+        meta: { institution: institution || undefined },
       });
     }
 

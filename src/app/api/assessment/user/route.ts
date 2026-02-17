@@ -18,6 +18,7 @@ export async function POST(req: Request) {
       // Update user details if provided
       if (name) user.name = name;
       if (phone) user.phone = phone;
+      if (institution) user.institution = institution;
       if (batch) user.meta = { ...user.meta, batch };
       if (institution) user.meta = { ...user.meta, institution };
       await user.save();
@@ -33,6 +34,7 @@ export async function POST(req: Request) {
         name,
         email,
         phone,
+        institution: institution || undefined,
         role: "student",
         meta: {
           batch: batch || undefined,
@@ -46,6 +48,7 @@ export async function POST(req: Request) {
       name: user.name,
       email: user.email,
       phone: user.phone,
+      institution: user.institution,
     });
   } catch (error) {
     console.error("User auth error:", error);

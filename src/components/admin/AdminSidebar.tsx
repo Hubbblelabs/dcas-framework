@@ -8,7 +8,6 @@ import {
   Users,
   FileQuestion,
   ClipboardList,
-  BarChart,
   Settings,
   LogOut,
   Moon,
@@ -22,10 +21,9 @@ import { useEffect, useState } from "react";
 
 const sidebarItems = [
   { title: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Cohorts & Users", href: "/admin/cohorts", icon: Users },
+  { title: "Users & Assessments", href: "/admin/cohorts", icon: Users },
   { title: "Question Bank", href: "/admin/questions", icon: FileQuestion },
   { title: "Assessments", href: "/admin/assessments", icon: ClipboardList },
-  { title: "Reports", href: "/admin/reports", icon: BarChart },
   {
     title: "DCAS Configuration",
     href: "/admin/dcas-configuration",
@@ -90,7 +88,7 @@ export function AdminSidebar({
         >
           <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute ml-0 h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="ml-4">{mounted ? (theme === "dark" ? "Light Mode" : "Dark Mode") : "Toggle Theme"}</span>
+          <span>{mounted ? (theme === "dark" ? "Light Mode" : "Dark Mode") : "Toggle Theme"}</span>
         </Button>
         <Button
           variant="ghost"
