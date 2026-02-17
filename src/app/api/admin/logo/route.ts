@@ -3,30 +3,23 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { writeFile, unlink, mkdir, readdir, access } from "fs/promises";
-import path from "path";
 
 export async function GET() {
   try {
     await connectToDatabase();
     const setting = await Settings.findOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
     
-    let logoUrl = setting?.value || null;
+    const logoUrl = setting?.value || null;
 
-    if (logoUrl) {
-      try {
-        // Remove leading slash for path joining
-        const relativePath = logoUrl.startsWith('/') ? logoUrl.slice(1) : logoUrl;
-        const filePath = path.join(process.cwd(), "public", relativePath);
-        await access(filePath);
-      } catch {
-        // File doesn't exist, treat as null to avoid 404s
-        console.warn(`Logo file missing at ${logoUrl}, returning null`);
-        logoUrl = null;
+    return NextResponse.json(
+      { logoUrl },
+      {
+        headers: {
+          "Cache-Control":
+            "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+        },
       }
-    }
-
-    return NextResponse.json({ logoUrl });
+    );
   } catch (error) {
     console.error("Error fetching logo:", error);
     return NextResponse.json(
@@ -72,37 +65,15 @@ export async function POST(request: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const ext = file.name.split(".").pop() || "png";
-    const timestamp = Date.now();
-    const filename = `logo-${timestamp}.${ext}`;
-
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    // Clean up old logos
-    try {
-      const files = await readdir(uploadDir);
-      for (const f of files) {
-        if (f.startsWith("logo-")) {
-          await unlink(path.join(uploadDir, f));
-        }
-      }
-    } catch (e) {
-      // Ignore error if directory doesn't exist or other issues
-      console.warn("Error cleaning up old logos:", e);
-    }
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    const logoUrl = `/uploads/${filename}`;
+    const base64String = buffer.toString('base64');
+    const logoUrl = `data:${file.type};base64,${base64String}`;
 
     await Settings.findOneAndUpdate(
       { key: SETTINGS_KEYS.CUSTOM_LOGO },
       {
         key: SETTINGS_KEYS.CUSTOM_LOGO,
         value: logoUrl,
-        description: "Custom logo URL",
+        description: "Custom logo base64 data",
       },
       { upsert: true, new: true },
     );
@@ -124,18 +95,7 @@ export async function DELETE() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await connectToDatabase();
-    const setting = await Settings.findOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
-
-    if (setting?.value) {
-      // Try to delete the file
-      try {
-        const filePath = path.join(process.cwd(), "public", setting.value);
-        await unlink(filePath);
-      } catch {
-        // File may not exist, that's OK
-      }
-    }
-
+    
     await Settings.deleteOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
     return NextResponse.json({ logoUrl: null });
   } catch (error) {

@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = {
 export async function GET() {
   try {
     await connectToDatabase();
-    const settings = await Settings.find({});
+    const settings = await Settings.find({ key: { $ne: SETTINGS_KEYS.CUSTOM_LOGO } });
     const settingsObj: Record<string, any> = { ...DEFAULT_SETTINGS };
     settings.forEach((s) => {
       settingsObj[s.key] = s.value;
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
     }
     await Promise.all(updates);
 
-    const settings = await Settings.find({});
+    const settings = await Settings.find({ key: { $ne: SETTINGS_KEYS.CUSTOM_LOGO } });
     const settingsObj: Record<string, any> = { ...DEFAULT_SETTINGS };
     settings.forEach((s) => {
       settingsObj[s.key] = s.value;
