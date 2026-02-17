@@ -20,8 +20,6 @@ import {
 import {
   DCASScores,
   DCASType,
-  dcasColors,
-  defaultDCASNames,
   getScoreLevel,
 } from "@/lib/dcas/scoring";
 import {
@@ -33,8 +31,10 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/Logo";
 import { CareerIcon } from "@/components/career-icon";
 import { Download, ArrowRight, Sparkles } from "lucide-react";
+import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 export default function ResultsPage() {
+  const { dcasColors, dcasNames } = useDCASConfig();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -178,7 +178,7 @@ export default function ResultsPage() {
               <div className="flex-1 text-center sm:text-left">
                 <div className="mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-3">
                   <h2 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
-                    The {defaultDCASNames[primaryType]}
+                    The {dcasNames[primaryType]}
                   </h2>
                   <Badge
                     className="px-2 py-0.5 text-xs sm:px-3 sm:py-1"
@@ -198,7 +198,7 @@ export default function ResultsPage() {
                     variant="outline"
                     className="rounded-full text-xs sm:text-sm"
                   >
-                    {defaultDCASNames[primaryType]}
+                    {dcasNames[primaryType]}
                   </Badge>
                   <Badge
                     variant="outline"
@@ -220,7 +220,7 @@ export default function ResultsPage() {
               key={type}
               className={`animate-fade-in-up stagger-${index + 1}`}
             >
-              <ScoreCard type={type} score={scores[type]} />
+              <ScoreCard type={type} score={scores[type]} colors={dcasColors} names={dcasNames} />
             </div>
           ))}
         </div>
@@ -256,9 +256,9 @@ export default function ResultsPage() {
             <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
               <div className="w-full overflow-x-auto">
                 {chartType === "bar" ? (
-                  <DCASBarChart scores={scores} />
+                  <DCASBarChart scores={scores} colors={dcasColors} names={dcasNames} />
                 ) : (
-                  <DCASRadarChart scores={scores} />
+                  <DCASRadarChart scores={scores} colors={dcasColors} names={dcasNames} />
                 )}
               </div>
             </CardContent>
@@ -292,7 +292,7 @@ export default function ResultsPage() {
                           </div>
                           <div>
                             <span className="text-sm font-medium text-slate-900 sm:text-base dark:text-white">
-                              {defaultDCASNames[type]}
+                              {dcasNames[type]}
                             </span>
                             {index === 0 && (
                               <Badge
@@ -441,7 +441,7 @@ export default function ResultsPage() {
               Behavioural Summary
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm">
-              Understanding your {defaultDCASNames[primaryType]} profile
+              Understanding your {dcasNames[primaryType]} profile
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 px-4 pb-4 sm:space-y-6 sm:px-6 sm:pb-6">
