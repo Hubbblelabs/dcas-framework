@@ -15,6 +15,9 @@ export async function GET() {
       ...u,
       createdAt: u.created_at,
       id: u._id,
+      phone: u.phone || "",
+      batch: u.meta?.batch || u.batch || "",
+      institution: u.meta?.institution || u.institution || "",
     }));
     
     return NextResponse.json(formattedUsers);

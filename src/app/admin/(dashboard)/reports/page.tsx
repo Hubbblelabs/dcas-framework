@@ -48,7 +48,7 @@ interface ReportSession {
   completedAt: string;
 }
 
-const dcasColors: Record<string, string> = {
+const dcasBadgeColors: Record<string, string> = {
   D: "bg-red-500",
   C: "bg-amber-500",
   A: "bg-emerald-500",
@@ -61,7 +61,7 @@ export default function ReportsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { getDCASTypeName } = useDCASConfig();
+  const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
 
   useEffect(() => {
     fetch("/api/reports")
@@ -107,7 +107,8 @@ export default function ReportsPage() {
   const exportCSV = () => {
     const header =
       "Name,Email,Driver,Connector,Anchor,Strategist,Primary,Secondary,Completed\n";
-    const rows = reports
+    const dataToExport = selected.size > 0 ? reports.filter((r) => selected.has(r._id)) : reports;
+    const rows = dataToExport
       .map((r) => {
         const name = r.user?.name || r.guestName || "Guest";
         const email = r.user?.email || "";
@@ -143,7 +144,8 @@ export default function ReportsPage() {
             onClick={exportCSV}
             disabled={reports.length === 0}
           >
-            <Download className="mr-2 h-4 w-4" /> Export CSV
+            <Download className="mr-2 h-4 w-4" />
+            {selected.size > 0 ? `Export Selected (${selected.size})` : "Export CSV"}
           </Button>
         </div>
       </div>
@@ -199,7 +201,8 @@ export default function ReportsPage() {
                           <div className="flex gap-1">
                             {r.score?.primary && (
                               <Badge
-                                className={`${dcasColors[r.score.primary]} text-white`}
+                                className="text-white"
+                                style={{ backgroundColor: configColors[r.score.primary as keyof typeof configColors]?.primary || undefined }}
                               >
                                 {getDCASTypeName(r.score.primary as any)}
                               </Badge>

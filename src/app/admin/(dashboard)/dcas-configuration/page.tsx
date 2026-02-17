@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, RefreshCw } from "lucide-react";
-import { DCASType, defaultDCASNames } from "@/lib/dcas/scoring";
+import { Loader2, Save, RefreshCw, Upload, Trash2, ImageIcon } from "lucide-react";
+import { DCASType, defaultDCASNames, dcasColors as defaultDcasColorMap } from "@/lib/dcas/scoring";
+import Image from "next/image";
 
 export default function DCASConfigurationPage() {
   const [names, setNames] =
@@ -26,6 +27,14 @@ export default function DCASConfigurationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [colors, setColors] = useState<Record<DCASType, string>>({
+    D: defaultDcasColorMap.D.primary,
+    C: defaultDcasColorMap.C.primary,
+    A: defaultDcasColorMap.A.primary,
+    S: defaultDcasColorMap.S.primary,
+  });
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     fetchConfig();
@@ -34,9 +43,10 @@ export default function DCASConfigurationPage() {
   const fetchConfig = async () => {
     setLoading(true);
     try {
-      const [namesRes, symbolsRes] = await Promise.all([
+      const [namesRes, symbolsRes, colorsRes] = await Promise.all([
         fetch("/api/admin/dcas-config"),
         fetch("/api/admin/settings?key=dcas_symbols"),
+        fetch("/api/admin/settings?key=dcas_colors"),
       ]);
       if (namesRes.ok) {
         const data = await namesRes.json();
@@ -45,6 +55,16 @@ export default function DCASConfigurationPage() {
       if (symbolsRes.ok) {
         const data = await symbolsRes.json();
         if (data?.dcas_symbols) setSymbols(data.dcas_symbols);
+      }
+      if (colorsRes.ok) {
+        const data = await colorsRes.json();
+        if (data?.dcas_colors) setColors(data.dcas_colors);
+      }
+      // Fetch logo
+      const logoRes = await fetch("/api/admin/logo");
+      if (logoRes.ok) {
+        const data = await logoRes.json();
+        if (data?.logoUrl) setLogoUrl(data.logoUrl);
       }
     } catch (e) {
       console.error("Failed to fetch DCAS config", e);
@@ -66,7 +86,7 @@ export default function DCASConfigurationPage() {
         fetch("/api/admin/settings", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ dcas_symbols: symbols }),
+          body: JSON.stringify({ dcas_symbols: symbols, dcas_colors: colors }),
         }),
       ]);
       setSaved(true);
@@ -82,6 +102,8 @@ export default function DCASConfigurationPage() {
     setNames((prev) => ({ ...prev, [type]: value }));
   const handleSymbolChange = (type: DCASType, value: string) =>
     setSymbols((prev) => ({ ...prev, [type]: value }));
+  const handleColorChange = (type: DCASType, value: string) =>
+    setColors((prev) => ({ ...prev, [type]: value }));
 
   if (loading)
     return (
@@ -227,6 +249,144 @@ export default function DCASConfigurationPage() {
                 </div>
               ),
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Color Configuration</CardTitle>
+          <CardDescription>
+            Customize the color associated with each DCAS type across the platform.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {typeConfigs.map(({ type, label, colorText }) => (
+              <div key={`color-${type}`} className="flex items-center gap-4 rounded-lg border p-4">
+                <div
+                  className="h-10 w-10 shrink-0 rounded-lg border"
+                  style={{ backgroundColor: colors[type] }}
+                />
+                <div className="flex-1">
+                  <Label className={`${colorText} block font-bold text-sm mb-1`}>{label}</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={colors[type]}
+                      onChange={(e) => handleColorChange(type, e.target.value)}
+                      className="h-8 w-12 cursor-pointer rounded border-0 p-0"
+                    />
+                    <Input
+                      value={colors[type]}
+                      onChange={(e) => handleColorChange(type, e.target.value)}
+                      placeholder="#000000"
+                      className="w-28 font-mono text-sm"
+                      maxLength={7}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Logo Customization</CardTitle>
+          <CardDescription>
+            Upload a custom logo to replace the default logo across the entire platform.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
+              {logoUrl ? (
+                <Image
+                  src={logoUrl}
+                  alt="Custom Logo"
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 rounded-lg object-contain"
+                  unoptimized
+                />
+              ) : (
+                <ImageIcon className="h-8 w-8 text-slate-400" />
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {logoUrl ? "Current custom logo" : "No custom logo set (using default)"}
+              </Label>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={uploadingLogo}
+                  onClick={() => document.getElementById("logo-upload")?.click()}
+                >
+                  {uploadingLogo ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="mr-2 h-4 w-4" />
+                  )}
+                  Upload Logo
+                </Button>
+                {logoUrl && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={uploadingLogo}
+                    onClick={async () => {
+                      setUploadingLogo(true);
+                      try {
+                        await fetch("/api/admin/logo", { method: "DELETE" });
+                        setLogoUrl(null);
+                      } catch (e) {
+                        console.error("Failed to delete logo", e);
+                      } finally {
+                        setUploadingLogo(false);
+                      }
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Remove
+                  </Button>
+                )}
+              </div>
+              <input
+                id="logo-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadingLogo(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append("logo", file);
+                    const res = await fetch("/api/admin/logo", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    if (res.ok) {
+                      const data = await res.json();
+                      setLogoUrl(data.logoUrl);
+                    }
+                  } catch (err) {
+                    console.error("Failed to upload logo", err);
+                  } finally {
+                    setUploadingLogo(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Accepted: PNG, JPEG, SVG, WebP. Max 2MB.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

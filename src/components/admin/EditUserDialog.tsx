@@ -15,6 +15,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
   batch?: string;
   institution?: string;
   createdAt?: string;
@@ -74,6 +75,17 @@ export function EditUserDialog({
               value={editedUser.email}
               onChange={(e) =>
                 setEditedUser({ ...editedUser, email: e.target.value })
+              }
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={editedUser.phone || ""}
+              onChange={(e) =>
+                setEditedUser({ ...editedUser, phone: e.target.value })
               }
             />
           </div>

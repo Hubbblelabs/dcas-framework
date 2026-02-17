@@ -29,4 +29,6 @@ export const SETTINGS_KEYS = {
   REQUIRE_EMAIL: "require_email",
   SITE_NAME: "site_name",
   DCAS_NAMES: "dcas_names",
+  DCAS_COLORS: "dcas_colors",
+  CUSTOM_LOGO: "custom_logo",
 };

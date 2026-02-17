@@ -59,6 +59,7 @@ export function CreateAssessmentDialog({
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [shuffleOptions, setShuffleOptions] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -77,6 +78,7 @@ export function CreateAssessmentDialog({
       setTimeLimit(0);
       setQuestionCount(30);
       setSelectedQuestions([]);
+      setShuffleOptions(false);
     }
   }, [open]);
 
@@ -109,6 +111,7 @@ export function CreateAssessmentDialog({
             language,
             time_limit: timeLimit,
             randomized: true,
+            shuffle_options: shuffleOptions,
             forced_response: true,
           },
           isLive,
@@ -226,6 +229,22 @@ export function CreateAssessmentDialog({
               </p>
             </div>
           )}
+
+          <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <Label htmlFor="shuffleOptions" className="text-sm font-medium">
+                Shuffle Answer Options
+              </Label>
+              <p className="text-muted-foreground text-xs">
+                Randomize the order of answer options for each question
+              </p>
+            </div>
+            <Switch
+              id="shuffleOptions"
+              checked={shuffleOptions}
+              onCheckedChange={setShuffleOptions}
+            />
+          </div>
 
           <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
             <div>

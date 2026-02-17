@@ -1,13 +1,31 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { dcasColors } from "@/lib/dcas/scoring";
+import { dcasColors as defaultDcasColors, defaultDCASNames, DCASType } from "@/lib/dcas/scoring";
 import { ModeToggle } from "@/components/theme-toggle";
 import { GraduationCap, BookOpen, Compass, ArrowRight } from "lucide-react";
+import { connectToDatabase } from "@/lib/mongodb";
+import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 
-const dcasTypes = {
+async function getDCASConfig() {
+  try {
+    await connectToDatabase();
+    const [namesSetting, colorsSetting] = await Promise.all([
+      Settings.findOne({ key: SETTINGS_KEYS.DCAS_NAMES }).lean(),
+      Settings.findOne({ key: SETTINGS_KEYS.DCAS_COLORS }).lean(),
+    ]);
+
+    const names: Record<DCASType, string> = namesSetting?.value ?? defaultDCASNames;
+    const customColors: Record<DCASType, string> | null = colorsSetting?.value ?? null;
+
+    return { names, customColors };
+  } catch {
+    return { names: defaultDCASNames, customColors: null };
+  }
+}
+
+const dcasTypeDefaults = {
   D: {
-    name: "Driver",
     desc: "Results-oriented",
     detail:
       "individuals who are direct, decisive, and focused on achieving goals. They thrive under pressure.",
@@ -15,7 +33,6 @@ const dcasTypes = {
     colorClass: "red",
   },
   C: {
-    name: "Connector",
     desc: "People-oriented",
     detail:
       "individuals who are enthusiastic, optimistic, and love collaboration. They excel at inspiring others.",
@@ -23,7 +40,6 @@ const dcasTypes = {
     colorClass: "amber",
   },
   A: {
-    name: "Anchor",
     desc: "Stability-oriented",
     detail:
       "individuals who are patient, reliable, and team-focused. They create harmony and consistency.",
@@ -31,7 +47,6 @@ const dcasTypes = {
     colorClass: "emerald",
   },
   S: {
-    name: "Strategist",
     desc: "Quality-oriented",
     detail:
       "individuals who are analytical, precise, and systematic. They ensure accuracy and high standards.",
@@ -40,7 +55,24 @@ const dcasTypes = {
   },
 } as const;
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const { names, customColors } = await getDCASConfig();
+
+  // Build effective colors map
+  const effectiveColors = { ...defaultDcasColors };
+  if (customColors) {
+    (["D", "C", "A", "S"] as DCASType[]).forEach((type) => {
+      if (customColors[type]) {
+        effectiveColors[type] = {
+          ...effectiveColors[type],
+          primary: customColors[type],
+        };
+      }
+    });
+  }
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Hero Section */}
@@ -176,7 +208,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
             {(["D", "C", "A", "S"] as const).map((type, idx) => {
-              const info = dcasTypes[type];
+              const info = dcasTypeDefaults[type];
               const stagger =
                 idx === 0
                   ? ""
@@ -236,12 +268,12 @@ export default function Home() {
                   <CardContent className="relative p-5 sm:p-6">
                     <div
                       className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-lg sm:mb-4 sm:h-14 sm:w-14 sm:text-2xl"
-                      style={{ backgroundColor: dcasColors[type].primary }}
+                      style={{ backgroundColor: effectiveColors[type].primary }}
                     >
                       {type}
                     </div>
                     <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl dark:text-white">
-                      {info.name}
+                      {names[type]}
                     </h3>
                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       <span className={`font-medium ${c.textAccent}`}>
@@ -250,7 +282,7 @@ export default function Home() {
                       {info.detail}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
-                      {info.tags.map((tag) => (
+                      {info.tags.map((tag: string) => (
                         <span
                           key={tag}
                           className={`rounded-full ${c.tagBg} px-2.5 py-0.5 text-xs font-medium sm:px-3 sm:py-1 ${c.tagText}`}

@@ -7,6 +7,7 @@ export interface IAssessmentTemplate extends Document {
   settings: {
     time_limit?: number;
     randomized: boolean;
+    shuffle_options: boolean;
     forced_response: boolean;
     language: string;
   };
@@ -25,6 +26,7 @@ const AssessmentTemplateSchema = new Schema<IAssessmentTemplate>(
     settings: {
       time_limit: { type: Number, default: 0 },
       randomized: { type: Boolean, default: false },
+      shuffle_options: { type: Boolean, default: false },
       forced_response: { type: Boolean, default: true },
       language: { type: String, default: "en" },
     },

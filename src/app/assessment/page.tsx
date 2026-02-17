@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/lib/dcas/scoring";
 import { AuthGate } from "@/components/auth-gate";
 import { ModeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/Logo";
 import {
   CheckCircle,
   AlertTriangle,
@@ -52,6 +53,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shuffleOptions, setShuffleOptions] = useState(false);
 
   const question = dcasQuestions[currentQuestion];
   const totalQuestions = dcasQuestions.length;
@@ -59,6 +61,16 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const progress = (answeredCount / totalQuestions) * 100;
   const displayAnsweredCount =
     answeredCount + (selectedOption && !answers[question.id] ? 1 : 0);
+
+  // Fetch shuffle_options setting from live template
+  useEffect(() => {
+    fetch("/api/assessment/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.shuffle_options) setShuffleOptions(true);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (answers[question.id]) {
@@ -194,7 +206,27 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const canProceed = selectedOption !== "";
   const isLastQuestion = currentQuestion === totalQuestions - 1;
 
-  const optionKeys = ["A", "B", "C", "D"] as const;
+  // Seeded shuffle for stable per-question option ordering
+  const getShuffledKeys = useCallback(
+    (questionId: number): readonly ("A" | "B" | "C" | "D")[] => {
+      const keys: ("A" | "B" | "C" | "D")[] = ["A", "B", "C", "D"];
+      if (!shuffleOptions) return keys;
+      // Simple seed from question id for deterministic shuffle
+      let seed = questionId * 2654435761; // Knuth multiplicative hash
+      for (let i = keys.length - 1; i > 0; i--) {
+        seed = ((seed >>> 0) * 48271 + 1) >>> 0;
+        const j = seed % (i + 1);
+        [keys[i], keys[j]] = [keys[j], keys[i]];
+      }
+      return keys;
+    },
+    [shuffleOptions],
+  );
+
+  const optionKeys = useMemo(
+    () => getShuffledKeys(question.id),
+    [question.id, getShuffledKeys],
+  );
 
   if (showConfirmation) {
     return (
@@ -324,12 +356,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
         <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm">
-                D
-              </div>
-              <span className="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white">
-                DCAS Assessment
-              </span>
+              <Logo size="sm" showText textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white" />
             </Link>
             <div className="flex items-center gap-2">
               <ModeToggle />

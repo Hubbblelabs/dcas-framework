@@ -36,6 +36,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
   batch?: string;
   institution?: string;
   createdAt?: string;
@@ -64,6 +65,7 @@ export default function CohortsPage() {
     (u) =>
       u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.batch?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.institution?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -194,6 +196,7 @@ export default function CohortsPage() {
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
                       <TableHead>Batch</TableHead>
                       <TableHead>Institution</TableHead>
                       <TableHead>Joined</TableHead>
@@ -206,6 +209,9 @@ export default function CohortsPage() {
                         <TableCell className="font-medium">{u.name}</TableCell>
                         <TableCell className="text-muted-foreground">
                           {u.email}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {u.phone || <span className="text-muted-foreground">—</span>}
                         </TableCell>
                         <TableCell>
                           {u.batch ? (
@@ -251,7 +257,7 @@ export default function CohortsPage() {
                     {filteredUsers.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={6}
+                          colSpan={7}
                           className="text-muted-foreground py-8 text-center"
                         >
                           {searchTerm

@@ -4,7 +4,7 @@ import { User } from "@/lib/models/User";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, phone } = await req.json();
+    const { name, email, phone, batch, institution } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -18,6 +18,8 @@ export async function POST(req: Request) {
       // Update user details if provided
       if (name) user.name = name;
       if (phone) user.phone = phone;
+      if (batch) user.meta = { ...user.meta, batch };
+      if (institution) user.meta = { ...user.meta, institution };
       await user.save();
     } else {
       // Create new user
@@ -32,6 +34,10 @@ export async function POST(req: Request) {
         email,
         phone,
         role: "student",
+        meta: {
+          batch: batch || undefined,
+          institution: institution || undefined,
+        },
       });
     }
 

@@ -24,6 +24,8 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [batch, setBatch] = useState("");
+  const [institution, setInstitution] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +37,7 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
       const res = await fetch("/api/assessment/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone }),
+        body: JSON.stringify({ name, email, phone, batch, institution }),
       });
 
       if (!res.ok) {
@@ -104,6 +106,24 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="batch">Batch</Label>
+              <Input
+                id="batch"
+                placeholder="e.g. 2024-A"
+                value={batch}
+                onChange={(e) => setBatch(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="institution">Institution</Label>
+              <Input
+                id="institution"
+                placeholder="Your Institution"
+                value={institution}
+                onChange={(e) => setInstitution(e.target.value)}
               />
             </div>
             {error && (

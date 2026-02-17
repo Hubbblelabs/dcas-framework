@@ -30,6 +30,7 @@ import {
 } from "@/lib/dcas/interpretations";
 import { getCareerRecommendations } from "@/lib/dcas/careers";
 import { ModeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/Logo";
 import { CareerIcon } from "@/components/career-icon";
 import { Download, ArrowRight, Sparkles } from "lucide-react";
 
@@ -120,12 +121,7 @@ export default function ResultsPage() {
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm">
-                D
-              </div>
-              <span className="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white">
-                DCAS Assessment
-              </span>
+              <Logo size="sm" showText textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white" />
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
               <ModeToggle />
@@ -136,14 +132,6 @@ export default function ResultsPage() {
                 >
                   <Download className="h-4 w-4" />
                   <span className="hidden sm:inline">Detailed Report</span>
-                </Button>
-              </Link>
-              <Link href="/assessment">
-                <Button
-                  variant="ghost"
-                  className="btn-press rounded-full text-sm"
-                >
-                  Retake
                 </Button>
               </Link>
             </div>
@@ -504,18 +492,17 @@ export default function ResultsPage() {
           <Card className="animate-fade-in-up border-0 bg-linear-to-r from-indigo-500 to-purple-600 text-white shadow-2xl">
             <CardContent className="p-6 sm:p-8">
               <h3 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
-                Want to Retake?
+                Assessment Complete!
               </h3>
               <p className="mx-auto mb-4 max-w-2xl px-2 text-sm text-indigo-100 sm:mb-6 sm:text-base">
-                You can retake the assessment at any time to see how your
-                behavioral profile may evolve.
+                Thank you for completing the DCAS assessment. Download your detailed report for comprehensive insights.
               </p>
-              <Link href="/assessment">
+              <Link href={`/report/${sessionId}`}>
                 <Button
                   size="lg"
                   className="btn-press rounded-full bg-white px-6 py-5 text-base font-semibold text-indigo-600 shadow-lg hover:bg-indigo-50 sm:px-8 sm:py-6 sm:text-lg"
                 >
-                  Retake Assessment <ArrowRight className="ml-2 h-5 w-5" />
+                  Download Report <Download className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
             </CardContent>
