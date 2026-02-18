@@ -11,8 +11,19 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, RefreshCw, Upload, Trash2, ImageIcon } from "lucide-react";
-import { DCASType, defaultDCASNames, dcasColors as defaultDcasColorMap } from "@/lib/dcas/scoring";
+import {
+  Loader2,
+  Save,
+  RefreshCw,
+  Upload,
+  Trash2,
+  ImageIcon,
+} from "lucide-react";
+import {
+  DCASType,
+  defaultDCASNames,
+  dcasColors as defaultDcasColorMap,
+} from "@/lib/dcas/scoring";
 import Image from "next/image";
 
 export default function DCASConfigurationPage() {
@@ -257,19 +268,27 @@ export default function DCASConfigurationPage() {
         <CardHeader>
           <CardTitle>Color Configuration</CardTitle>
           <CardDescription>
-            Customize the color associated with each DCAS type across the platform.
+            Customize the color associated with each DCAS type across the
+            platform.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             {typeConfigs.map(({ type, label, colorText }) => (
-              <div key={`color-${type}`} className="flex items-center gap-4 rounded-lg border p-4">
+              <div
+                key={`color-${type}`}
+                className="flex items-center gap-4 rounded-lg border p-4"
+              >
                 <div
                   className="h-10 w-10 shrink-0 rounded-lg border"
                   style={{ backgroundColor: colors[type] }}
                 />
                 <div className="flex-1">
-                  <Label className={`${colorText} block font-bold text-sm mb-1`}>{label}</Label>
+                  <Label
+                    className={`${colorText} mb-1 block text-sm font-bold`}
+                  >
+                    {label}
+                  </Label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -296,7 +315,8 @@ export default function DCASConfigurationPage() {
         <CardHeader>
           <CardTitle>Logo Customization</CardTitle>
           <CardDescription>
-            Upload a custom logo to replace the default logo across the entire platform.
+            Upload a custom logo to replace the default logo across the entire
+            platform.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -316,15 +336,19 @@ export default function DCASConfigurationPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">
-                {logoUrl ? "Current custom logo" : "No custom logo set (using default)"}
+              <Label className="text-muted-foreground text-sm">
+                {logoUrl
+                  ? "Current custom logo"
+                  : "No custom logo set (using default)"}
               </Label>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   disabled={uploadingLogo}
-                  onClick={() => document.getElementById("logo-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("logo-upload")?.click()
+                  }
                 >
                   {uploadingLogo ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -383,7 +407,7 @@ export default function DCASConfigurationPage() {
                   }
                 }}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Accepted: PNG, JPEG, SVG, WebP. Max 2MB.
               </p>
             </div>

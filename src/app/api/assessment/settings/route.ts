@@ -5,7 +5,9 @@ import { AssessmentTemplate } from "@/lib/models/AssessmentTemplate";
 export async function GET() {
   try {
     await connectToDatabase();
-    const liveTemplate = await AssessmentTemplate.findOne({ isLive: true }).select("settings").lean();
+    const liveTemplate = await AssessmentTemplate.findOne({ isLive: true })
+      .select("settings")
+      .lean();
     if (!liveTemplate) {
       return NextResponse.json({ shuffle_options: false });
     }

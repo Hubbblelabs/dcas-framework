@@ -8,7 +8,7 @@ export async function GET() {
   try {
     await connectToDatabase();
     const setting = await Settings.findOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
-    
+
     const logoUrl = setting?.value || null;
 
     return NextResponse.json(
@@ -18,7 +18,7 @@ export async function GET() {
           "Cache-Control":
             "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
         },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching logo:", error);
@@ -40,14 +40,16 @@ export async function POST(request: NextRequest) {
     const file = formData.get("logo") as File;
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No file provided" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     // Validate file type
-    const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "image/webp"];
+    const validTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/svg+xml",
+      "image/webp",
+    ];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
         { error: "Invalid file type. Allowed: PNG, JPEG, SVG, WebP" },
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const base64String = buffer.toString('base64');
+    const base64String = buffer.toString("base64");
     const logoUrl = `data:${file.type};base64,${base64String}`;
 
     await Settings.findOneAndUpdate(
@@ -95,7 +97,7 @@ export async function DELETE() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await connectToDatabase();
-    
+
     await Settings.deleteOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
     return NextResponse.json({ logoUrl: null });
   } catch (error) {

@@ -47,18 +47,13 @@ export function Logo({
           className={cn(
             sizeClass,
             "flex items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white shadow-lg sm:text-base",
-            iconClassName
+            iconClassName,
           )}
         >
           D
         </div>
         {showText && (
-          <span
-            className={cn(
-              "text-lg font-bold sm:text-xl",
-              textClassName,
-            )}
-          >
+          <span className={cn("text-lg font-bold sm:text-xl", textClassName)}>
             DCAS Assessment
           </span>
         )}
@@ -83,19 +78,14 @@ export function Logo({
           className={cn(
             sizeClass,
             "flex items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white shadow-lg sm:text-base",
-            iconClassName
+            iconClassName,
           )}
         >
           D
         </div>
       )}
       {showText && (
-        <span
-          className={cn(
-            "text-lg font-bold sm:text-xl",
-            textClassName,
-          )}
-        >
+        <span className={cn("text-lg font-bold sm:text-xl", textClassName)}>
           DCAS Assessment
         </span>
       )}

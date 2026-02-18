@@ -82,16 +82,16 @@ export default function UsersAssessmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  
+
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  
+
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
 
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
 
   useEffect(() => {
@@ -149,7 +149,9 @@ export default function UsersAssessmentsPage() {
       });
       if (res.ok) {
         const saved = await res.json();
-        setUsers(users.map((u) => (u._id === saved._id ? { ...u, ...saved } : u)));
+        setUsers(
+          users.map((u) => (u._id === saved._id ? { ...u, ...saved } : u)),
+        );
         setIsEditOpen(false);
         setEditingUser(null);
       } else {
@@ -218,14 +220,15 @@ export default function UsersAssessmentsPage() {
   const renderProfileBadge = (type: string) => {
     const name = getDCASTypeName(type as any);
     const symbol = name.charAt(0).toUpperCase();
-    const color = configColors[type as keyof typeof configColors]?.primary || "#64748b";
-    
+    const color =
+      configColors[type as keyof typeof configColors]?.primary || "#64748b";
+
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div 
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white font-bold text-xs shadow-sm"
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
               style={{ backgroundColor: color }}
             >
               {symbol}
@@ -240,16 +243,17 @@ export default function UsersAssessmentsPage() {
   };
 
   // Helper for truncated text with tooltip
-  const renderTruncatedCell = (text: string | undefined, maxWidth: string = "max-w-[150px]") => {
+  const renderTruncatedCell = (
+    text: string | undefined,
+    maxWidth: string = "max-w-[150px]",
+  ) => {
     if (!text) return <span className="text-muted-foreground">—</span>;
-    
+
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className={`truncate ${maxWidth} text-sm`}>
-               {text}
-            </div>
+            <div className={`truncate ${maxWidth} text-sm`}>{text}</div>
           </TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
@@ -297,7 +301,7 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-cyan-100 p-2 dark:bg-cyan-900/30">
-                 <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{users.length}</p>
@@ -310,7 +314,7 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/30">
-                 <GraduationCap className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <GraduationCap className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{uniqueBatches.length}</p>
@@ -323,7 +327,7 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
-                 <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
@@ -338,7 +342,7 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                 <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedCount}</p>
@@ -371,7 +375,7 @@ export default function UsersAssessmentsPage() {
                   setSelected(new Set());
                 }}
               >
-                <SelectTrigger className="w-[170px] h-9 text-sm">
+                <SelectTrigger className="h-9 w-[170px] text-sm">
                   <SelectValue placeholder="Filter Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -389,7 +393,7 @@ export default function UsersAssessmentsPage() {
                     setSearchTerm(e.target.value);
                     setSelected(new Set());
                   }}
-                  className="pl-9 h-9 text-sm"
+                  className="h-9 pl-9 text-sm"
                 />
               </div>
             </div>
@@ -421,20 +425,23 @@ export default function UsersAssessmentsPage() {
                       <TableHead>Batch</TableHead>
                       <TableHead>Institution</TableHead>
                       <TableHead>Profile Result</TableHead>
-                      <TableHead className="text-right pr-6">Actions</TableHead>
+                      <TableHead className="pr-6 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((u) => (
-                      <TableRow 
-                        key={u._id} 
-                        className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                      <TableRow
+                        key={u._id}
+                        className="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-900"
                         onClick={() => {
                           setViewingUser(u);
                           setIsViewOpen(true);
                         }}
                       >
-                        <TableCell className="pl-4" onClick={(e) => e.stopPropagation()}>
+                        <TableCell
+                          className="pl-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Checkbox
                             checked={selected.has(u._id)}
                             onCheckedChange={() => toggleSelect(u._id)}
@@ -447,113 +454,129 @@ export default function UsersAssessmentsPage() {
                           {renderTruncatedCell(u.email)}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {u.phone || <span className="text-muted-foreground">—</span>}
+                          {u.phone || (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           {u.batch ? (
-                             renderTruncatedCell(u.batch, "max-w-[120px]")
+                            renderTruncatedCell(u.batch, "max-w-[120px]")
                           ) : (
                             <span className="text-muted-foreground">—</span>
                           )}
                         </TableCell>
                         <TableCell>
-                           {renderTruncatedCell(u.institution, "max-w-[150px]")}
+                          {renderTruncatedCell(u.institution, "max-w-[150px]")}
                         </TableCell>
                         <TableCell>
                           {u.score ? (
                             <div className="flex gap-2">
-                              {u.score.primary && renderProfileBadge(u.score.primary)}
-                              {u.score.secondary && renderProfileBadge(u.score.secondary)}
+                              {u.score.primary &&
+                                renderProfileBadge(u.score.primary)}
+                              {u.score.secondary &&
+                                renderProfileBadge(u.score.secondary)}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground text-sm pl-2">
+                            <span className="text-muted-foreground pl-2 text-sm">
                               —
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
+                        <TableCell
+                          className="pr-6 text-right"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <div className="flex items-center justify-end gap-2">
-                             {/* Status Indicator */}
-                             <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className="flex items-center justify-center">
-                                      {u.status === "Completed" ? (
-                                        <CheckCircle className="h-5 w-5 text-emerald-500" />
-                                      ) : (
-                                        <Clock className="h-5 w-5 text-slate-300 dark:text-slate-600" />
-                                      )}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>
-                                      {u.status === "Completed" 
-                                        ? `Assessment Completed on ${u.completedAt ? new Date(u.completedAt).toLocaleDateString() : 'Unknown date'}`
-                                        : "Not Attempted"
-                                      }
-                                    </p>
-                                  </TooltipContent>
-                                </Tooltip>
-                             </TooltipProvider>
+                            {/* Status Indicator */}
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center justify-center">
+                                    {u.status === "Completed" ? (
+                                      <CheckCircle className="h-5 w-5 text-emerald-500" />
+                                    ) : (
+                                      <Clock className="h-5 w-5 text-slate-300 dark:text-slate-600" />
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    {u.status === "Completed"
+                                      ? `Assessment Completed on ${u.completedAt ? new Date(u.completedAt).toLocaleDateString() : "Unknown date"}`
+                                      : "Not Attempted"}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
 
                             {u.status === "Completed" && u.latestReportId && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                                            onClick={() => {
-                                              const hostname = window.location.hostname.replace(/^admin\./,"");
-                                              const port = window.location.port ? ":" + window.location.port : "";
-                                              const url = `${window.location.protocol}//${hostname}${port}/results/${u.latestReportId}`;
-                                              window.open(url, "_blank");
-                                            }}
-                                          >
-                                            <ExternalLink className="h-4 w-4" />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>View Assessment Report</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            )}
-                            
-                            <TooltipProvider>
+                              <TooltipProvider>
                                 <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                          onClick={() => {
-                                            setEditingUser(u);
-                                            setIsEditOpen(true);
-                                          }}
-                                        >
-                                          <Pencil className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Edit User</p></TooltipContent>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                      onClick={() => {
+                                        const hostname =
+                                          window.location.hostname.replace(
+                                            /^admin\./,
+                                            "",
+                                          );
+                                        const port = window.location.port
+                                          ? ":" + window.location.port
+                                          : "";
+                                        const url = `${window.location.protocol}//${hostname}${port}/results/${u.latestReportId}`;
+                                        window.open(url, "_blank");
+                                      }}
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View Assessment Report</p>
+                                  </TooltipContent>
                                 </Tooltip>
+                              </TooltipProvider>
+                            )}
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800"
+                                    onClick={() => {
+                                      setEditingUser(u);
+                                      setIsEditOpen(true);
+                                    }}
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Edit User</p>
+                                </TooltipContent>
+                              </Tooltip>
                             </TooltipProvider>
 
                             <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/10"
-                                          onClick={() => setDeleteUser(u)}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Delete User</p></TooltipContent>
-                                </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="hover:text-destructive hover:bg-destructive/10 h-8 w-8 text-slate-400"
+                                    onClick={() => setDeleteUser(u)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Delete User</p>
+                                </TooltipContent>
+                              </Tooltip>
                             </TooltipProvider>
                           </div>
                         </TableCell>
@@ -586,7 +609,7 @@ export default function UsersAssessmentsPage() {
         onOpenChange={setIsEditOpen}
         onSave={handleSaveUser}
       />
-      
+
       {/* View User Details Dialog */}
       <UserDetailsDialog
         user={viewingUser}

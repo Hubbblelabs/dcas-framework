@@ -17,14 +17,20 @@ export default function AdminLayout({
 
   return (
     <SessionProvider>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-        <div className="flex min-h-screen w-full bg-white dark:bg-background">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
+      >
+        <div className="dark:bg-background flex min-h-screen w-full bg-white">
           <AdminSidebar className="hidden md:flex" />
           <div className="flex h-screen flex-1 flex-col overflow-hidden">
-            <header
-              className="flex items-center justify-between border-b border-slate-200 bg-white p-4 text-slate-900 dark:border-slate-800 dark:bg-background/95 backdrop-blur-sm dark:text-white md:hidden"
-            >
-              <Logo size="sm" showText textClassName="text-slate-900 dark:text-white text-base" />
+            <header className="dark:bg-background/95 flex items-center justify-between border-b border-slate-200 bg-white p-4 text-slate-900 backdrop-blur-sm md:hidden dark:border-slate-800 dark:text-white">
+              <Logo
+                size="sm"
+                showText
+                textClassName="text-slate-900 dark:text-white text-base"
+              />
               <Button
                 variant="ghost"
                 size="icon"
@@ -40,9 +46,7 @@ export default function AdminLayout({
                   className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                   onClick={() => setIsMobileMenuOpen(false)}
                 />
-                <div
-                  className="animate-in slide-in-from-left relative h-full w-64 shadow-xl duration-200"
-                >
+                <div className="animate-in slide-in-from-left relative h-full w-64 shadow-xl duration-200">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -55,7 +59,7 @@ export default function AdminLayout({
                 </div>
               </div>
             )}
-            <main className="flex-1 overflow-y-auto bg-slate-50 p-4 text-slate-900 dark:bg-slate-950 dark:text-slate-100 md:p-6">
+            <main className="flex-1 overflow-y-auto bg-slate-50 p-4 text-slate-900 md:p-6 dark:bg-slate-950 dark:text-slate-100">
               {children}
             </main>
           </div>

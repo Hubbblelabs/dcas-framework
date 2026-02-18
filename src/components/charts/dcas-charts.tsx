@@ -1,6 +1,11 @@
 "use client";
 
-import { DCASScores, dcasColors as defaultDcasColors, defaultDCASNames, DCASType } from "@/lib/dcas/scoring";
+import {
+  DCASScores,
+  dcasColors as defaultDcasColors,
+  defaultDCASNames,
+  DCASType,
+} from "@/lib/dcas/scoring";
 import {
   BarChart,
   Bar,
@@ -23,7 +28,11 @@ interface DCASChartProps {
   names?: Record<DCASType, string>;
 }
 
-export function DCASBarChart({ scores, colors = defaultDcasColors, names = defaultDCASNames }: DCASChartProps) {
+export function DCASBarChart({
+  scores,
+  colors = defaultDcasColors,
+  names = defaultDCASNames,
+}: DCASChartProps) {
   const data = [
     {
       name: names.D,
@@ -91,7 +100,11 @@ export function DCASBarChart({ scores, colors = defaultDcasColors, names = defau
   );
 }
 
-export function DCASRadarChart({ scores, colors = defaultDcasColors, names = defaultDCASNames }: DCASChartProps) {
+export function DCASRadarChart({
+  scores,
+  colors = defaultDcasColors,
+  names = defaultDCASNames,
+}: DCASChartProps) {
   const data = [
     {
       subject: "D",
@@ -285,7 +298,13 @@ interface ScoreCardProps {
   names?: Record<DCASType, string>;
 }
 
-export function ScoreCard({ type, score, maxScore = 30, colors = defaultDcasColors, names = defaultDCASNames }: ScoreCardProps) {
+export function ScoreCard({
+  type,
+  score,
+  maxScore = 30,
+  colors = defaultDcasColors,
+  names = defaultDCASNames,
+}: ScoreCardProps) {
   const config = { ...colors[type], name: names[type] };
   const percentage = (score / maxScore) * 100;
 

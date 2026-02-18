@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { defaultDCASNames, DCASType, dcasColors as defaultDcasColors } from "@/lib/dcas/scoring";
+import {
+  defaultDCASNames,
+  DCASType,
+  dcasColors as defaultDcasColors,
+} from "@/lib/dcas/scoring";
 
 type DCASNames = Record<DCASType, string>;
-type DCASColorConfig = Record<DCASType, { primary: string; light: string; bg: string }>;
+type DCASColorConfig = Record<
+  DCASType,
+  { primary: string; light: string; bg: string }
+>;
 
 function hexToLightVariant(hex: string): string {
   // Convert hex to a light background variant
@@ -16,7 +23,8 @@ function hexToLightVariant(hex: string): string {
 
 export function useDCASConfig() {
   const [dcasNames, setDcasNames] = useState<DCASNames>(defaultDCASNames);
-  const [dcasColors, setDcasColors] = useState<DCASColorConfig>(defaultDcasColors);
+  const [dcasColors, setDcasColors] =
+    useState<DCASColorConfig>(defaultDcasColors);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

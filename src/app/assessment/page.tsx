@@ -72,10 +72,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       .then((data) => {
         if (data?.shuffle_options) setShuffleOptions(true);
         if (data?.shuffle_questions) {
-            setShuffleQuestions(true);
-            // Simple random shuffle for questions
-            const shuffled = [...dcasQuestions].sort(() => Math.random() - 0.5);
-            setShuffledQuestions(shuffled);
+          setShuffleQuestions(true);
+          // Simple random shuffle for questions
+          const shuffled = [...dcasQuestions].sort(() => Math.random() - 0.5);
+          setShuffledQuestions(shuffled);
         }
       })
       .catch(() => {});
@@ -365,7 +365,11 @@ function AssessmentContent({ userId }: { userId: string | null }) {
         <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <Logo size="sm" showText textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white" />
+              <Logo
+                size="sm"
+                showText
+                textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white"
+              />
             </Link>
             <div className="flex items-center gap-2">
               <ModeToggle />
