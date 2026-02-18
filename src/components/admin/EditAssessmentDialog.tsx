@@ -130,7 +130,13 @@ export function EditAssessmentDialog({
           questions: selectionMethod === "manual" ? selectedQuestions : [],
           selection_method: selectionMethod,
           question_count: questionCount,
-          settings: { ...assessment.settings, language, time_limit: timeLimit, shuffle_options: shuffleOptions, shuffle_questions: shuffleQuestions },
+          settings: {
+            ...assessment.settings,
+            language,
+            time_limit: timeLimit,
+            shuffle_options: shuffleOptions,
+            shuffle_questions: shuffleQuestions,
+          },
           isLive,
         }),
       });
@@ -247,7 +253,10 @@ export function EditAssessmentDialog({
 
           <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
             <div>
-              <Label htmlFor="edit-shuffleOptions" className="text-sm font-medium">
+              <Label
+                htmlFor="edit-shuffleOptions"
+                className="text-sm font-medium"
+              >
                 Shuffle Answer Options
               </Label>
               <p className="text-muted-foreground text-xs">
@@ -263,7 +272,10 @@ export function EditAssessmentDialog({
 
           <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
             <div>
-              <Label htmlFor="edit-shuffleQuestions" className="text-sm font-medium">
+              <Label
+                htmlFor="edit-shuffleQuestions"
+                className="text-sm font-medium"
+              >
                 Shuffle Questions
               </Label>
               <p className="text-muted-foreground text-xs">

@@ -7,11 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DCASBarChart } from "@/components/charts/dcas-charts";
-import {
-  DCASScores,
-  DCASType,
-  getScoreLevel,
-} from "@/lib/dcas/scoring";
+import { DCASScores, DCASType, getScoreLevel } from "@/lib/dcas/scoring";
 import {
   interpretations,
   getCombinedProfileDescription,
@@ -325,7 +321,11 @@ export default function ReportPage() {
                 </CardHeader>
                 <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
                   <div className="w-full overflow-x-auto">
-                    <DCASBarChart scores={scores} colors={dcasColors} names={dcasNames} />
+                    <DCASBarChart
+                      scores={scores}
+                      colors={dcasColors}
+                      names={dcasNames}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -618,9 +618,9 @@ export default function ReportPage() {
             <Card className="border-0 bg-linear-to-br from-indigo-50 to-purple-50 shadow-xl dark:from-indigo-950/30 dark:to-purple-950/30">
               <CardContent className="p-4 sm:p-6 lg:p-8">
                 <p className="mb-4 text-xs text-slate-700 sm:mb-6 sm:text-sm dark:text-slate-300">
-                  Based on your {dcasNames[primaryType]} profile,
-                  here&apos;s a personalized action plan to maximize your
-                  strengths and address development areas:
+                  Based on your {dcasNames[primaryType]} profile, here&apos;s a
+                  personalized action plan to maximize your strengths and
+                  address development areas:
                 </p>
                 <div className="space-y-4 sm:space-y-6">
                   {[
