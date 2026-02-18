@@ -60,7 +60,7 @@ export async function proxy(request: NextRequest) {
   //
   // admin.dcas.teammistake.com/dashboard  →  internal: /admin/dashboard
   // admin.dcas.teammistake.com/login      →  internal: /admin/login
-  if (isAdminSubdomain && !pathname.startsWith("/admin")) {
+  if (isAdminSubdomain && !pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
     const url = request.nextUrl.clone();
     url.pathname = `/admin${pathname}`;
     if (tenant) {
