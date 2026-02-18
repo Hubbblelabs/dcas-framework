@@ -56,15 +56,18 @@ export function AdminSidebar({
   return (
     <div
       className={cn(
-        "flex h-screen w-64 flex-col border-r bg-sidebar text-sidebar-foreground dark:border-sidebar-border dark:bg-sidebar",
+        "bg-sidebar text-sidebar-foreground dark:border-sidebar-border dark:bg-sidebar flex h-screen w-64 flex-col border-r",
         "border-slate-200 bg-white dark:border-[#1e1e1e] dark:bg-[#0a0a0a]",
         className,
       )}
     >
-      <div
-        className="flex h-16 items-center border-b border-slate-200 px-6 font-semibold text-slate-900 dark:border-[#1e1e1e] dark:text-white"
-      >
-        <Logo size="md" showText textClassName="text-slate-900 dark:text-white text-base" iconClassName="rounded-full" />
+      <div className="flex h-16 items-center border-b border-slate-200 px-6 font-semibold text-slate-900 dark:border-[#1e1e1e] dark:text-white">
+        <Logo
+          size="md"
+          showText
+          textClassName="text-slate-900 dark:text-white text-base"
+          iconClassName="rounded-full"
+        />
       </div>
       <div className="flex-1 overflow-auto py-6">
         <nav className="grid items-start px-4 text-sm font-medium">
@@ -85,9 +88,7 @@ export function AdminSidebar({
           ))}
         </nav>
       </div>
-      <div
-        className="mt-auto space-y-1 border-t border-slate-200 p-4 dark:border-[#1e1e1e]"
-      >
+      <div className="mt-auto space-y-1 border-t border-slate-200 p-4 dark:border-[#1e1e1e]">
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-white/60 dark:hover:bg-white/5 dark:hover:text-white"
@@ -95,7 +96,13 @@ export function AdminSidebar({
         >
           <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute ml-0 h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span>{mounted ? (theme === "dark" ? "Light Mode" : "Dark Mode") : "Toggle Theme"}</span>
+          <span>
+            {mounted
+              ? theme === "dark"
+                ? "Light Mode"
+                : "Dark Mode"
+              : "Toggle Theme"}
+          </span>
         </Button>
         <Button
           variant="ghost"

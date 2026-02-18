@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { dcasColors as defaultDcasColors, defaultDCASNames, DCASType } from "@/lib/dcas/scoring";
+import {
+  dcasColors as defaultDcasColors,
+  defaultDCASNames,
+  DCASType,
+} from "@/lib/dcas/scoring";
 import { ModeToggle } from "@/components/theme-toggle";
 import { GraduationCap, BookOpen, Compass, ArrowRight } from "lucide-react";
 import { connectToDatabase } from "@/lib/mongodb";
@@ -16,8 +20,10 @@ async function getDCASConfig() {
       Settings.findOne({ key: SETTINGS_KEYS.DCAS_COLORS }).lean(),
     ]);
 
-    const names: Record<DCASType, string> = namesSetting?.value ?? defaultDCASNames;
-    const customColors: Record<DCASType, string> | null = colorsSetting?.value ?? null;
+    const names: Record<DCASType, string> =
+      namesSetting?.value ?? defaultDCASNames;
+    const customColors: Record<DCASType, string> | null =
+      colorsSetting?.value ?? null;
 
     return { names, customColors };
   } catch {
@@ -446,7 +452,7 @@ export default async function Home() {
               showText
               textClassName="text-sm font-semibold text-slate-900 sm:text-base dark:text-white"
             />
-            <div className="flex flex-col items-center sm:items-end gap-1">
+            <div className="flex flex-col items-center gap-1 sm:items-end">
               <p className="text-center text-xs text-slate-600 sm:text-right sm:text-sm dark:text-slate-400">
                 © {new Date().getFullYear()} DCAS Behavioural Assessment. All
                 rights reserved.

@@ -59,24 +59,26 @@ export function UserDetailsDialog({
       <DialogContent className="max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-xl">{user.name}</DialogTitle>
-          <DialogDescription>User Profile & Assessment Details</DialogDescription>
+          <DialogDescription>
+            User Profile & Assessment Details
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
           {/* Contact & Info */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              <h4 className="text-muted-foreground text-sm font-medium tracking-wider uppercase">
                 Contact Information
               </h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <Mail className="text-muted-foreground h-4 w-4" />
                   <span>{user.email}</span>
                 </div>
                 {user.phone && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <Phone className="text-muted-foreground h-4 w-4" />
                     <span>{user.phone}</span>
                   </div>
                 )}
@@ -84,24 +86,24 @@ export function UserDetailsDialog({
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              <h4 className="text-muted-foreground text-sm font-medium tracking-wider uppercase">
                 Academic Info
               </h4>
               <div className="space-y-2">
                 {user.institution && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <Building2 className="text-muted-foreground h-4 w-4" />
                     <span>{user.institution}</span>
                   </div>
                 )}
                 {user.batch && (
                   <div className="flex items-center gap-2 text-sm">
-                    <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                    <GraduationCap className="text-muted-foreground h-4 w-4" />
                     <span>{user.batch}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-sm">
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <CalendarDays className="text-muted-foreground h-4 w-4" />
                   <span>
                     Joined{" "}
                     {user.createdAt
@@ -117,31 +119,36 @@ export function UserDetailsDialog({
 
           {/* Assessment Details */}
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <h4 className="text-muted-foreground flex items-center gap-2 text-sm font-medium tracking-wider uppercase">
               Assessment Status
               {user.status === "Completed" ? (
-                <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 dark:text-emerald-400 gap-1 border-0">
+                <Badge className="gap-1 border-0 bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 dark:text-emerald-400">
                   <CheckCircle className="h-3 w-3" /> Completed
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="text-muted-foreground gap-1">
+                <Badge
+                  variant="secondary"
+                  className="text-muted-foreground gap-1"
+                >
                   <Clock className="h-3 w-3" /> Not Attempted
                 </Badge>
               )}
             </h4>
 
             {user.status === "Completed" && user.score && (
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-100 dark:border-slate-800">
+              <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <span className="text-xs text-muted-foreground uppercase block mb-1">
+                    <span className="text-muted-foreground mb-1 block text-xs uppercase">
                       Primary Profile
                     </span>
                     <Badge
-                      className="text-white text-sm py-1 px-3"
+                      className="px-3 py-1 text-sm text-white"
                       style={{
                         backgroundColor:
-                          configColors[user.score.primary as keyof typeof configColors]?.primary,
+                          configColors[
+                            user.score.primary as keyof typeof configColors
+                          ]?.primary,
                       }}
                     >
                       {primaryName}
@@ -149,17 +156,17 @@ export function UserDetailsDialog({
                   </div>
                   {user.score.secondary && (
                     <div>
-                      <span className="text-xs text-muted-foreground uppercase block mb-1">
+                      <span className="text-muted-foreground mb-1 block text-xs uppercase">
                         Secondary Profile
                       </span>
-                      <Badge variant="outline" className="text-sm py-1 px-3">
+                      <Badge variant="outline" className="px-3 py-1 text-sm">
                         {secondaryName}
                       </Badge>
                     </div>
                   )}
                   {user.completedAt && (
-                    <div className="sm:col-span-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
-                      <span className="text-xs text-muted-foreground">
+                    <div className="mt-2 border-t border-slate-200 pt-2 sm:col-span-2 dark:border-slate-700">
+                      <span className="text-muted-foreground text-xs">
                         Completed on:{" "}
                         {new Date(user.completedAt).toLocaleString()}
                       </span>
@@ -169,9 +176,9 @@ export function UserDetailsDialog({
               </div>
             )}
             {user.status !== "Completed" && (
-                <div className="text-sm text-muted-foreground italic">
-                    User has not completed the assessment yet.
-                </div>
+              <div className="text-muted-foreground text-sm italic">
+                User has not completed the assessment yet.
+              </div>
             )}
           </div>
         </div>
