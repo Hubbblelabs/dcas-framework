@@ -91,12 +91,12 @@ export default function AdminsPage() {
       setError("");
       const res = await fetch("/api/admins");
       if (!res.ok) {
-         if (res.status === 401 || res.status === 403) {
-             setError("Unauthorized access");
-         } else {
-             throw new Error("Failed to fetch admins");
-         }
-         return;
+        if (res.status === 401 || res.status === 403) {
+          setError("Unauthorized access");
+        } else {
+          throw new Error("Failed to fetch admins");
+        }
+        return;
       }
       const data = await res.json();
       setAdmins(data.admins || []);
@@ -110,7 +110,7 @@ export default function AdminsPage() {
 
   useEffect(() => {
     if (session) {
-        fetchAdmins();
+      fetchAdmins();
     }
   }, [session]);
 
@@ -207,25 +207,25 @@ export default function AdminsPage() {
   const filteredAdmins = admins.filter(
     (admin) =>
       admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+      admin.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const canManageSuperAdmin = session?.user?.role === "superadmin";
 
   if (loading) {
-      return (
-          <div className="flex h-screen items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
-          </div>
-      );
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
+      </div>
+    );
   }
 
   if (error) {
-      return (
-          <div className="flex h-screen items-center justify-center text-red-500">
-              {error}
-          </div>
-      );
+    return (
+      <div className="flex h-screen items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
   }
 
   return (
@@ -239,10 +239,12 @@ export default function AdminsPage() {
             Create, update, and manage admin access and permissions.
           </p>
         </div>
-        <Button onClick={() => {
+        <Button
+          onClick={() => {
             setFormData({ name: "", email: "", password: "", role: "admin" });
             setIsCreateOpen(true);
-        }}>
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" /> Add Admin
         </Button>
       </div>
@@ -250,8 +252,8 @@ export default function AdminsPage() {
       <Card>
         <CardHeader className="border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
               <Input
                 placeholder="Search admins..."
                 className="pl-9"
@@ -269,13 +271,16 @@ export default function AdminsPage() {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Created At</TableHead>
-                <TableHead className="text-right pr-6">Actions</TableHead>
+                <TableHead className="pr-6 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredAdmins.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-slate-500">
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-slate-500"
+                  >
                     No admins found.
                   </TableCell>
                 </TableRow>
@@ -283,8 +288,12 @@ export default function AdminsPage() {
                 filteredAdmins.map((admin) => (
                   <TableRow key={admin._id}>
                     <TableCell className="pl-6 font-medium">
-                        {admin.name}
-                        {session?.user?.id === admin._id && <span className="ml-2 text-xs text-slate-500">(You)</span>}
+                      {admin.name}
+                      {session?.user?.id === admin._id && (
+                        <span className="ml-2 text-xs text-slate-500">
+                          (You)
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>{admin.email}</TableCell>
                     <TableCell>
@@ -296,9 +305,9 @@ export default function AdminsPage() {
                         }`}
                       >
                         {admin.role === "superadmin" ? (
-                            <ShieldAlert className="mr-1 h-3 w-3" />
+                          <ShieldAlert className="mr-1 h-3 w-3" />
                         ) : (
-                            <Shield className="mr-1 h-3 w-3" />
+                          <Shield className="mr-1 h-3 w-3" />
                         )}
                         {admin.role}
                       </span>
@@ -306,13 +315,15 @@ export default function AdminsPage() {
                     <TableCell>
                       {new Date(admin.createdAt).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="text-right pr-6">
+                    <TableCell className="pr-6 text-right">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => openEdit(admin)}
-                          disabled={!canManageSuperAdmin && admin.role === "superadmin"}
+                          disabled={
+                            !canManageSuperAdmin && admin.role === "superadmin"
+                          }
                           className="hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           <Pencil className="h-4 w-4" />
@@ -320,9 +331,13 @@ export default function AdminsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                           onClick={() => setDeleteAdmin(admin)}
-                          disabled={(!canManageSuperAdmin && admin.role === "superadmin") || session?.user?.id === admin._id}
+                          disabled={
+                            (!canManageSuperAdmin &&
+                              admin.role === "superadmin") ||
+                            session?.user?.id === admin._id
+                          }
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -341,9 +356,7 @@ export default function AdminsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Admin</DialogTitle>
-            <DialogDescription>
-              Create a new admin user.
-            </DialogDescription>
+            <DialogDescription>Create a new admin user.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate}>
             <div className="grid gap-4 py-4">
@@ -432,7 +445,8 @@ export default function AdminsPage() {
           <DialogHeader>
             <DialogTitle>Edit Admin</DialogTitle>
             <DialogDescription>
-              Update admin details. Leave password blank to keep current password.
+              Update admin details. Leave password blank to keep current
+              password.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
@@ -530,7 +544,9 @@ export default function AdminsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isSubmitting}

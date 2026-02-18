@@ -55,6 +55,10 @@ import {
   GraduationCap,
   CheckCircle,
   Clock,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { EditUserDialog } from "@/components/admin/EditUserDialog";
 import { UserDetailsDialog } from "@/components/admin/UserDetailsDialog";
@@ -74,57 +78,85 @@ interface User {
   status: "Completed" | "Not Attempted";
 }
 
+interface Stats {
+  totalUsers: number;
+  completed: number;
+  uniqueBatches: number;
+  uniqueInstitutions: number;
+}
+
 type FilterStatus = "all" | "completed" | "not_attempted";
 
 export default function UsersAssessmentsPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [meta, setMeta] = useState<any>({});
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Pagination & Filtering State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+
+  // Selection
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  
+
+  // Dialogs
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
-
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
 
+  // Debounce search
   useEffect(() => {
-    fetch("/api/users")
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Reset page on filter change
+  useEffect(() => {
+    setPage(1);
+    setSelected(new Set()); // Clear selection on filter change
+  }, [debouncedSearch, filterStatus]);
+
+  // Fetch Users
+  useEffect(() => {
+    setLoading(true);
+
+    const params = new URLSearchParams();
+    params.set("page", page.toString());
+    params.set("limit", limit.toString());
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (filterStatus !== "all") params.set("status", filterStatus);
+
+    // Only fetch stats if we don't have them yet
+    if (!stats) params.set("includeStats", "true");
+
+    fetch(`/api/users?${params.toString()}`)
       .then((r) => r.json())
-      .then((d) => {
-        setUsers(d);
+      .then((res) => {
+        if (res.data) {
+          setUsers(res.data);
+          setMeta(res.meta || {});
+          if (res.meta?.stats) {
+            setStats(res.meta.stats);
+          }
+        } else if (Array.isArray(res)) {
+          // Fallback if API returns array (should not happen with updated backend)
+          setUsers(res);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
-
-  // ---------- Derived ----------
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.batch?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.institution?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    if (!matchesSearch) return false;
-
-    if (filterStatus === "completed") return u.status === "Completed";
-    if (filterStatus === "not_attempted") return u.status === "Not Attempted";
-    return true;
-  });
-
-  const uniqueBatches = [...new Set(users.map((u) => u.batch).filter(Boolean))];
-  const uniqueInstitutions = [
-    ...new Set(users.map((u) => u.institution).filter(Boolean)),
-  ];
-  const completedCount = users.filter((u) => u.status === "Completed").length;
+  }, [page, limit, debouncedSearch, filterStatus, stats]);
 
   // ---------- Selection ----------
   const toggleSelect = (id: string) => {
@@ -134,9 +166,10 @@ export default function UsersAssessmentsPage() {
   };
 
   const toggleAll = () => {
-    selected.size === filteredUsers.length
+    // Select all on CURRENT page
+    selected.size === users.length
       ? setSelected(new Set())
-      : setSelected(new Set(filteredUsers.map((u) => u._id)));
+      : setSelected(new Set(users.map((u) => u._id)));
   };
 
   // ---------- Actions ----------
@@ -149,7 +182,10 @@ export default function UsersAssessmentsPage() {
       });
       if (res.ok) {
         const saved = await res.json();
-        setUsers(users.map((u) => (u._id === saved._id ? { ...u, ...saved } : u)));
+        // Update local state if the user is in the current page
+        setUsers(
+          users.map((u) => (u._id === saved._id ? { ...u, ...saved } : u)),
+        );
         setIsEditOpen(false);
         setEditingUser(null);
       } else {
@@ -176,6 +212,7 @@ export default function UsersAssessmentsPage() {
           return next;
         });
         setDeleteUser(null);
+        // Ideally refetch to fill the page, but removing is fine for UX
       }
     } catch (e) {
       console.error("Delete failed", e);
@@ -184,14 +221,41 @@ export default function UsersAssessmentsPage() {
     }
   };
 
-  const exportCSV = () => {
+  const exportCSV = async () => {
+    // If specific users selected, export them.
+    // If not, fetch ALL matching users.
+
+    let usersToExport: User[] = [];
+
+    if (selected.size > 0) {
+      // Export only selected from current page (since we only have IDs for current page usually)
+      // Wait, 'selected' stores IDs.
+      // We only have user objects for the current page in 'users'.
+      // So we can only export selected users if they are in 'users' array?
+      // Yes, selection clears on page change.
+      usersToExport = users.filter((u) => selected.has(u._id));
+    } else {
+      // Fetch ALL matching current filters
+      try {
+        const params = new URLSearchParams();
+        params.set("limit", "0"); // 0 for all
+        if (debouncedSearch) params.set("search", debouncedSearch);
+        if (filterStatus !== "all") params.set("status", filterStatus);
+
+        const res = await fetch(`/api/users?${params.toString()}`);
+        const json = await res.json();
+        usersToExport = json.data || [];
+      } catch (e) {
+        console.error("Export failed", e);
+        alert("Export failed");
+        return;
+      }
+    }
+
     const header =
       "Name,Email,Phone,Batch,Institution,Status,Primary Profile,Secondary Profile,Completed At\n";
-    const dataToExport =
-      selected.size > 0
-        ? filteredUsers.filter((u) => selected.has(u._id))
-        : filteredUsers;
-    const rows = dataToExport
+
+    const rows = usersToExport
       .map((u) => {
         const primary = u.score?.primary
           ? getDCASTypeName(u.score.primary as any)
@@ -205,6 +269,7 @@ export default function UsersAssessmentsPage() {
         return `"${u.name}","${u.email}","${u.phone || ""}","${u.batch || ""}","${u.institution || ""}","${u.status}","${primary}","${secondary}","${completed}"`;
       })
       .join("\n");
+
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -214,18 +279,19 @@ export default function UsersAssessmentsPage() {
     URL.revokeObjectURL(url);
   };
 
-  // Helper to render DCASType Badge with Symbol
+  // Helper to render DCASType Badge
   const renderProfileBadge = (type: string) => {
     const name = getDCASTypeName(type as any);
     const symbol = name.charAt(0).toUpperCase();
-    const color = configColors[type as keyof typeof configColors]?.primary || "#64748b";
-    
+    const color =
+      configColors[type as keyof typeof configColors]?.primary || "#64748b";
+
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div 
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white font-bold text-xs shadow-sm"
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
               style={{ backgroundColor: color }}
             >
               {symbol}
@@ -239,17 +305,16 @@ export default function UsersAssessmentsPage() {
     );
   };
 
-  // Helper for truncated text with tooltip
-  const renderTruncatedCell = (text: string | undefined, maxWidth: string = "max-w-[150px]") => {
+  const renderTruncatedCell = (
+    text: string | undefined,
+    maxWidth: string = "max-w-[150px]",
+  ) => {
     if (!text) return <span className="text-muted-foreground">—</span>;
-    
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className={`truncate ${maxWidth} text-sm`}>
-               {text}
-            </div>
+            <div className={`truncate ${maxWidth} text-sm`}>{text}</div>
           </TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
@@ -281,7 +346,7 @@ export default function UsersAssessmentsPage() {
           <Button
             variant="outline"
             onClick={exportCSV}
-            disabled={filteredUsers.length === 0}
+            disabled={users.length === 0}
           >
             <Download className="mr-2 h-4 w-4" />
             {selected.size > 0
@@ -297,10 +362,10 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-cyan-100 p-2 dark:bg-cyan-900/30">
-                 <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{users.length}</p>
+                <p className="text-2xl font-bold">{stats?.totalUsers ?? "-"}</p>
                 <p className="text-muted-foreground text-xs">Total Users</p>
               </div>
             </div>
@@ -310,10 +375,12 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/30">
-                 <GraduationCap className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <GraduationCap className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{uniqueBatches.length}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.uniqueBatches ?? "-"}
+                </p>
                 <p className="text-muted-foreground text-xs">Unique Batches</p>
               </div>
             </div>
@@ -323,11 +390,11 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
-                 <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {uniqueInstitutions.length}
+                  {stats?.uniqueInstitutions ?? "-"}
                 </p>
                 <p className="text-muted-foreground text-xs">Institutions</p>
               </div>
@@ -338,10 +405,10 @@ export default function UsersAssessmentsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                 <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedCount}</p>
+                <p className="text-2xl font-bold">{stats?.completed ?? "-"}</p>
                 <p className="text-muted-foreground text-xs">
                   Completed Assessments
                 </p>
@@ -358,7 +425,7 @@ export default function UsersAssessmentsPage() {
             <div>
               <CardTitle>All Users</CardTitle>
               <CardDescription>
-                {filteredUsers.length} of {users.length} users
+                {meta.total ? meta.total : users.length} users found
                 {filterStatus !== "all" &&
                   ` · Filtered: ${filterStatus === "completed" ? "Completed" : "Not Attempted"}`}
               </CardDescription>
@@ -368,10 +435,9 @@ export default function UsersAssessmentsPage() {
                 value={filterStatus}
                 onValueChange={(v) => {
                   setFilterStatus(v as FilterStatus);
-                  setSelected(new Set());
                 }}
               >
-                <SelectTrigger className="w-[170px] h-9 text-sm">
+                <SelectTrigger className="h-9 w-[170px] text-sm">
                   <SelectValue placeholder="Filter Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -387,94 +453,108 @@ export default function UsersAssessmentsPage() {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    setSelected(new Set());
                   }}
-                  className="pl-9 h-9 text-sm"
+                  className="h-9 pl-9 text-sm"
                 />
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
+          {loading && users.length === 0 ? (
             <div className="flex justify-center p-8">
               <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
             </div>
           ) : (
-            <div className="border-t">
-              <div className="overflow-x-auto">
-                <Table className="min-w-[1000px]">
-                  <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
-                    <TableRow>
-                      <TableHead className="w-[40px] pl-4">
-                        <Checkbox
-                          checked={
-                            selected.size === filteredUsers.length &&
-                            filteredUsers.length > 0
-                          }
-                          onCheckedChange={toggleAll}
-                        />
-                      </TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Batch</TableHead>
-                      <TableHead>Institution</TableHead>
-                      <TableHead>Profile Result</TableHead>
-                      <TableHead className="text-right pr-6">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((u) => (
-                      <TableRow 
-                        key={u._id} 
-                        className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
-                        onClick={() => {
-                          setViewingUser(u);
-                          setIsViewOpen(true);
-                        }}
-                      >
-                        <TableCell className="pl-4" onClick={(e) => e.stopPropagation()}>
+            <>
+              <div className="border-t">
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[1000px]">
+                    <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                      <TableRow>
+                        <TableHead className="w-[40px] pl-4">
                           <Checkbox
-                            checked={selected.has(u._id)}
-                            onCheckedChange={() => toggleSelect(u._id)}
+                            checked={
+                              selected.size === users.length && users.length > 0
+                            }
+                            onCheckedChange={toggleAll}
                           />
-                        </TableCell>
-                        <TableCell className="font-medium text-slate-900 dark:text-slate-100">
-                          {u.name}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {renderTruncatedCell(u.email)}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {u.phone || <span className="text-muted-foreground">—</span>}
-                        </TableCell>
-                        <TableCell>
-                          {u.batch ? (
-                             renderTruncatedCell(u.batch, "max-w-[120px]")
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                           {renderTruncatedCell(u.institution, "max-w-[150px]")}
-                        </TableCell>
-                        <TableCell>
-                          {u.score ? (
-                            <div className="flex gap-2">
-                              {u.score.primary && renderProfileBadge(u.score.primary)}
-                              {u.score.secondary && renderProfileBadge(u.score.secondary)}
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-sm pl-2">
-                              —
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-2">
-                             {/* Status Indicator */}
-                             <TooltipProvider>
+                        </TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Batch</TableHead>
+                        <TableHead>Institution</TableHead>
+                        <TableHead>Profile Result</TableHead>
+                        <TableHead className="pr-6 text-right">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((u) => (
+                        <TableRow
+                          key={u._id}
+                          className="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-900"
+                          onClick={() => {
+                            setViewingUser(u);
+                            setIsViewOpen(true);
+                          }}
+                        >
+                          <TableCell
+                            className="pl-4"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Checkbox
+                              checked={selected.has(u._id)}
+                              onCheckedChange={() => toggleSelect(u._id)}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium text-slate-900 dark:text-slate-100">
+                            {u.name}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {renderTruncatedCell(u.email)}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {u.phone || (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {u.batch ? (
+                              renderTruncatedCell(u.batch, "max-w-[120px]")
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {renderTruncatedCell(
+                              u.institution,
+                              "max-w-[150px]",
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {u.score ? (
+                              <div className="flex gap-2">
+                                {u.score.primary &&
+                                  renderProfileBadge(u.score.primary)}
+                                {u.score.secondary &&
+                                  renderProfileBadge(u.score.secondary)}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground pl-2 text-sm">
+                                —
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell
+                            className="pr-6 text-right"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-end gap-2">
+                              {/* Status Indicator */}
+                              <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <div className="flex items-center justify-center">
@@ -487,94 +567,149 @@ export default function UsersAssessmentsPage() {
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>
-                                      {u.status === "Completed" 
-                                        ? `Assessment Completed on ${u.completedAt ? new Date(u.completedAt).toLocaleDateString() : 'Unknown date'}`
-                                        : "Not Attempted"
-                                      }
+                                      {u.status === "Completed"
+                                        ? `Assessment Completed on ${u.completedAt ? new Date(u.completedAt).toLocaleDateString() : "Unknown date"}`
+                                        : "Not Attempted"}
                                     </p>
                                   </TooltipContent>
                                 </Tooltip>
-                             </TooltipProvider>
+                              </TooltipProvider>
 
-                            {u.status === "Completed" && u.latestReportId && (
+                              {u.status === "Completed" && u.latestReportId && (
                                 <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                                            onClick={() => {
-                                              const hostname = window.location.hostname.replace(/^admin\./,"");
-                                              const port = window.location.port ? ":" + window.location.port : "";
-                                              const url = `${window.location.protocol}//${hostname}${port}/results/${u.latestReportId}`;
-                                              window.open(url, "_blank");
-                                            }}
-                                          >
-                                            <ExternalLink className="h-4 w-4" />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>View Assessment Report</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                        onClick={() => {
+                                          const hostname =
+                                            window.location.hostname.replace(
+                                              /^admin\./,
+                                              "",
+                                            );
+                                          const port = window.location.port
+                                            ? ":" + window.location.port
+                                            : "";
+                                          const url = `${window.location.protocol}//${hostname}${port}/results/${u.latestReportId}`;
+                                          window.open(url, "_blank");
+                                        }}
+                                      >
+                                        <ExternalLink className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>View Assessment Report</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </TooltipProvider>
-                            )}
-                            
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                          onClick={() => {
-                                            setEditingUser(u);
-                                            setIsEditOpen(true);
-                                          }}
-                                        >
-                                          <Pencil className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Edit User</p></TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                              )}
 
-                            <TooltipProvider>
+                              <TooltipProvider>
                                 <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/10"
-                                          onClick={() => setDeleteUser(u)}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Delete User</p></TooltipContent>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800"
+                                      onClick={() => {
+                                        setEditingUser(u);
+                                        setIsEditOpen(true);
+                                      }}
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Edit User</p>
+                                  </TooltipContent>
                                 </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {filteredUsers.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={9} // Adjusted colspan since one column was removed
-                          className="text-muted-foreground py-12 text-center"
-                        >
-                          {searchTerm || filterStatus !== "all"
-                            ? "No users match your filters."
-                            : "No users registered yet."}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="hover:text-destructive hover:bg-destructive/10 h-8 w-8 text-slate-400"
+                                      onClick={() => setDeleteUser(u)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Delete User</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {!loading && users.length === 0 && (
+                        <TableRow>
+                          <TableCell
+                            colSpan={9}
+                            className="text-muted-foreground py-12 text-center"
+                          >
+                            {searchTerm || filterStatus !== "all"
+                              ? "No users match your filters."
+                              : "No users registered yet."}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
-            </div>
+
+              {/* Pagination Controls */}
+              {meta.totalPages > 1 && (
+                <div className="flex items-center justify-between border-t px-4 py-4">
+                  <div className="text-muted-foreground text-sm">
+                    Page {meta.page} of {meta.totalPages}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(1)}
+                      disabled={page === 1}
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setPage((p) => Math.min(meta.totalPages, p + 1))
+                      }
+                      disabled={page === meta.totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(meta.totalPages)}
+                      disabled={page === meta.totalPages}
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -586,7 +721,7 @@ export default function UsersAssessmentsPage() {
         onOpenChange={setIsEditOpen}
         onSave={handleSaveUser}
       />
-      
+
       {/* View User Details Dialog */}
       <UserDetailsDialog
         user={viewingUser}

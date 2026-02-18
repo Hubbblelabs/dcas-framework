@@ -17,11 +17,7 @@ import {
   DCASRadarChart,
   ScoreCard,
 } from "@/components/charts/dcas-charts";
-import {
-  DCASScores,
-  DCASType,
-  getScoreLevel,
-} from "@/lib/dcas/scoring";
+import { DCASScores, DCASType, getScoreLevel } from "@/lib/dcas/scoring";
 import {
   interpretations,
   getCombinedProfileDescription,
@@ -121,7 +117,11 @@ export default function ResultsPage() {
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <Logo size="sm" showText textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white" />
+              <Logo
+                size="sm"
+                showText
+                textClassName="hidden text-sm font-semibold text-slate-900 sm:inline sm:text-base dark:text-white"
+              />
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
               <ModeToggle />
@@ -220,7 +220,12 @@ export default function ResultsPage() {
               key={type}
               className={`animate-fade-in-up stagger-${index + 1}`}
             >
-              <ScoreCard type={type} score={scores[type]} colors={dcasColors} names={dcasNames} />
+              <ScoreCard
+                type={type}
+                score={scores[type]}
+                colors={dcasColors}
+                names={dcasNames}
+              />
             </div>
           ))}
         </div>
@@ -256,9 +261,17 @@ export default function ResultsPage() {
             <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
               <div className="w-full overflow-x-auto">
                 {chartType === "bar" ? (
-                  <DCASBarChart scores={scores} colors={dcasColors} names={dcasNames} />
+                  <DCASBarChart
+                    scores={scores}
+                    colors={dcasColors}
+                    names={dcasNames}
+                  />
                 ) : (
-                  <DCASRadarChart scores={scores} colors={dcasColors} names={dcasNames} />
+                  <DCASRadarChart
+                    scores={scores}
+                    colors={dcasColors}
+                    names={dcasNames}
+                  />
                 )}
               </div>
             </CardContent>
@@ -495,7 +508,8 @@ export default function ResultsPage() {
                 Assessment Complete!
               </h3>
               <p className="mx-auto mb-4 max-w-2xl px-2 text-sm text-indigo-100 sm:mb-6 sm:text-base">
-                Thank you for completing the DCAS assessment. Download your detailed report for comprehensive insights.
+                Thank you for completing the DCAS assessment. Download your
+                detailed report for comprehensive insights.
               </p>
               <Link href={`/report/${sessionId}`}>
                 <Button
