@@ -8,8 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 interface QuestionOption {
@@ -86,26 +84,19 @@ export function PreviewAssessmentDialog({
                 Question {currentIndex + 1} of {fullQuestions.length}
               </span>
               <h3 className="text-lg font-semibold">{current.text}</h3>
-              <RadioGroup className="space-y-3">
+              <div className="space-y-3">
                 {current.options?.map((opt) => (
                   <div
                     key={opt.label}
-                    className="pointer-events-none flex items-start space-x-3 rounded-lg border p-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900"
+                    className="flex items-start space-x-3 transition-colors"
                   >
-                    <RadioGroupItem
-                      value={opt.label}
-                      id={`preview-${opt.label}`}
-                    />
-                    <Label
-                      htmlFor={`preview-${opt.label}`}
-                      className="flex-1 cursor-pointer font-normal"
-                    >
-                      <span className="mr-2 font-bold">{opt.label}.</span>
+                    <span className="font-bold">{opt.label}.</span>
+                    <span className="flex-1 font-normal">
                       {opt.text}
-                    </Label>
+                    </span>
                   </div>
                 ))}
-              </RadioGroup>
+              </div>
             </div>
           ) : (
             <div className="text-destructive text-center">
