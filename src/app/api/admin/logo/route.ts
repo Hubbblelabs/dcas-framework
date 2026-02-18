@@ -9,14 +9,19 @@ export async function GET() {
     await connectToDatabase();
     const setting = await Settings.findOne({ key: SETTINGS_KEYS.CUSTOM_LOGO });
 
-    const logoUrl = setting?.value || null;
+    const logoUrl =
+      setting?.value && setting.updatedAt
+        ? `/api/admin/logo/image?v=${new Date(setting.updatedAt).getTime()}`
+        : null;
 
     return NextResponse.json(
-      { logoUrl },
+      {
+        logoUrl,
+        updatedAt: setting?.updatedAt,
+      },
       {
         headers: {
-          "Cache-Control":
-            "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+          "Cache-Control": "public, max-age=0, must-revalidate",
         },
       },
     );
@@ -68,19 +73,23 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64String = buffer.toString("base64");
-    const logoUrl = `data:${file.type};base64,${base64String}`;
+    const logoUrlData = `data:${file.type};base64,${base64String}`;
 
-    await Settings.findOneAndUpdate(
+    const updatedSetting = await Settings.findOneAndUpdate(
       { key: SETTINGS_KEYS.CUSTOM_LOGO },
       {
         key: SETTINGS_KEYS.CUSTOM_LOGO,
-        value: logoUrl,
+        value: logoUrlData,
         description: "Custom logo base64 data",
       },
-      { upsert: true, new: true },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 
-    return NextResponse.json({ logoUrl });
+    const newLogoUrl = `/api/admin/logo/image?v=${new Date(
+      updatedSetting.updatedAt,
+    ).getTime()}`;
+
+    return NextResponse.json({ logoUrl: newLogoUrl });
   } catch (error) {
     console.error("Error uploading logo:", error);
     return NextResponse.json(

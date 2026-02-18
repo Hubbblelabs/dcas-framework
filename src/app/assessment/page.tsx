@@ -7,12 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { dcasQuestions } from "@/lib/data/questions";
 import {
   DCASType,
-  calculateScores,
   getRankedTypes,
-  defaultDCASNames,
 } from "@/lib/dcas/scoring";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
 import { AuthGate } from "@/components/auth-gate";
@@ -26,7 +23,20 @@ import {
   X,
   ArrowLeft,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
+
+// DB question shape (from /api/assessment/settings)
+interface DBQuestion {
+  _id: string;
+  text: string;
+  options: Array<{
+    label: string;
+    text: string;
+    dcas_type: DCASType;
+  }>;
+  active: boolean;
+}
 
 export default function AssessmentPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -48,50 +58,69 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const { dcasColors } = useDCASConfig();
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, DCASType>>({});
+  const [answers, setAnswers] = useState<Record<string, DCASType>>({});
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
-  const [shuffleQuestions, setShuffleQuestions] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState(dcasQuestions);
+  const [shuffledQuestions, setShuffledQuestions] = useState<DBQuestion[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Fetch questions and settings from the live assessment template
+  useEffect(() => {
+    setLoadingQuestions(true);
+    setLoadError(null);
+    fetch("/api/assessment/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        const questions: DBQuestion[] = data.questions || [];
+        if (questions.length === 0) {
+          setLoadError(
+            "No assessment is currently live. Please contact your administrator.",
+          );
+          setLoadingQuestions(false);
+          return;
+        }
+
+        if (data?.shuffle_options) setShuffleOptions(true);
+
+        if (data?.shuffle_questions) {
+          setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
+        } else {
+          setShuffledQuestions(questions);
+        }
+        setLoadingQuestions(false);
+      })
+      .catch(() => {
+        setLoadError("Failed to load assessment. Please try again.");
+        setLoadingQuestions(false);
+      });
+  }, []);
 
   const question = shuffledQuestions[currentQuestion];
   const totalQuestions = shuffledQuestions.length;
   const answeredCount = Object.keys(answers).length;
-  const progress = (answeredCount / totalQuestions) * 100;
+  const progress = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
   const displayAnsweredCount =
-    answeredCount + (selectedOption && !answers[question.id] ? 1 : 0);
-
-  // Fetch settings from live template
-  useEffect(() => {
-    fetch("/api/assessment/settings")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.shuffle_options) setShuffleOptions(true);
-        if (data?.shuffle_questions) {
-          setShuffleQuestions(true);
-          // Simple random shuffle for questions
-          const shuffled = [...dcasQuestions].sort(() => Math.random() - 0.5);
-          setShuffledQuestions(shuffled);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    answeredCount + (selectedOption && question && !answers[question._id] ? 1 : 0);
 
   useEffect(() => {
-    if (answers[question.id]) {
-      setSelectedOption(answers[question.id]);
+    if (!question) return;
+    if (answers[question._id]) {
+      setSelectedOption(answers[question._id]);
     } else {
       setSelectedOption("");
     }
-  }, [currentQuestion, answers, question.id]);
+  }, [currentQuestion, answers, question]);
 
   const handleOptionSelect = (value: string) => {
     setSelectedOption(value);
-    setAnswers((prev) => ({ ...prev, [question.id]: value as DCASType }));
+    if (question) {
+      setAnswers((prev) => ({ ...prev, [question._id]: value as DCASType }));
+    }
   };
 
   const handleNext = () => {
@@ -104,7 +133,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       } else {
         const currentAnswers = {
           ...answers,
-          [question.id]: selectedOption as DCASType,
+          ...(question ? { [question._id]: selectedOption as DCASType } : {}),
         };
         const allAnswered =
           Object.keys(currentAnswers).length === totalQuestions;
@@ -132,37 +161,34 @@ function AssessmentContent({ userId }: { userId: string | null }) {
     setIsSubmitting(true);
     const finalAnswers = {
       ...answers,
-      [question.id]: selectedOption as DCASType,
+      ...(question ? { [question._id]: selectedOption as DCASType } : {}),
     };
-    const scores = calculateScores(finalAnswers);
+
+    // Build a scores map from the DB question options
+    const scores = { D: 0, C: 0, A: 0, S: 0 };
+    shuffledQuestions.forEach((q) => {
+      const selectedType = finalAnswers[q._id];
+      if (selectedType) {
+        scores[selectedType]++;
+      }
+    });
+
     const rankedTypes = getRankedTypes(scores);
 
     try {
-      // Save session to MongoDB
       const res = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: userId,
-          responses: Object.entries(finalAnswers).map(([qId, type]) => {
-            const qNum = parseInt(qId);
-            const questionObj = dcasQuestions.find((q) => q.id === qNum);
-            // Find the option key that corresponds to the selected DCASType
-            // Note: options is an object { A: {...}, B: {...} ... }
-            // We need to find which one has type === type
-            let label = "";
-            if (questionObj) {
-              const option = Object.values(questionObj.options).find(
-                (opt) => opt.type === type,
-              );
-              if (option) label = option.text;
-            }
-
+          responses: shuffledQuestions.map((q) => {
+            const selectedType = finalAnswers[q._id];
+            const option = q.options.find((o) => o.dcas_type === selectedType);
             return {
-              question_id: qNum,
-              selected_option: type,
-              dcas_type: type,
-              selected_option_label: label,
+              question_id: q._id,
+              selected_option: selectedType || "",
+              dcas_type: selectedType || "",
+              selected_option_label: option?.text || "",
             };
           }),
           score: {
@@ -204,7 +230,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
     } catch {
       // Fallback: use sessionStorage
       sessionStorage.setItem("dcasScores", JSON.stringify(scores));
-      sessionStorage.setItem("dcasRankedTypes", JSON.stringify(rankedTypes));
+      sessionStorage.setItem(
+        "dcasRankedTypes",
+        JSON.stringify(getRankedTypes(scores)),
+      );
       sessionStorage.setItem("dcasAnswers", JSON.stringify(finalAnswers));
       router.push("/results/local");
     } finally {
@@ -216,26 +245,74 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const isLastQuestion = currentQuestion === totalQuestions - 1;
 
   // Seeded shuffle for stable per-question option ordering
-  const getShuffledKeys = useCallback(
-    (questionId: number): readonly ("A" | "B" | "C" | "D")[] => {
-      const keys: ("A" | "B" | "C" | "D")[] = ["A", "B", "C", "D"];
-      if (!shuffleOptions) return keys;
-      // Simple seed from question id for deterministic shuffle
-      let seed = questionId * 2654435761; // Knuth multiplicative hash
-      for (let i = keys.length - 1; i > 0; i--) {
+  const getShuffledOptionIndices = useCallback(
+    (questionId: string, optionCount: number): number[] => {
+      const indices = Array.from({ length: optionCount }, (_, i) => i);
+      if (!shuffleOptions) return indices;
+      // Simple seed from question id string hash
+      let seed = 0;
+      for (let i = 0; i < questionId.length; i++) {
+        seed = (seed * 31 + questionId.charCodeAt(i)) >>> 0;
+      }
+      seed = (seed * 2654435761) >>> 0;
+      for (let i = indices.length - 1; i > 0; i--) {
         seed = ((seed >>> 0) * 48271 + 1) >>> 0;
         const j = seed % (i + 1);
-        [keys[i], keys[j]] = [keys[j], keys[i]];
+        [indices[i], indices[j]] = [indices[j], indices[i]];
       }
-      return keys;
+      return indices;
     },
     [shuffleOptions],
   );
 
-  const optionKeys = useMemo(
-    () => getShuffledKeys(question.id),
-    [question.id, getShuffledKeys],
+  const optionIndices = useMemo(
+    () =>
+      question
+        ? getShuffledOptionIndices(question._id, question.options.length)
+        : [],
+    [question, getShuffledOptionIndices],
   );
+
+  // Loading state
+  if (loadingQuestions) {
+    return (
+      <div className="safe-area-inset flex min-h-dvh items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Loading assessment...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error / no live assessment
+  if (loadError || shuffledQuestions.length === 0) {
+    return (
+      <div className="safe-area-inset flex min-h-dvh items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 px-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <Card className="w-full max-w-md border-0 shadow-2xl">
+          <CardContent className="p-6 text-center sm:p-8">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30">
+              <AlertTriangle className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">
+              Assessment Unavailable
+            </h2>
+            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
+              {loadError ||
+                "No active assessment found. Please contact your administrator."}
+            </p>
+            <Link href="/">
+              <Button className="w-full rounded-full bg-linear-to-r from-indigo-600 to-purple-600">
+                Go Back
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (showConfirmation) {
     return (
@@ -249,8 +326,8 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               Assessment Complete!
             </h2>
             <p className="mb-6 text-sm text-slate-600 sm:mb-8 sm:text-base dark:text-slate-400">
-              You&apos;ve answered all 30 questions. Ready to discover your DCAS
-              behavioural profile?
+              You&apos;ve answered all {totalQuestions} questions. Ready to
+              discover your DCAS behavioural profile?
             </p>
             <div className="flex flex-col gap-3">
               <Button
@@ -279,7 +356,9 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       totalQuestions -
       Object.keys({
         ...answers,
-        ...(selectedOption ? { [question.id]: selectedOption } : {}),
+        ...(selectedOption && question
+          ? { [question._id]: selectedOption }
+          : {}),
       }).length;
 
     return (
@@ -294,9 +373,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
             </h2>
             <p className="mb-4 text-sm text-slate-600 sm:text-base dark:text-slate-400">
               You have{" "}
-              <span className="font-bold text-amber-600">
-                {unansweredCount}
-              </span>{" "}
+              <span className="font-bold text-amber-600">{unansweredCount}</span>{" "}
               unanswered question{unansweredCount !== 1 ? "s" : ""}. Please
               complete all questions to get accurate results.
             </p>
@@ -307,11 +384,12 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               <div className="flex flex-wrap justify-center gap-2">
                 {shuffledQuestions.map((q, idx) => {
                   const isAnswered =
-                    answers[q.id] || (q.id === question.id && selectedOption);
+                    answers[q._id] ||
+                    (question && q._id === question._id && selectedOption);
                   if (isAnswered) return null;
                   return (
                     <button
-                      key={q.id}
+                      key={q._id}
                       onClick={() => {
                         setCurrentQuestion(idx);
                         setShowIncompleteWarning(false);
@@ -329,8 +407,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 onClick={() => {
                   const firstUnanswered = shuffledQuestions.findIndex(
                     (q) =>
-                      !answers[q.id] &&
-                      (q.id !== question.id || !selectedOption),
+                      !answers[q._id] &&
+                      (!question ||
+                        q._id !== question._id ||
+                        !selectedOption),
                   );
                   if (firstUnanswered !== -1)
                     setCurrentQuestion(firstUnanswered);
@@ -439,7 +519,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               </div>
             </div>
             <CardTitle className="text-lg leading-tight font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">
-              {question.question}
+              {question.text}
             </CardTitle>
           </CardHeader>
 
@@ -449,20 +529,22 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               onValueChange={handleOptionSelect}
               className="space-y-2 sm:space-y-3"
             >
-              {optionKeys.map((key, index) => {
-                const option = question.options[key];
+              {optionIndices.map((optIdx) => {
+                const option = question.options[optIdx];
                 return (
                   <RadioGroupItem
-                    key={key}
-                    value={option.type}
-                    className={`p-3 transition-all duration-200 sm:p-4 ${selectedOption === option.type ? "ring-offset-background ring-2 ring-offset-2" : ""}`}
+                    key={option.label}
+                    value={option.dcas_type}
+                    className={`p-3 transition-all duration-200 sm:p-4 ${selectedOption === option.dcas_type ? "ring-offset-background ring-2 ring-offset-2" : ""}`}
                     style={{
                       borderColor:
-                        selectedOption === option.type ? "#6366f1" : undefined, // Indigo-500
+                        selectedOption === option.dcas_type
+                          ? "#6366f1"
+                          : undefined,
                       backgroundColor:
-                        selectedOption === option.type
+                        selectedOption === option.dcas_type
                           ? "#e0e7ff50"
-                          : undefined, // Indigo-100 with opacity
+                          : undefined,
                     }}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
@@ -496,10 +578,11 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                   )
                   .map((_, idx) => {
                     const actualIdx = Math.max(0, currentQuestion - 2) + idx;
+                    const q = shuffledQuestions[actualIdx];
                     return (
                       <div
                         key={actualIdx}
-                        className={`h-2 w-2 rounded-full transition-all ${actualIdx === currentQuestion ? "w-6 bg-indigo-600" : answers[actualIdx + 1] ? "bg-emerald-400" : "bg-slate-300 dark:bg-slate-700"}`}
+                        className={`h-2 w-2 rounded-full transition-all ${actualIdx === currentQuestion ? "w-6 bg-indigo-600" : q && answers[q._id] ? "bg-emerald-400" : "bg-slate-300 dark:bg-slate-700"}`}
                       />
                     );
                   })}
@@ -537,12 +620,12 @@ function AssessmentContent({ userId }: { userId: string | null }) {
             <div className="mt-3 grid grid-cols-6 gap-1.5 sm:mt-4 sm:grid-cols-10 sm:gap-2">
               {shuffledQuestions.map((q, idx) => (
                 <button
-                  key={q.id}
+                  key={q._id}
                   onClick={() => setCurrentQuestion(idx)}
                   className={`h-8 w-full rounded-lg text-xs font-medium transition-all focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none sm:h-8 sm:w-8 ${
                     idx === currentQuestion
                       ? "bg-indigo-600 text-white shadow-lg"
-                      : answers[q.id]
+                      : answers[q._id]
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                   }`}
