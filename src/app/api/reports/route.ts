@@ -7,6 +7,15 @@ import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (
+      !session ||
+      !session.user?.role ||
+      !["admin", "superadmin"].includes(session.user.role)
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const reports = await Session.find({ status: "completed" })
       .populate("user_id")
