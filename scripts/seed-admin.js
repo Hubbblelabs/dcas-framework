@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const dns = require("dns");
+
+// Fix for SRV resolution issues in some environments (like Cloudflare WARP)
+try {
+  dns.setServers(["1.1.1.1", "8.8.8.8"]);
+} catch (e) {
+  console.warn("Failed to set DNS servers for SRV resolution:", e);
+}
 
 const MONGODB_URI =
   process.env.MONGODB_URI;
