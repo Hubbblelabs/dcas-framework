@@ -6,6 +6,10 @@ import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     await connectToDatabase();
     const questions = await Question.find({}).sort({ createdAt: -1 });
     return NextResponse.json(questions);
