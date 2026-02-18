@@ -4,60 +4,120 @@ import { User } from "@/lib/models/User";
 import { Session } from "@/lib/models/Session";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { FilterQuery } from "mongoose";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    const users = await User.find({ role: "student" })
-      .sort({ created_at: -1 })
-      .lean();
 
-    const formattedUsers = await Promise.all(
-      users.map(async (u: any) => {
-        // Try to read from embedded result first
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "50", 10);
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "all";
+    const batch = searchParams.get("batch") || "all";
+    const institution = searchParams.get("institution") || "all";
+    const sortField = searchParams.get("sort") || "created_at";
+    const sortOrder = searchParams.get("order") === "asc" ? 1 : -1;
+
+    // Build Query
+    const andConditions: FilterQuery<any>[] = [{ role: "student" }];
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      andConditions.push({
+        $or: [
+            { name: searchRegex },
+            { email: searchRegex },
+            { phone: searchRegex },
+            { "meta.batch": searchRegex },
+            { "meta.institution": searchRegex },
+            { institution: searchRegex },
+            { batch: searchRegex },
+        ]
+      });
+    }
+
+    if (batch && batch !== "all") {
+        andConditions.push({
+            $or: [
+                { "meta.batch": batch },
+                { batch: batch }
+            ]
+        });
+    }
+
+    if (institution && institution !== "all") {
+        andConditions.push({
+            $or: [
+                { "meta.institution": institution },
+                { institution: institution }
+            ]
+        });
+    }
+
+    if (status === "Completed") {
+        andConditions.push({ "result.score.primary": { $exists: true } });
+    } else if (status === "Not Attempted") {
+        andConditions.push({ "result.score.primary": { $exists: false } });
+    }
+
+    const finalQuery = { $and: andConditions };
+
+    const skip = (page - 1) * limit;
+
+    // Fetch Users, Count, and Facets
+    const [users, total, batches, institutions] = await Promise.all([
+      User.find(finalQuery)
+        .sort({ [sortField]: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(finalQuery),
+      User.distinct("meta.batch", { role: "student" }),
+      User.distinct("meta.institution", { role: "student" }),
+    ]);
+
+    // Optimize N+1: Batch fetch sessions for these users
+    const userIds = users.map((u: any) => u._id);
+
+    const sessions = await Session.find({
+        user_id: { $in: userIds },
+        status: "completed"
+    }).lean();
+
+    const sessionMap = new Map();
+    sessions.forEach((s: any) => {
+        const uid = s.user_id.toString();
+        if (!sessionMap.has(uid) || new Date(s.completed_at) > new Date(sessionMap.get(uid).completed_at)) {
+            sessionMap.set(uid, s);
+        }
+    });
+
+    const formattedUsers = users.map((u: any) => {
         let score = null;
         let latestReportId = null;
         let completedAt = null;
         let status = "Not Attempted";
 
         if (u.result?.score?.primary) {
-          // Use embedded result data
-          score = {
-            primary: u.result.score.primary,
-            secondary: u.result.score.secondary,
-          };
-          latestReportId = u.result.session_id || null;
-          completedAt = u.result.completed_at || null;
-          status = "Completed";
-        } else {
-          // Fallback: query Session collection for backward compat
-          const session = await Session.findOne({
-            user_id: u._id,
-            status: "completed",
-          })
-            .sort({ completed_at: -1 })
-            .lean();
-
-          if (session) {
-            const s = session as any;
-            score = s.score
-              ? { primary: s.score.primary, secondary: s.score.secondary }
-              : null;
-            latestReportId = s._id || null;
-            completedAt = s.completed_at || null;
+            score = {
+                primary: u.result.score.primary,
+                secondary: u.result.score.secondary,
+            };
+            latestReportId = u.result.session_id || null;
+            completedAt = u.result.completed_at || null;
             status = "Completed";
-
-            // Backfill: embed result into user document for future reads
-            await User.findByIdAndUpdate(u._id, {
-              $set: {
-                result: {
-                  session_id: s._id,
-                  score: s.score,
-                  completed_at: s.completed_at,
-                },
-              },
-            });
-          }
+        } else {
+            const s = sessionMap.get(u._id.toString());
+            if (s) {
+                score = s.score
+                  ? { primary: s.score.primary, secondary: s.score.secondary }
+                  : null;
+                latestReportId = s._id || null;
+                completedAt = s.completed_at || null;
+                status = "Completed";
+            }
         }
 
         return {
@@ -72,10 +132,21 @@ export async function GET() {
           completedAt,
           status,
         };
-      }),
-    );
+    });
 
-    return NextResponse.json(formattedUsers);
+    return NextResponse.json({
+        users: formattedUsers,
+        metadata: {
+            total,
+            page,
+            limit,
+            pages: Math.ceil(total / limit),
+            facets: {
+                batches: batches.filter(Boolean).sort(),
+                institutions: institutions.filter(Boolean).sort()
+            }
+        }
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
@@ -122,11 +193,9 @@ export async function PUT(request: Request) {
     if (!_id)
       return NextResponse.json({ error: "Missing User ID" }, { status: 400 });
 
-    // If institution is being updated, sync to both top-level and meta
     if (updateData.institution !== undefined) {
       updateData["meta.institution"] = updateData.institution;
     }
-    // If batch is being updated, sync to meta.batch
     if (updateData.batch !== undefined) {
       updateData["meta.batch"] = updateData.batch;
     }

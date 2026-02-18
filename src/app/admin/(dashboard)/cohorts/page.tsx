@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -55,6 +55,8 @@ import {
   GraduationCap,
   CheckCircle,
   Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { EditUserDialog } from "@/components/admin/EditUserDialog";
 import { UserDetailsDialog } from "@/components/admin/UserDetailsDialog";
@@ -74,13 +76,28 @@ interface User {
   status: "Completed" | "Not Attempted";
 }
 
-type FilterStatus = "all" | "completed" | "not_attempted";
+type FilterStatus = "all" | "completed" | "not_attempted"; // Note: API expects 'Not Attempted' or 'Completed'
 
 export default function UsersAssessmentsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination & Filtering State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterBatch, setFilterBatch] = useState<string>("all");
+  const [filterInstitution, setFilterInstitution] = useState<string>("all");
+
+  const [availableBatches, setAvailableBatches] = useState<string[]>([]);
+  const [availableInstitutions, setAvailableInstitutions] = useState<string[]>([]);
+
   const [selected, setSelected] = useState<Set<string>>(new Set());
   
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -94,39 +111,75 @@ export default function UsersAssessmentsPage() {
   
   const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
 
+  // Debounce search
   useEffect(() => {
-    fetch("/api/users")
-      .then((r) => r.json())
-      .then((d) => {
-        setUsers(d);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setPage(1); // Reset to page 1 on search change
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  // ---------- Derived ----------
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.batch?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.institution?.toLowerCase().includes(searchTerm.toLowerCase());
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set("page", page.toString());
+      params.set("limit", limit.toString());
 
-    if (!matchesSearch) return false;
+      if (debouncedSearch) params.set("search", debouncedSearch);
 
-    if (filterStatus === "completed") return u.status === "Completed";
-    if (filterStatus === "not_attempted") return u.status === "Not Attempted";
-    return true;
-  });
+      if (filterStatus !== "all") {
+        // Map frontend filter value to API expected value
+        if (filterStatus === "completed") params.set("status", "Completed");
+        else if (filterStatus === "not_attempted") params.set("status", "Not Attempted");
+      }
 
-  const uniqueBatches = [...new Set(users.map((u) => u.batch).filter(Boolean))];
-  const uniqueInstitutions = [
-    ...new Set(users.map((u) => u.institution).filter(Boolean)),
-  ];
-  const completedCount = users.filter((u) => u.status === "Completed").length;
+      if (filterBatch !== "all") params.set("batch", filterBatch);
+      if (filterInstitution !== "all") params.set("institution", filterInstitution);
 
-  // ---------- Selection ----------
+      params.set("sort", "created_at");
+      params.set("order", "desc");
+
+      const res = await fetch(`/api/users?${params.toString()}`);
+      const data = await res.json();
+
+      if (data.users) {
+        setUsers(data.users);
+        setTotalUsers(data.metadata.total);
+        setTotalPages(data.metadata.pages);
+
+        // Update facets if provided (and if we don't want to reset them based on current filter context)
+        // Ideally facets should show ALL available options, regardless of current filters,
+        // OR narrowing options. Here we take what API gives.
+        if (data.metadata.facets) {
+            // Only set if we haven't selected one? Or always update?
+            // If I select "Batch A", do I want to see only "Batch A" in dropdown? No.
+            // But API likely filters facets based on query.
+            // For now, let's use what API returns, but maybe we should persist the initial load's facets?
+            // Let's rely on API.
+            setAvailableBatches(data.metadata.facets.batches || []);
+            setAvailableInstitutions(data.metadata.facets.institutions || []);
+        }
+      } else {
+        // Fallback for array response (should not happen with new API)
+        if (Array.isArray(data)) {
+            setUsers(data);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, limit, debouncedSearch, filterStatus, filterBatch, filterInstitution]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+
+  // ---------- Actions ----------
   const toggleSelect = (id: string) => {
     const next = new Set(selected);
     next.has(id) ? next.delete(id) : next.add(id);
@@ -134,12 +187,11 @@ export default function UsersAssessmentsPage() {
   };
 
   const toggleAll = () => {
-    selected.size === filteredUsers.length
+    selected.size === users.length
       ? setSelected(new Set())
-      : setSelected(new Set(filteredUsers.map((u) => u._id)));
+      : setSelected(new Set(users.map((u) => u._id)));
   };
 
-  // ---------- Actions ----------
   const handleSaveUser = async (updatedUser: any) => {
     try {
       const res = await fetch("/api/users", {
@@ -149,9 +201,11 @@ export default function UsersAssessmentsPage() {
       });
       if (res.ok) {
         const saved = await res.json();
+        // Optimistic update
         setUsers(users.map((u) => (u._id === saved._id ? { ...u, ...saved } : u)));
         setIsEditOpen(false);
         setEditingUser(null);
+        fetchUsers(); // Refresh to be sure
       } else {
         const err = await res.json();
         alert(`Failed: ${err.error || "Unknown error"}`);
@@ -176,6 +230,7 @@ export default function UsersAssessmentsPage() {
           return next;
         });
         setDeleteUser(null);
+        fetchUsers(); // Refresh to update counts
       }
     } catch (e) {
       console.error("Delete failed", e);
@@ -187,10 +242,13 @@ export default function UsersAssessmentsPage() {
   const exportCSV = () => {
     const header =
       "Name,Email,Phone,Batch,Institution,Status,Primary Profile,Secondary Profile,Completed At\n";
+    // If selecting all, we might want to export ALL from server?
+    // For now, export displayed/selected.
     const dataToExport =
       selected.size > 0
-        ? filteredUsers.filter((u) => selected.has(u._id))
-        : filteredUsers;
+        ? users.filter((u) => selected.has(u._id))
+        : users;
+
     const rows = dataToExport
       .map((u) => {
         const primary = u.score?.primary
@@ -199,57 +257,31 @@ export default function UsersAssessmentsPage() {
         const secondary = u.score?.secondary
           ? getDCASTypeName(u.score.secondary as any)
           : "";
-        const completed = u.completedAt
+        const date = u.completedAt
           ? new Date(u.completedAt).toLocaleDateString()
           : "";
-        return `"${u.name}","${u.email}","${u.phone || ""}","${u.batch || ""}","${u.institution || ""}","${u.status}","${primary}","${secondary}","${completed}"`;
+        return `"${u.name}","${u.email}","${u.phone || ""}","${u.batch || ""}","${
+          u.institution || ""
+        }","${u.status}","${primary}","${secondary}","${date}"`;
       })
       .join("\n");
+
     const blob = new Blob([header + rows], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "users-assessments.csv";
+    a.download = "users_assessments.csv";
     a.click();
-    URL.revokeObjectURL(url);
   };
 
-  // Helper to render DCASType Badge with Symbol
-  const renderProfileBadge = (type: string) => {
-    const name = getDCASTypeName(type as any);
-    const symbol = name.charAt(0).toUpperCase();
-    const color = configColors[type as keyof typeof configColors]?.primary || "#64748b";
-    
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div 
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white font-bold text-xs shadow-sm"
-              style={{ backgroundColor: color }}
-            >
-              {symbol}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{name}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  };
-
-  // Helper for truncated text with tooltip
-  const renderTruncatedCell = (text: string | undefined, maxWidth: string = "max-w-[150px]") => {
+  // Helper for truncation
+  const renderTruncatedCell = (text?: string, className = "max-w-[200px]") => {
     if (!text) return <span className="text-muted-foreground">—</span>;
-    
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className={`truncate ${maxWidth} text-sm`}>
-               {text}
-            </div>
+            <div className={`truncate ${className}`}>{text}</div>
           </TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
@@ -259,158 +291,127 @@ export default function UsersAssessmentsPage() {
     );
   };
 
-  // ---------- Render ----------
+  const renderProfileBadge = (type: string) => {
+    const colors = configColors[type as keyof typeof configColors];
+    if (!colors) return <Badge variant="outline">{type}</Badge>;
+    return (
+      <Badge
+        className="font-bold border"
+        style={{
+          backgroundColor: colors.bg,
+          color: colors.text,
+          borderColor: colors.border,
+        }}
+      >
+        {type}
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Users &amp; Assessments
-          </h1>
-          <p className="text-muted-foreground">
-            Manage users and view assessment results in one place
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            Cohort Management
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Manage users, track assessment progress, and view reports.
           </p>
         </div>
-        <div className="flex gap-2">
-          {selected.size > 0 && (
-            <Badge variant="secondary" className="px-3 py-1.5 text-sm">
-              {selected.size} selected
-            </Badge>
-          )}
-          <Button
-            variant="outline"
-            onClick={exportCSV}
-            disabled={filteredUsers.length === 0}
-          >
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={exportCSV}>
             <Download className="mr-2 h-4 w-4" />
-            {selected.size > 0
-              ? `Export Selected (${selected.size})`
-              : "Export CSV"}
+            Export CSV
+          </Button>
+          <Button variant="default" className="bg-primary hover:bg-primary/90">
+            <Users className="mr-2 h-4 w-4" />
+            Add Student
           </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-cyan-100 p-2 dark:bg-cyan-900/30">
-                 <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{users.length}</p>
-                <p className="text-muted-foreground text-xs">Total Users</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/30">
-                 <GraduationCap className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{uniqueBatches.length}</p>
-                <p className="text-muted-foreground text-xs">Unique Batches</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
-                 <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {uniqueInstitutions.length}
-                </p>
-                <p className="text-muted-foreground text-xs">Institutions</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                 <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{completedCount}</p>
-                <p className="text-muted-foreground text-xs">
-                  Completed Assessments
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Table Card */}
-      <Card className="shadow-sm">
+      <Card>
         <CardHeader className="pb-3">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>
-                {filteredUsers.length} of {users.length} users
-                {filterStatus !== "all" &&
-                  ` · Filtered: ${filterStatus === "completed" ? "Completed" : "Not Attempted"}`}
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-3">
-              <Select
-                value={filterStatus}
-                onValueChange={(v) => {
-                  setFilterStatus(v as FilterStatus);
-                  setSelected(new Set());
-                }}
-              >
-                <SelectTrigger className="w-[170px] h-9 text-sm">
-                  <SelectValue placeholder="Filter Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
-                  <SelectItem value="completed">Completed Only</SelectItem>
-                  <SelectItem value="not_attempted">Not Attempted</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="relative w-64">
-                <Search className="text-muted-foreground absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <Input
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setSelected(new Set());
-                  }}
-                  className="pl-9 h-9 text-sm"
-                />
-              </div>
-            </div>
-          </div>
+          <CardTitle>Students</CardTitle>
+          <CardDescription>
+            Total registered users: {totalUsers}
+          </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, email, phone..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select
+              value={filterStatus}
+              onValueChange={(val) => { setFilterStatus(val); setPage(1); }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="not_attempted">Not Attempted</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filterBatch}
+              onValueChange={(val) => { setFilterBatch(val); setPage(1); }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Batch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Batches</SelectItem>
+                {availableBatches.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filterInstitution}
+              onValueChange={(val) => { setFilterInstitution(val); setPage(1); }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Institution" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Institutions</SelectItem>
+                {availableInstitutions.map((i) => (
+                  <SelectItem key={i} value={i}>
+                    {i}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {loading ? (
-            <div className="flex justify-center p-8">
-              <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="border-t">
-              <div className="overflow-x-auto">
-                <Table className="min-w-[1000px]">
-                  <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
-                    <TableRow>
-                      <TableHead className="w-[40px] pl-4">
+            <div className="rounded-md border">
+              <div className="relative w-full overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50 dark:bg-slate-800/50">
+                      <TableHead className="w-[50px] pl-4">
                         <Checkbox
                           checked={
-                            selected.size === filteredUsers.length &&
-                            filteredUsers.length > 0
+                            users.length > 0 && selected.size === users.length
                           }
                           onCheckedChange={toggleAll}
                         />
@@ -420,12 +421,12 @@ export default function UsersAssessmentsPage() {
                       <TableHead>Phone</TableHead>
                       <TableHead>Batch</TableHead>
                       <TableHead>Institution</TableHead>
-                      <TableHead>Profile Result</TableHead>
+                      <TableHead>Profile</TableHead>
                       <TableHead className="text-right pr-6">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUsers.map((u) => (
+                    {users.map((u) => (
                       <TableRow 
                         key={u._id} 
                         className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
@@ -559,10 +560,10 @@ export default function UsersAssessmentsPage() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {filteredUsers.length === 0 && (
+                    {users.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={9} // Adjusted colspan since one column was removed
+                          colSpan={9}
                           className="text-muted-foreground py-12 text-center"
                         >
                           {searchTerm || filterStatus !== "all"
@@ -574,6 +575,37 @@ export default function UsersAssessmentsPage() {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Pagination Controls */}
+              <div className="flex items-center justify-between px-4 py-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalUsers)} of {totalUsers} users
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <div className="text-sm font-medium">
+                    Page {page} of {totalPages}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
             </div>
           )}
         </CardContent>
