@@ -12,6 +12,7 @@ import {
   LogOut,
   Moon,
   Sun,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
@@ -24,6 +25,11 @@ const sidebarItems = [
   { title: "Users & Assessments", href: "/admin/cohorts", icon: Users },
   { title: "Question Bank", href: "/admin/questions", icon: FileQuestion },
   { title: "Assessments", href: "/admin/assessments", icon: ClipboardList },
+  {
+    title: "Manage Admins",
+    href: "/admin/admins",
+    icon: ShieldCheck,
+  },
   {
     title: "DCAS Configuration",
     href: "/admin/dcas-configuration",
@@ -43,6 +49,7 @@ export function AdminSidebar({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 

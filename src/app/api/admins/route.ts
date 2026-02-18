@@ -8,11 +8,22 @@ import { authOptions } from "../auth/[...nextauth]/route";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== "superadmin") {
+    if (
+      !session ||
+      !session.user?.role ||
+      !["admin", "superadmin"].includes(session.user.role)
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     await connectToDatabase();
-    const admins = await Admin.find({})
+
+    const query: any = {};
+    if (session.user.role === "admin") {
+      // Admins cannot see superadmins
+      query.role = { $ne: "superadmin" };
+    }
+
+    const admins = await Admin.find(query)
       .select("-password")
       .sort({ createdAt: -1 });
     return NextResponse.json({ admins });
@@ -28,10 +39,22 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== "superadmin") {
+    if (
+      !session ||
+      !session.user?.role ||
+      !["admin", "superadmin"].includes(session.user.role)
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email, password, name, role } = await request.json();
+
+    if (session.user.role === "admin" && role === "superadmin") {
+      return NextResponse.json(
+        { error: "Admins cannot create superadmins" },
+        { status: 403 },
+      );
+    }
+
     if (!email || !password || !name) {
       return NextResponse.json(
         { error: "Email, password, and name are required" },
