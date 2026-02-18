@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://kavinnandha:kavin4343@cluster0.ipg5jxa.mongodb.net/dcas-unified";
+  process.env.MONGODB_URI;
 
 const AdminSchema = new mongoose.Schema(
   {
