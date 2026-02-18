@@ -30,7 +30,8 @@ import { Download, ArrowRight, Sparkles } from "lucide-react";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 export default function ResultsPage() {
-  const { dcasColors, dcasNames } = useDCASConfig();
+  const { dcasColors, dcasNames, dcasSymbols, getDCASTypeSymbol } =
+    useDCASConfig();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -173,7 +174,7 @@ export default function ResultsPage() {
                   background: `linear-gradient(135deg, ${dcasColors[primaryType].primary}, ${dcasColors[primaryType].primary}dd)`,
                 }}
               >
-                {primaryType}
+                {getDCASTypeSymbol(primaryType)}
               </div>
               <div className="flex-1 text-center sm:text-left">
                 <div className="mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-3">
@@ -225,6 +226,7 @@ export default function ResultsPage() {
                 score={scores[type]}
                 colors={dcasColors}
                 names={dcasNames}
+                symbols={dcasSymbols}
               />
             </div>
           ))}
@@ -265,12 +267,14 @@ export default function ResultsPage() {
                     scores={scores}
                     colors={dcasColors}
                     names={dcasNames}
+                    symbols={dcasSymbols}
                   />
                 ) : (
                   <DCASRadarChart
                     scores={scores}
                     colors={dcasColors}
                     names={dcasNames}
+                    symbols={dcasSymbols}
                   />
                 )}
               </div>
@@ -301,7 +305,7 @@ export default function ResultsPage() {
                               backgroundColor: dcasColors[type].primary,
                             }}
                           >
-                            {type}
+                            {getDCASTypeSymbol(type)}
                           </div>
                           <div>
                             <span className="text-sm font-medium text-slate-900 sm:text-base dark:text-white">
@@ -449,7 +453,7 @@ export default function ResultsPage() {
                 className="flex h-8 w-8 items-center justify-center rounded-xl text-base font-bold text-white sm:h-10 sm:w-10 sm:text-lg"
                 style={{ backgroundColor: dcasColors[primaryType].primary }}
               >
-                {primaryType}
+                {getDCASTypeSymbol(primaryType)}
               </span>
               Behavioural Summary
             </CardTitle>

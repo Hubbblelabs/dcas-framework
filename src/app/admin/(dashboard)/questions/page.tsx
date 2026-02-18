@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
 import { EditQuestionDialog } from "@/components/admin/EditQuestionDialog";
 import { AddQuestionDialog } from "@/components/admin/AddQuestionDialog";
+import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 interface Question {
   _id: string;
@@ -45,6 +46,7 @@ interface Question {
 }
 
 export default function QuestionsPage() {
+  const { getDCASTypeSymbol } = useDCASConfig();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -168,7 +170,7 @@ export default function QuestionsPage() {
                                 variant="outline"
                                 className="text-xs whitespace-nowrap"
                               >
-                                {opt.label}: {opt.dcas_type}
+                                {opt.label}: {getDCASTypeSymbol(opt.dcas_type)}
                               </Badge>
                             ))}
                           </div>

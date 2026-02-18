@@ -29,7 +29,8 @@ import { Logo } from "@/components/Logo";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 export default function ReportPage() {
-  const { dcasColors, dcasNames } = useDCASConfig();
+  const { dcasColors, dcasNames, dcasSymbols, getDCASTypeSymbol } =
+    useDCASConfig();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -274,7 +275,7 @@ export default function ReportPage() {
                         className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-bold text-white shadow-lg sm:mb-4 sm:h-20 sm:w-20 sm:text-3xl"
                         style={{ backgroundColor: dcasColors[type].primary }}
                       >
-                        {type}
+                        {getDCASTypeSymbol(type)}
                       </div>
                       <Badge
                         className="mb-2 text-xs"
@@ -325,6 +326,7 @@ export default function ReportPage() {
                       scores={scores}
                       colors={dcasColors}
                       names={dcasNames}
+                      symbols={dcasSymbols}
                     />
                   </div>
                 </CardContent>
@@ -368,7 +370,7 @@ export default function ReportPage() {
                                     backgroundColor: dcasColors[type].primary,
                                   }}
                                 >
-                                  {type}
+                                  {getDCASTypeSymbol(type)}
                                 </div>
                                 <span className="text-xs text-slate-700 sm:text-sm dark:text-slate-300">
                                   {dcasNames[type]}
@@ -414,7 +416,7 @@ export default function ReportPage() {
                     className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold text-white sm:h-16 sm:w-16 sm:text-3xl"
                     style={{ backgroundColor: dcasColors[primaryType].primary }}
                   >
-                    {primaryType}
+                    {getDCASTypeSymbol(primaryType)}
                   </div>
                   <div className="text-center sm:text-left">
                     <h3 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
@@ -555,7 +557,7 @@ export default function ReportPage() {
                     className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm"
                     style={{ backgroundColor: dcasColors[type].primary }}
                   >
-                    {type}
+                    {getDCASTypeSymbol(type)}
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
                     {dcasNames[type]} Careers

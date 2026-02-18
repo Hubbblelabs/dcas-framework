@@ -91,12 +91,27 @@ export const defaultDCASNames: Record<DCASType, string> = {
   S: "Strategist",
 };
 
+export const defaultDCASSymbols: Record<DCASType, string> = {
+  D: "D",
+  C: "C",
+  A: "A",
+  S: "S",
+};
+
 export function getDCASTypeName(
   type: DCASType,
   customNames?: Record<DCASType, string>,
 ): string {
   const names = customNames || defaultDCASNames;
   return names[type] || defaultDCASNames[type];
+}
+
+export function getDCASTypeSymbol(
+  type: DCASType,
+  customSymbols?: Record<DCASType, string>,
+): string {
+  const symbols = customSymbols || defaultDCASSymbols;
+  return symbols[type] || defaultDCASSymbols[type];
 }
 
 export function getDCASColor(type: DCASType): string {

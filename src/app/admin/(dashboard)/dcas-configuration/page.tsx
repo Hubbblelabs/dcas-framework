@@ -204,10 +204,9 @@ export default function DCASConfigurationPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>DCAS Identity</CardTitle>
+          <CardTitle>DCAS Type Configuration</CardTitle>
           <CardDescription>
-            Define how each DCAS type matches your brand. Use custom names and
-            symbols (1–2 chars or emoji).
+            Customize the names, symbols, and colors for each behavioural type.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -225,12 +224,26 @@ export default function DCASConfigurationPage() {
                   key={type}
                   className={`space-y-4 rounded-lg border p-4 ${bgClass}`}
                 >
-                  <Label
-                    htmlFor={`type-${type}`}
-                    className={`${colorText} mb-2 block font-bold`}
-                  >
-                    {label}
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label
+                      htmlFor={`type-${type}`}
+                      className={`${colorText} block font-bold`}
+                    >
+                      {label}
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colors[type]}
+                        onChange={(e) => handleColorChange(type, e.target.value)}
+                        className="h-6 w-6 cursor-pointer rounded-full border-0 p-0"
+                      />
+                      <span className="font-mono text-[10px] opacity-70">
+                        {colors[type]}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-[1fr_80px] gap-2">
                     <div className="space-y-1">
                       <Label className="text-xs">Name</Label>
@@ -239,6 +252,7 @@ export default function DCASConfigurationPage() {
                         value={names[type]}
                         onChange={(e) => handleNameChange(type, e.target.value)}
                         placeholder={placeholder}
+                        className="bg-background"
                       />
                     </div>
                     <div className="space-y-1">
@@ -250,63 +264,14 @@ export default function DCASConfigurationPage() {
                         }
                         placeholder={type}
                         maxLength={2}
-                        className="text-center font-bold"
+                        className="bg-background text-center font-bold"
                       />
                     </div>
                   </div>
-                  <p className="text-muted-foreground mt-2 text-xs">
-                    {description}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{description}</p>
                 </div>
               ),
             )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Color Configuration</CardTitle>
-          <CardDescription>
-            Customize the color associated with each DCAS type across the
-            platform.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {typeConfigs.map(({ type, label, colorText }) => (
-              <div
-                key={`color-${type}`}
-                className="flex items-center gap-4 rounded-lg border p-4"
-              >
-                <div
-                  className="h-10 w-10 shrink-0 rounded-lg border"
-                  style={{ backgroundColor: colors[type] }}
-                />
-                <div className="flex-1">
-                  <Label
-                    className={`${colorText} mb-1 block text-sm font-bold`}
-                  >
-                    {label}
-                  </Label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={colors[type]}
-                      onChange={(e) => handleColorChange(type, e.target.value)}
-                      className="h-8 w-12 cursor-pointer rounded border-0 p-0"
-                    />
-                    <Input
-                      value={colors[type]}
-                      onChange={(e) => handleColorChange(type, e.target.value)}
-                      placeholder="#000000"
-                      className="w-28 font-mono text-sm"
-                      maxLength={7}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </CardContent>
       </Card>

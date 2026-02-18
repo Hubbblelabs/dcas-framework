@@ -49,7 +49,7 @@ export function AddQuestionDialog({
   ]);
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
-  const { getDCASTypeName } = useDCASConfig();
+  const { getDCASTypeName, getDCASTypeSymbol } = useDCASConfig();
 
   const handleOptionChange = (
     index: number,
@@ -138,10 +138,18 @@ export function AddQuestionDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="D">{getDCASTypeName("D")}</SelectItem>
-                    <SelectItem value="C">{getDCASTypeName("C")}</SelectItem>
-                    <SelectItem value="A">{getDCASTypeName("A")}</SelectItem>
-                    <SelectItem value="S">{getDCASTypeName("S")}</SelectItem>
+                    <SelectItem value="D">
+                      {getDCASTypeSymbol("D")} - {getDCASTypeName("D")}
+                    </SelectItem>
+                    <SelectItem value="C">
+                      {getDCASTypeSymbol("C")} - {getDCASTypeName("C")}
+                    </SelectItem>
+                    <SelectItem value="A">
+                      {getDCASTypeSymbol("A")} - {getDCASTypeName("A")}
+                    </SelectItem>
+                    <SelectItem value="S">
+                      {getDCASTypeSymbol("S")} - {getDCASTypeName("S")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

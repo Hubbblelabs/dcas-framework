@@ -92,7 +92,11 @@ export default function UsersAssessmentsPage() {
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
+  const {
+    getDCASTypeName,
+    getDCASTypeSymbol,
+    dcasColors: configColors,
+  } = useDCASConfig();
 
   useEffect(() => {
     fetch("/api/users")
@@ -219,7 +223,7 @@ export default function UsersAssessmentsPage() {
   // Helper to render DCASType Badge with Symbol
   const renderProfileBadge = (type: string) => {
     const name = getDCASTypeName(type as any);
-    const symbol = name.charAt(0).toUpperCase();
+    const symbol = getDCASTypeSymbol(type as any);
     const color =
       configColors[type as keyof typeof configColors]?.primary || "#64748b";
 

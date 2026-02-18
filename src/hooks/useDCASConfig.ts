@@ -5,9 +5,11 @@ import {
   defaultDCASNames,
   DCASType,
   dcasColors as defaultDcasColors,
+  defaultDCASSymbols,
 } from "@/lib/dcas/scoring";
 
 type DCASNames = Record<DCASType, string>;
+type DCASSymbols = Record<DCASType, string>;
 type DCASColorConfig = Record<
   DCASType,
   { primary: string; light: string; bg: string }
@@ -23,6 +25,8 @@ function hexToLightVariant(hex: string): string {
 
 export function useDCASConfig() {
   const [dcasNames, setDcasNames] = useState<DCASNames>(defaultDCASNames);
+  const [dcasSymbols, setDcasSymbols] =
+    useState<DCASSymbols>(defaultDCASSymbols);
   const [dcasColors, setDcasColors] =
     useState<DCASColorConfig>(defaultDcasColors);
   const [loading, setLoading] = useState(true);
@@ -32,7 +36,7 @@ export function useDCASConfig() {
       try {
         const [namesRes, settingsRes] = await Promise.all([
           fetch("/api/admin/dcas-config"),
-          fetch("/api/admin/settings?key=dcas_colors"),
+          fetch("/api/admin/settings?key=dcas_symbols,dcas_colors"),
         ]);
         if (namesRes.ok) {
           const data = await namesRes.json();
@@ -42,6 +46,9 @@ export function useDCASConfig() {
         }
         if (settingsRes.ok) {
           const data = await settingsRes.json();
+          if (data?.dcas_symbols) {
+            setDcasSymbols(data.dcas_symbols);
+          }
           if (data?.dcas_colors) {
             const custom = data.dcas_colors;
             const colors: DCASColorConfig = { ...defaultDcasColors };
@@ -68,10 +75,13 @@ export function useDCASConfig() {
 
   return {
     dcasNames,
+    dcasSymbols,
     dcasColors,
     loading,
     getDCASTypeName: (type: DCASType) =>
       dcasNames[type] || defaultDCASNames[type],
+    getDCASTypeSymbol: (type: DCASType) =>
+      dcasSymbols[type] || defaultDCASSymbols[type],
     getDCASColor: (type: DCASType) =>
       dcasColors[type] || defaultDcasColors[type],
   };

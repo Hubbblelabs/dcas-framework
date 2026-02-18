@@ -25,6 +25,7 @@ import {
   Target,
 } from "lucide-react";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
+import { DCASType } from "@/lib/dcas/scoring";
 
 interface DashboardStats {
   totalUsers: number;
@@ -47,18 +48,11 @@ interface DashboardStats {
   lastUpdated: string;
 }
 
-const DCAS_COLORS = {
-  D: { bg: "bg-red-500", text: "text-red-600", light: "bg-red-100" },
-  C: { bg: "bg-yellow-500", text: "text-yellow-600", light: "bg-yellow-100" },
-  A: { bg: "bg-green-500", text: "text-green-600", light: "bg-green-100" },
-  S: { bg: "bg-blue-500", text: "text-blue-600", light: "bg-blue-100" },
-};
-
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const { getDCASTypeName } = useDCASConfig();
+  const { getDCASTypeName, getDCASTypeSymbol, dcasColors } = useDCASConfig();
 
   const fetchStats = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -144,7 +138,7 @@ export default function DashboardPage() {
       </div>
 
       {stats.liveAssessment && (
-        <Card className="border-green-200 bg-linear-to-r from-green-50 to-emerald-50">
+        <Card className="border-green-200 bg-linear-to-r from-green-50 to-emerald-50 dark:border-green-900/50 dark:from-green-900/20 dark:to-emerald-900/20">
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -152,16 +146,16 @@ export default function DashboardPage() {
                   <Zap className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-green-800">
+                  <p className="font-semibold text-green-800 dark:text-green-300">
                     Live Assessment
                   </p>
-                  <p className="text-sm text-green-600">
+                  <p className="text-sm text-green-600 dark:text-green-400">
                     {stats.liveAssessment.name} •{" "}
                     {stats.liveAssessment.questionCount} questions
                   </p>
                 </div>
               </div>
-              <Badge className="animate-pulse bg-green-500">
+              <Badge className="animate-pulse bg-green-500 text-white">
                 <span className="mr-1">●</span> Active
               </Badge>
             </div>
@@ -239,17 +233,16 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {(
-                Object.keys(DCAS_COLORS) as Array<keyof typeof DCAS_COLORS>
-              ).map((type) => (
+              {(["D", "C", "A", "S"] as const).map((type) => (
                 <div key={type} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`h-3 w-3 rounded-full ${DCAS_COLORS[type].bg}`}
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: dcasColors[type].primary }}
                       />
                       <span className="font-medium">
-                        {type} - {getDCASTypeName(type)}
+                        {getDCASTypeSymbol(type)} - {getDCASTypeName(type)}
                       </span>
                     </div>
                     <span className="text-muted-foreground">
@@ -260,6 +253,9 @@ export default function DashboardPage() {
                   <Progress
                     value={stats.dcasPercentages[type]}
                     className="h-2"
+                    indicatorStyle={{
+                      backgroundColor: dcasColors[type].primary,
+                    }}
                   />
                 </div>
               ))}
@@ -315,49 +311,49 @@ export default function DashboardPage() {
             </p>
           ) : (
             <div className="space-y-3">
-              {stats.recentSessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-full font-bold text-white ${session.primaryType !== "N/A" ? DCAS_COLORS[session.primaryType as keyof typeof DCAS_COLORS]?.bg || "bg-gray-500" : "bg-gray-500"}`}
-                    >
-                      {session.primaryType !== "N/A"
-                        ? getDCASTypeName(session.primaryType as any)
-                            .charAt(0)
-                            .toUpperCase()
-                        : "?"}
+              {stats.recentSessions.map((session) => {
+                const type = session.primaryType as DCASType;
+                const hasScore = session.primaryType !== "N/A";
+                const color = hasScore ? dcasColors[type].primary : "#94a3b8";
+                const lightBg = hasScore ? dcasColors[type].light : "#f1f5f9";
+
+                return (
+                  <div
+                    key={session.id}
+                    className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-white"
+                        style={{ backgroundColor: color }}
+                      >
+                        {hasScore ? getDCASTypeSymbol(type) : "?"}
+                      </div>
+                      <div>
+                        <p className="font-medium">{session.studentName}</p>
+                        <p className="text-muted-foreground text-sm">
+                          {session.email}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{session.studentName}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {session.email}
+                    <div className="text-right">
+                      <Badge
+                        variant="outline"
+                        style={{
+                          backgroundColor: lightBg,
+                          color: color,
+                          borderColor: color + "40",
+                        }}
+                      >
+                        {hasScore ? getDCASTypeName(type) : "Unknown"}
+                      </Badge>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        {formatDate(session.completedAt)}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge
-                      variant="outline"
-                      className={
-                        session.primaryType !== "N/A"
-                          ? DCAS_COLORS[
-                              session.primaryType as keyof typeof DCAS_COLORS
-                            ]?.light
-                          : ""
-                      }
-                    >
-                      {session.primaryType !== "N/A"
-                        ? getDCASTypeName(session.primaryType as any)
-                        : "Unknown"}
-                    </Badge>
-                    <p className="text-muted-foreground mt-1 text-xs">
-                      {formatDate(session.completedAt)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

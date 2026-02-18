@@ -5,6 +5,7 @@ import {
   dcasColors as defaultDcasColors,
   defaultDCASNames,
   DCASType,
+  defaultDCASSymbols,
 } from "@/lib/dcas/scoring";
 import {
   BarChart,
@@ -26,37 +27,39 @@ interface DCASChartProps {
   scores: DCASScores;
   colors?: Record<DCASType, { primary: string; light: string; bg: string }>;
   names?: Record<DCASType, string>;
+  symbols?: Record<DCASType, string>;
 }
 
 export function DCASBarChart({
   scores,
   colors = defaultDcasColors,
   names = defaultDCASNames,
+  symbols = defaultDCASSymbols,
 }: DCASChartProps) {
   const data = [
     {
       name: names.D,
       value: scores.D,
       color: colors.D.primary,
-      shortName: "D",
+      shortName: symbols.D,
     },
     {
       name: names.C,
       value: scores.C,
       color: colors.C.primary,
-      shortName: "C",
+      shortName: symbols.C,
     },
     {
       name: names.A,
       value: scores.A,
       color: colors.A.primary,
-      shortName: "A",
+      shortName: symbols.A,
     },
     {
       name: names.S,
       value: scores.S,
       color: colors.S.primary,
-      shortName: "S",
+      shortName: symbols.S,
     },
   ];
 
@@ -104,31 +107,32 @@ export function DCASRadarChart({
   scores,
   colors = defaultDcasColors,
   names = defaultDCASNames,
+  symbols = defaultDCASSymbols,
 }: DCASChartProps) {
   const data = [
     {
-      subject: "D",
+      subject: symbols.D,
       fullName: names.D,
       value: scores.D,
       fullMark: 30,
       color: colors.D.primary,
     },
     {
-      subject: "C",
+      subject: symbols.C,
       fullName: names.C,
       value: scores.C,
       fullMark: 30,
       color: colors.C.primary,
     },
     {
-      subject: "A",
+      subject: symbols.A,
       fullName: names.A,
       value: scores.A,
       fullMark: 30,
       color: colors.A.primary,
     },
     {
-      subject: "S",
+      subject: symbols.S,
       fullName: names.S,
       value: scores.S,
       fullMark: 30,
@@ -296,6 +300,7 @@ interface ScoreCardProps {
   maxScore?: number;
   colors?: Record<DCASType, { primary: string; light: string; bg: string }>;
   names?: Record<DCASType, string>;
+  symbols?: Record<DCASType, string>;
 }
 
 export function ScoreCard({
@@ -304,6 +309,7 @@ export function ScoreCard({
   maxScore = 30,
   colors = defaultDcasColors,
   names = defaultDCASNames,
+  symbols = defaultDCASSymbols,
 }: ScoreCardProps) {
   const config = { ...colors[type], name: names[type] };
   const percentage = (score / maxScore) * 100;
@@ -344,7 +350,7 @@ export function ScoreCard({
           className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
           style={{ backgroundColor: config.light }}
         >
-          {type}
+          {symbols[type]}
         </div>
       </div>
       <div className="mt-4">

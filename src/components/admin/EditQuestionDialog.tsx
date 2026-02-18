@@ -50,7 +50,7 @@ export function EditQuestionDialog({
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(
     question,
   );
-  const { getDCASTypeName } = useDCASConfig();
+  const { getDCASTypeName, getDCASTypeSymbol } = useDCASConfig();
 
   if (question && editedQuestion?._id !== question._id) {
     setEditedQuestion(question);
@@ -124,10 +124,18 @@ export function EditQuestionDialog({
                       <SelectValue placeholder="Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="D">{getDCASTypeName("D")}</SelectItem>
-                      <SelectItem value="C">{getDCASTypeName("C")}</SelectItem>
-                      <SelectItem value="A">{getDCASTypeName("A")}</SelectItem>
-                      <SelectItem value="S">{getDCASTypeName("S")}</SelectItem>
+                      <SelectItem value="D">
+                        {getDCASTypeSymbol("D")} - {getDCASTypeName("D")}
+                      </SelectItem>
+                      <SelectItem value="C">
+                        {getDCASTypeSymbol("C")} - {getDCASTypeName("C")}
+                      </SelectItem>
+                      <SelectItem value="A">
+                        {getDCASTypeSymbol("A")} - {getDCASTypeName("A")}
+                      </SelectItem>
+                      <SelectItem value="S">
+                        {getDCASTypeSymbol("S")} - {getDCASTypeName("S")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
