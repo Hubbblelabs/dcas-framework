@@ -134,11 +134,12 @@ export const authOptions: NextAuthOptions = buildAuthOptions(
  */
 async function handler(
   req: Request,
-  context: { params: { nextauth: string[] } },
+  props: { params: Promise<{ nextauth: string[] }> },
 ) {
+  const params = await props.params;
   const host = req.headers.get("host") ?? undefined;
   const options = buildAuthOptions(host);
-  return NextAuth(options)(req as never, context as never);
+  return NextAuth(options)(req as never, { params } as never);
 }
 
 export { handler as GET, handler as POST };
