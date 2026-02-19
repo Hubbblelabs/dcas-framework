@@ -138,7 +138,7 @@ export default async function Home() {
             </h1>
 
             <p className="animate-fade-in-up stagger-1 mx-auto mb-8 max-w-2xl px-2 text-base leading-relaxed text-slate-600 sm:mb-10 sm:text-lg dark:text-slate-400">
-              Take our comprehensive 30-question assessment to understand your
+              Take our comprehensive assessment to understand your
               behavioral style, unlock your strengths, and discover career paths
               that align with your natural tendencies.
             </p>
@@ -166,34 +166,6 @@ export default async function Home() {
                   Learn More
                 </Button>
               </a>
-            </div>
-
-            {/* Stats */}
-            <div className="animate-fade-in-up stagger-3 mt-12 grid grid-cols-3 gap-4 border-t border-slate-200 pt-8 sm:mt-16 sm:gap-8 sm:pt-10 dark:border-slate-800">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
-                  30
-                </p>
-                <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                  Questions
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
-                  4
-                </p>
-                <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                  Behavioural Styles
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
-                  12
-                </p>
-                <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                  Career Matches
-                </p>
-              </div>
             </div>
           </div>
         </div>
@@ -325,7 +297,7 @@ export default async function Home() {
               {
                 num: 1,
                 title: "Take the Assessment",
-                desc: "Answer 30 carefully crafted questions about your preferences and behaviors in various situations.",
+                desc: "Answer our carefully crafted questions about your preferences and behaviors in various situations.",
                 gradient: "from-indigo-500 to-purple-600",
                 shadow: "shadow-indigo-500/30",
               },

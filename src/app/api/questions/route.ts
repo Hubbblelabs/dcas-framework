@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Question } from "@/lib/models/Question";
+import { AssessmentTemplate } from "@/lib/models/AssessmentTemplate";
 import { getServerSession } from "next-auth";
 import { buildAuthOptions } from "@/lib/auth";
 
@@ -98,19 +99,56 @@ export async function DELETE(request: NextRequest) {
     await connectToDatabase();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const force = searchParams.get("force") === "true";
     if (!id)
       return NextResponse.json(
         { error: "Missing Question ID" },
         { status: 400 },
       );
 
+    // Check if question is used in any assessment templates
+    const affectedTemplates = await AssessmentTemplate.find({
+      questions: id,
+    }).lean();
+
+    if (affectedTemplates.length > 0 && !force) {
+      // Return warning with affected template info
+      return NextResponse.json({
+        warning: true,
+        message: `This question is used in ${affectedTemplates.length} assessment template(s).`,
+        affectedTemplates: affectedTemplates.map((t: any) => ({
+          _id: t._id,
+          name: t.name,
+          isLive: t.isLive,
+          questionCount: t.questions?.length || 0,
+        })),
+      }, { status: 200 });
+    }
+
+    // Delete the question
     const deletedQuestion = await Question.findByIdAndDelete(id);
     if (!deletedQuestion)
       return NextResponse.json(
         { error: "Question not found" },
         { status: 404 },
       );
-    return NextResponse.json({ success: true, message: "Question deleted" });
+
+    // Update affected assessment templates: remove question reference and update count
+    if (affectedTemplates.length > 0) {
+      await AssessmentTemplate.updateMany(
+        { questions: id },
+        {
+          $pull: { questions: id },
+          $inc: { question_count: -1 },
+        },
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Question deleted",
+      updatedTemplates: affectedTemplates.length,
+    });
   } catch (error) {
     console.error("Error deleting question:", error);
     return NextResponse.json(

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAssessmentTemplate extends Document {
   name: string;
+  description?: string;
   questions: mongoose.Types.ObjectId[];
   org_id?: string;
   settings: {
@@ -22,6 +23,7 @@ export interface IAssessmentTemplate extends Document {
 const AssessmentTemplateSchema = new Schema<IAssessmentTemplate>(
   {
     name: { type: String, required: true },
+    description: { type: String, default: "" },
     questions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
     org_id: { type: String, index: true },
     settings: {

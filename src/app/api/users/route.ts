@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { Session } from "@/lib/models/Session";
+import { Report } from "@/lib/models/Report";
 import { getServerSession } from "next-auth";
 import { buildAuthOptions } from "@/lib/auth";
 
@@ -214,10 +215,27 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
     if (!id)
       return NextResponse.json({ error: "Missing User ID" }, { status: 400 });
-    const deleted = await User.findByIdAndDelete(id);
-    if (!deleted)
+
+    const user = await User.findById(id);
+    if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    return NextResponse.json({ success: true });
+
+    // Cascade delete all associated data
+    const [deletedSessions, deletedReports] = await Promise.all([
+      Session.deleteMany({ user_id: id }),
+      Report.deleteMany({ user_id: id }),
+    ]);
+
+    // Delete the user
+    await User.findByIdAndDelete(id);
+
+    return NextResponse.json({
+      success: true,
+      deleted: {
+        sessions: deletedSessions.deletedCount,
+        reports: deletedReports.deletedCount,
+      },
+    });
   } catch (error) {
     console.error("Error deleting user:", error);
     return NextResponse.json(

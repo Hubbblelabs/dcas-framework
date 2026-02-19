@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { EditQuestionDialog } from "@/components/admin/EditQuestionDialog";
 import { AddQuestionDialog } from "@/components/admin/AddQuestionDialog";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
@@ -55,6 +55,11 @@ export default function QuestionsPage() {
   const [deleteQuestion, setDeleteQuestion] = useState<Question | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [deleteWarning, setDeleteWarning] = useState<{
+    question: Question;
+    message: string;
+    affectedTemplates: Array<{ _id: string; name: string; isLive: boolean; questionCount: number }>;
+  } | null>(null);
 
   const handleEdit = (question: Question) => {
     setEditingQuestion(question);
@@ -96,12 +101,40 @@ export default function QuestionsPage() {
       const res = await fetch(`/api/questions?id=${deleteQuestion._id}`, {
         method: "DELETE",
       });
-      if (res.ok) {
+      const data = await res.json();
+
+      if (data.warning) {
+        // Show warning about affected templates
+        setDeleteWarning({
+          question: deleteQuestion,
+          message: data.message,
+          affectedTemplates: data.affectedTemplates,
+        });
+        setDeleteQuestion(null);
+      } else if (res.ok) {
         setQuestions(questions.filter((q) => q._id !== deleteQuestion._id));
         setDeleteQuestion(null);
       }
     } catch (e) {
       console.error("Delete failed", e);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleForceDelete = async () => {
+    if (!deleteWarning) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/questions?id=${deleteWarning.question._id}&force=true`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setQuestions(questions.filter((q) => q._id !== deleteWarning.question._id));
+        setDeleteWarning(null);
+      }
+    } catch (e) {
+      console.error("Force delete failed", e);
     } finally {
       setIsDeleting(false);
     }
@@ -145,7 +178,7 @@ export default function QuestionsPage() {
           ) : (
             <div className="border-border/40 overflow-hidden rounded-md border">
               <div className="overflow-x-auto">
-                <Table className="min-w-[800px]">
+                <Table className="min-w-200">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[30%]">Question Text</TableHead>
@@ -266,6 +299,63 @@ export default function QuestionsPage() {
                 </>
               ) : (
                 "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Warning dialog for questions used in assessments */}
+      <AlertDialog
+        open={!!deleteWarning}
+        onOpenChange={(open) => !open && setDeleteWarning(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="h-5 w-5" />
+              Question In Use
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>{deleteWarning?.message}</p>
+                <p className="font-medium text-foreground">
+                  &quot;{deleteWarning?.question.text}&quot;
+                </p>
+                <div className="rounded-lg border p-3 space-y-2">
+                  <p className="text-xs font-semibold text-foreground">Affected Assessment Templates:</p>
+                  {deleteWarning?.affectedTemplates.map((t) => (
+                    <div key={t._id} className="flex items-center justify-between text-xs">
+                      <span className="font-medium">{t.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">{t.questionCount} questions</span>
+                        {t.isLive && (
+                          <Badge className="bg-green-500 text-xs px-1.5 py-0">Live</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Deleting this question will remove it from all affected templates and update their question counts.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleForceDelete}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Anyway"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

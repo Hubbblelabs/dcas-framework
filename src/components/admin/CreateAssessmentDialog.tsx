@@ -54,13 +54,14 @@ export function CreateAssessmentDialog({
     "manual",
   );
   const [timeLimit, setTimeLimit] = useState(0);
-  const [questionCount, setQuestionCount] = useState(30);
+  const [questionCount, setQuestionCount] = useState<number>(0);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -77,10 +78,11 @@ export function CreateAssessmentDialog({
       setIsLive(false);
       setSelectionMethod("manual");
       setTimeLimit(0);
-      setQuestionCount(30);
+      setQuestionCount((prev) => (prev === 0 ? 0 : prev)); // Default, will be clamped
       setSelectedQuestions([]);
       setShuffleOptions(false);
       setShuffleQuestions(false);
+      setDescription("");
     }
   }, [open]);
 
@@ -106,6 +108,7 @@ export function CreateAssessmentDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
+          description,
           questions: selectionMethod === "manual" ? selectedQuestions : [],
           selection_method: selectionMethod,
           question_count: questionCount,
@@ -174,6 +177,15 @@ export function CreateAssessmentDialog({
               </div>
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                placeholder="Brief description of this assessment"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="timeLimit">Time Limit (Minutes)</Label>
               <Input
                 id="timeLimit"
@@ -220,15 +232,17 @@ export function CreateAssessmentDialog({
                 id="questionCount"
                 type="number"
                 min={1}
-                max={activeQuestions.length || 100}
+                max={activeQuestions.length || 1}
                 value={questionCount}
-                onChange={(e) =>
-                  setQuestionCount(parseInt(e.target.value) || 30)
-                }
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  const max = activeQuestions.length || 1;
+                  setQuestionCount(Math.min(val, max));
+                }}
               />
-              <p className="text-muted-foreground text-xs">
+              <p className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}>
                 {activeQuestions.length} total active questions available in
-                bank.
+                bank.{questionCount > activeQuestions.length && " Cannot exceed available questions."}
               </p>
             </div>
           )}
@@ -281,7 +295,7 @@ export function CreateAssessmentDialog({
           </div>
 
           {selectionMethod === "manual" && (
-            <div className="flex min-h-[300px] flex-1 flex-col overflow-hidden">
+            <div className="flex min-h-75 flex-1 flex-col overflow-hidden">
               <div className="mb-2 flex items-center justify-between">
                 <Label>Select Questions *</Label>
                 <Button variant="ghost" size="sm" onClick={handleSelectAll}>
@@ -290,7 +304,7 @@ export function CreateAssessmentDialog({
                     : "Select All"}
                 </Button>
               </div>
-              <ScrollArea className="h-[300px] flex-1 rounded-lg border p-3">
+              <ScrollArea className="h-75 flex-1 rounded-lg border p-3">
                 {loading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -343,7 +357,7 @@ export function CreateAssessmentDialog({
               saving ||
               (selectionMethod === "manual" &&
                 selectedQuestions.length === 0) ||
-              (selectionMethod === "random" && questionCount <= 0)
+              (selectionMethod === "random" && (questionCount <= 0 || questionCount > activeQuestions.length))
             }
           >
             {saving ? (

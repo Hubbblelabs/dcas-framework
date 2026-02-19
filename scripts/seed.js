@@ -543,6 +543,75 @@ async function seed() {
     console.log(`Inserted ${insertedQuestions.length} questions`);
 
     // Create a default assessment template with all questions
+    const Settings =
+      mongoose.models.Settings ||
+      mongoose.model(
+        "Settings",
+        new mongoose.Schema({
+          key: { type: String, required: true, unique: true },
+          value: mongoose.Schema.Types.Mixed,
+          description: String,
+        }),
+      );
+
+    // Default Settings
+    const defaultSettings = [
+      {
+        key: "total_questions",
+        value: 30,
+        description: "Total number of questions in the assessment",
+      },
+      {
+        key: "assessment_time_limit",
+        value: 0,
+        description: "Time limit in minutes (0 for unlimited)",
+      },
+      {
+        key: "allow_guest_assessments",
+        value: true,
+        description: "Allow users to take assessments without logging in",
+      },
+      {
+        key: "require_email",
+        value: false,
+        description: "Require email to view results",
+      },
+      {
+        key: "site_name",
+        value: "DCAS Assessment",
+        description: "Name of the application",
+      },
+      {
+        key: "dcas_names",
+        value: {
+          D: "Driver",
+          C: "Connector",
+          A: "Anchor",
+          S: "Strategist",
+        },
+        description: "Custom names for DCAS types",
+      },
+      {
+        key: "dcas_colors",
+        value: {
+          D: "#6E2A8C",
+          C: "#F08A24",
+          A: "#1B2D4F",
+          S: "#2F8F83",
+        },
+        description: "Custom colors for DCAS types",
+      },
+    ];
+
+    // Upsert settings
+    for (const setting of defaultSettings) {
+      await Settings.findOneAndUpdate({ key: setting.key }, setting, {
+        upsert: true,
+        new: true,
+      });
+    }
+    console.log("Seeded default settings");
+
     await AssessmentTemplate.deleteMany({});
     const template = await AssessmentTemplate.create({
       name: "DCAS Assessment - Default",

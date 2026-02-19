@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "DCAS Behavioural Assessment | Discover Your Career Direction",
   description:
-    "Take our comprehensive 30-question DCAS behavioural assessment to discover your personality style, unlock your strengths, and find career paths that align with your natural tendencies.",
+    "Take our comprehensive DCAS behavioural assessment to discover your personality style, unlock your strengths, and find career paths that align with your natural tendencies.",
   keywords: [
     "DCAS",
     "personality assessment",

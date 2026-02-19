@@ -6,6 +6,7 @@ import {
   defaultDCASNames,
   DCASType,
   defaultDCASSymbols,
+  getScoreLevel,
 } from "@/lib/dcas/scoring";
 import {
   BarChart,
@@ -35,7 +36,8 @@ export function DCASBarChart({
   colors = defaultDcasColors,
   names = defaultDCASNames,
   symbols = defaultDCASSymbols,
-}: DCASChartProps) {
+  maxScore = 30,
+}: DCASChartProps & { maxScore?: number }) {
   const data = [
     {
       name: names.D,
@@ -76,7 +78,7 @@ export function DCASBarChart({
           tick={{ fill: "currentColor" }}
         />
         <YAxis
-          domain={[0, 30]}
+          domain={[0, maxScore]}
           className="fill-muted-foreground text-sm"
           tick={{ fill: "currentColor" }}
         />
@@ -108,34 +110,35 @@ export function DCASRadarChart({
   colors = defaultDcasColors,
   names = defaultDCASNames,
   symbols = defaultDCASSymbols,
-}: DCASChartProps) {
+  maxScore = 30,
+}: DCASChartProps & { maxScore?: number }) {
   const data = [
     {
       subject: symbols.D,
       fullName: names.D,
       value: scores.D,
-      fullMark: 30,
+      fullMark: maxScore,
       color: colors.D.primary,
     },
     {
       subject: symbols.C,
       fullName: names.C,
       value: scores.C,
-      fullMark: 30,
+      fullMark: maxScore,
       color: colors.C.primary,
     },
     {
       subject: symbols.A,
       fullName: names.A,
       value: scores.A,
-      fullMark: 30,
+      fullMark: maxScore,
       color: colors.A.primary,
     },
     {
       subject: symbols.S,
       fullName: names.S,
       value: scores.S,
-      fullMark: 30,
+      fullMark: maxScore,
       color: colors.S.primary,
     },
   ];
@@ -232,7 +235,7 @@ export function DCASRadarChart({
           />
           <PolarRadiusAxis
             angle={90}
-            domain={[0, 30]}
+            domain={[0, maxScore]}
             tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
             tickCount={4}
             axisLine={false}
@@ -267,10 +270,10 @@ export function DCASRadarChart({
             }}
             formatter={(value, _name, props) => {
               const numValue = typeof value === "number" ? value : 0;
-              const percentage = Math.round((numValue / 30) * 100);
+              const percentage = Math.round((numValue / maxScore) * 100);
               const payload = (props as any).payload;
               return [
-                `${numValue} / 30 (${percentage}%)`,
+                `${numValue} / ${maxScore} (${percentage}%)`,
                 payload?.fullName || "",
               ];
             }}
@@ -314,17 +317,19 @@ export function ScoreCard({
   const config = { ...colors[type], name: names[type] };
   const percentage = (score / maxScore) * 100;
 
-  let level: string;
+  /* 
+    Import getScoreLevel at the top of file if not already imported. 
+    It is not in the diff context, so I must start from line 1 or check imports first.
+    I will assume I need to add it to the import list.
+  */
+  const level = getScoreLevel(score, maxScore);
   let levelColor: string;
 
-  if (score <= 7) {
-    level = "Low";
+  if (level === "Low") {
     levelColor = "text-muted-foreground";
-  } else if (score <= 14) {
-    level = "Moderate";
+  } else if (level === "Moderate") {
     levelColor = "text-amber-500";
   } else {
-    level = "High";
     levelColor = "text-emerald-500";
   }
 

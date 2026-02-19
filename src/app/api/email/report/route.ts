@@ -8,6 +8,7 @@ import {
   getCombinedProfileDescription,
 } from "@/lib/dcas/interpretations";
 import { DCASType, defaultDCASNames } from "@/lib/dcas/scoring";
+import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.hostinger.com",
@@ -47,7 +48,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const { subject, html } = generateEmailContent(user, session);
+    const settings = await Settings.find({
+      key: {
+        $in: [SETTINGS_KEYS.TOTAL_QUESTIONS, SETTINGS_KEYS.DCAS_COLORS],
+      },
+    });
+
+    const settingsMap = settings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, any>);
+
+    const { subject, html } = generateEmailContent(user, session, settingsMap);
 
     const info = await transporter.sendMail({
       from:
@@ -68,10 +80,19 @@ export async function POST(req: Request) {
   }
 }
 
-function generateEmailContent(user: any, session: any) {
+function generateEmailContent(
+  user: any,
+  session: any,
+  settings: Record<string, any>,
+) {
   const scores = session.score?.raw || {}; // Use raw scores for display
   const rawScores = session.score?.raw || {};
   const percentScores = session.score?.percent || {};
+  const maxScore = 
+    Object.values(rawScores).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) || 
+    settings[SETTINGS_KEYS.TOTAL_QUESTIONS] || 
+    30;
+  const customColors = settings[SETTINGS_KEYS.DCAS_COLORS] || {};
 
   // Determine ranks if not present, though usually they are calculated on frontend.
   // We trust session.score.primary/secondary if available, otherwise recalculate.
@@ -91,10 +112,10 @@ function generateEmailContent(user: any, session: any) {
 
   // Theme colors
   const colors: Record<string, string> = {
-    D: "#dc2626", // red-600
-    C: "#eab308", // yellow-500
-    A: "#10b981", // emerald-500
-    S: "#3b82f6", // blue-500
+    D: customColors.D || "#6E2A8C",
+    C: customColors.C || "#F08A24",
+    A: customColors.A || "#1B2D4F",
+    S: customColors.S || "#2F8F83",
     primary: "#4f46e5", // indigo-600
     text: "#1e293b", // slate-800
     textLight: "#64748b", // slate-500
@@ -149,19 +170,19 @@ function generateEmailContent(user: any, session: any) {
                 <h2 style="${styles.h2}">Score Breakdown</h2>
                 <div style="${styles.scoreRow}">
                     <span style="${styles.scoreLabel}">Driver (D)</span>
-                    <span style="${styles.scoreValue}" style="color: ${colors.D}">${rawScores.D} / 30</span>
+                    <span style="${styles.scoreValue}" style="color: ${colors.D}">${rawScores.D} / ${maxScore}</span>
                 </div>
                 <div style="${styles.scoreRow}">
                     <span style="${styles.scoreLabel}">Connector (C)</span>
-                    <span style="${styles.scoreValue}" style="color: ${colors.C}">${rawScores.C} / 30</span>
+                    <span style="${styles.scoreValue}" style="color: ${colors.C}">${rawScores.C} / ${maxScore}</span>
                 </div>
                 <div style="${styles.scoreRow}">
                     <span style="${styles.scoreLabel}">Anchor (A)</span>
-                    <span style="${styles.scoreValue}" style="color: ${colors.A}">${rawScores.A} / 30</span>
+                    <span style="${styles.scoreValue}" style="color: ${colors.A}">${rawScores.A} / ${maxScore}</span>
                 </div>
                 <div style="${styles.scoreRow}">
                     <span style="${styles.scoreLabel}">Strategist (S)</span>
-                    <span style="${styles.scoreValue}" style="color: ${colors.S}">${rawScores.S} / 30</span>
+                    <span style="${styles.scoreValue}" style="color: ${colors.S}">${rawScores.S} / ${maxScore}</span>
                 </div>
             </div>
 

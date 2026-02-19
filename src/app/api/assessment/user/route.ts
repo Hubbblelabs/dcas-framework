@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
+import { Session } from "@/lib/models/Session";
 
 export async function POST(req: Request) {
   try {
@@ -16,8 +17,31 @@ export async function POST(req: Request) {
 
     if (user) {
       // Security fix: Do not update existing users to prevent unauthorized changes/impersonation.
-      // We simply return the existing user's ID.
-      // If a student needs to update details, they should contact admin or we need a proper auth flow.
+      // Check if user already completed an assessment
+      let completedSessionId = user.result?.session_id || null;
+
+      if (!completedSessionId) {
+        // Fallback: query Session collection
+        const completedSession = await Session.findOne({
+          user_id: user._id,
+          status: "completed",
+        })
+          .sort({ completed_at: -1 })
+          .lean();
+        if (completedSession) {
+          completedSessionId = (completedSession as any)._id;
+        }
+      }
+
+      return NextResponse.json({
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        institution: user.institution,
+        hasCompletedAssessment: !!completedSessionId,
+        completedSessionId: completedSessionId || null,
+      });
     } else {
       // Create new user
       if (!name) {
@@ -45,6 +69,8 @@ export async function POST(req: Request) {
       email: user.email,
       phone: user.phone,
       institution: user.institution,
+      hasCompletedAssessment: false,
+      completedSessionId: null,
     });
   } catch (error) {
     console.error("User auth error:", error);

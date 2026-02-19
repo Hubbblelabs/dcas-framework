@@ -73,7 +73,7 @@ export function EditAssessmentDialog({
     "manual",
   );
   const [timeLimit, setTimeLimit] = useState(0);
-  const [questionCount, setQuestionCount] = useState(30);
+  const [questionCount, setQuestionCount] = useState(0);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const activeQuestions = useMemo(
@@ -84,6 +84,7 @@ export function EditAssessmentDialog({
   const [saving, setSaving] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (open && assessment) {
@@ -100,7 +101,8 @@ export function EditAssessmentDialog({
       setTimeLimit(assessment.settings?.time_limit || 0);
       setIsLive(assessment.isLive || false);
       setSelectionMethod(assessment.selection_method || "manual");
-      setQuestionCount(assessment.question_count || 30);
+      setQuestionCount(assessment.question_count || 30); // Will be clamped by input max
+      setDescription((assessment as any).description || "");
       const qIds = (assessment.questions || []).map((q: any) =>
         typeof q === "string" ? q : q._id,
       );
@@ -129,6 +131,7 @@ export function EditAssessmentDialog({
         body: JSON.stringify({
           _id: assessment._id,
           name,
+          description,
           questions: selectionMethod === "manual" ? selectedQuestions : [],
           selection_method: selectionMethod,
           question_count: questionCount,
@@ -193,6 +196,15 @@ export function EditAssessmentDialog({
               </div>
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="edit-description">Description</Label>
+              <Input
+                id="edit-description"
+                placeholder="Brief description of this assessment"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="edit-timeLimit">Time Limit (Minutes)</Label>
               <Input
                 id="edit-timeLimit"
@@ -239,15 +251,17 @@ export function EditAssessmentDialog({
                 id="edit-questionCount"
                 type="number"
                 min={1}
-                max={activeQuestions.length || 100}
+                max={activeQuestions.length || 1}
                 value={questionCount}
-                onChange={(e) =>
-                  setQuestionCount(parseInt(e.target.value) || 30)
-                }
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  const max = activeQuestions.length || 1;
+                  setQuestionCount(Math.min(val, max));
+                }}
               />
-              <p className="text-muted-foreground text-xs">
+              <p className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}>
                 {activeQuestions.length} total active questions available in
-                bank. Saving will regenerate the random selection.
+                bank. Saving will regenerate the random selection.{questionCount > activeQuestions.length && " Cannot exceed available questions."}
               </p>
             </div>
           )}
@@ -307,7 +321,7 @@ export function EditAssessmentDialog({
           </div>
 
           {selectionMethod === "manual" && (
-            <div className="flex min-h-[300px] flex-1 flex-col overflow-hidden">
+            <div className="flex min-h-75 flex-1 flex-col overflow-hidden">
               <div className="mb-2 flex items-center justify-between">
                 <Label>Select Questions</Label>
                 <Button variant="ghost" size="sm" onClick={handleSelectAll}>
@@ -316,7 +330,7 @@ export function EditAssessmentDialog({
                     : "Select All"}
                 </Button>
               </div>
-              <ScrollArea className="h-[300px] flex-1 rounded-lg border p-3">
+              <ScrollArea className="h-75 flex-1 rounded-lg border p-3">
                 {loading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -369,7 +383,7 @@ export function EditAssessmentDialog({
               saving ||
               (selectionMethod === "manual" &&
                 selectedQuestions.length === 0) ||
-              (selectionMethod === "random" && questionCount <= 0)
+              (selectionMethod === "random" && (questionCount <= 0 || questionCount > activeQuestions.length))
             }
           >
             {saving ? (

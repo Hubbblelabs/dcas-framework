@@ -4,9 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DCASBarChart } from "@/components/charts/dcas-charts";
+import { DCASBarChart, DCASRadarChart, ScoreCard } from "@/components/charts/dcas-charts";
 import { DCASScores, DCASType, getScoreLevel } from "@/lib/dcas/scoring";
 import {
   interpretations,
@@ -23,10 +23,13 @@ import {
   MessageCircle,
   AlertTriangle,
   Pin,
+  Sparkles,
 } from "lucide-react";
 import { CareerIcon } from "@/components/career-icon";
 import { Logo } from "@/components/Logo";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
+import { pdf } from "@react-pdf/renderer";
+import { ReportPDF } from "@/components/ReportPDF";
 
 export default function ReportPage() {
   const { dcasColors, dcasNames, dcasSymbols, getDCASTypeSymbol } =
@@ -39,25 +42,56 @@ export default function ReportPage() {
   const [rankedTypes, setRankedTypes] = useState<DCASType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [maxScore, setMaxScore] = useState(30);
+  const [chartType, setChartType] = useState<"bar" | "radar">("bar");
+  const [studentName, setStudentName] = useState<string>("Student");
+  const [assessmentDate, setAssessmentDate] = useState<string>("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    // Fetch logo
+    fetch("/api/admin/logo")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.logoUrl) setLogoUrl(data.logoUrl);
+      })
+      .catch((err) => console.error("Error fetching logo:", err));
+  }, []);
+
+  useEffect(() => {
+    if (!sessionId || sessionId === "undefined") {
+        return;
+    }
+
     if (sessionId === "local") {
       const storedScores = sessionStorage.getItem("dcasScores");
       const storedRankedTypes = sessionStorage.getItem("dcasRankedTypes");
       if (storedScores && storedRankedTypes) {
-        setScores(JSON.parse(storedScores));
+        const parsedScores = JSON.parse(storedScores);
+        setScores(parsedScores);
         setRankedTypes(JSON.parse(storedRankedTypes));
+        setStudentName("Local User");
+        setAssessmentDate(new Date().toISOString());
+        
+        // Calculate maxScore from scores
+        const total = Object.values(parsedScores).reduce((a: number, b: any) => a + b, 0);
+        setMaxScore(total);
+        
         setIsLoaded(true);
       } else {
         router.push("/assessment");
       }
     } else {
       fetch(`/api/sessions/${sessionId}`, {
-        credentials: 'include',
+        credentials: "include",
       })
         .then((res) => {
           if (!res.ok) {
-            console.error("Failed to fetch session:", res.status, res.statusText);
+            console.error(
+              "Failed to fetch session:",
+              res.status,
+              res.statusText,
+            );
             throw new Error("Failed to fetch session");
           }
           return res.json();
@@ -66,6 +100,14 @@ export default function ReportPage() {
           console.log("Session data:", data);
           if (data.session?.score) {
             setScores(data.session.score.raw);
+            if (data.studentName) setStudentName(data.studentName);
+            if (data.createdAt) setAssessmentDate(data.createdAt);
+            
+            // Calculate maxScore from scores
+            const raw = data.session.score.raw;
+            const total = Object.values(raw).reduce((a: number, b: any) => a + b, 0);
+            setMaxScore(total);
+
             const ranked: DCASType[] = [];
             if (data.session.score.primary)
               ranked.push(data.session.score.primary);
@@ -95,52 +137,31 @@ export default function ReportPage() {
   }, [sessionId, router]);
 
   const handleDownloadPdf = async () => {
-    if (!reportRef.current) return;
+    if (!scores) return;
     setIsGeneratingPdf(true);
     try {
-      // Dynamic imports to avoid SSR issues
-      const { toPng } = await import("html-to-image");
-      const { jsPDF } = await import("jspdf");
-
-      const noPrintElements = document.querySelectorAll(".no-print");
-      noPrintElements.forEach(
-        (el) => ((el as HTMLElement).style.display = "none"),
-      );
-
-      const dataUrl = await toPng(reportRef.current, {
-        quality: 0.95,
-        backgroundColor: "#ffffff",
-      });
-
-      noPrintElements.forEach((el) => ((el as HTMLElement).style.display = ""));
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(dataUrl);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      let heightLeft = pdfHeight;
-      let position = 0;
-
-      // First page
-      pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, pdfHeight);
-      heightLeft -= pageHeight;
-
-      // Subsequent pages
-      while (heightLeft > 0) {
-        position -= pageHeight; // Move image up by one page height
-        pdf.addPage();
-        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
-      }
-
-      const date = new Date().toISOString().split("T")[0];
-      pdf.save(`DCAS-Behavioural-Report-${date}.pdf`);
+      const blob = await pdf(
+        <ReportPDF
+          scores={scores}
+          rankedTypes={rankedTypes}
+          dcasColors={dcasColors}
+          dcasNames={dcasNames}
+          maxScore={maxScore}
+          studentName={studentName}
+          assessmentDate={assessmentDate}
+          logoUrl={logoUrl}
+        />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `DCAS-Behavioural-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error generating PDF:", error);
-      // Fallback to browser print if image generation fails
-      window.print();
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -167,29 +188,20 @@ export default function ReportPage() {
   const profileDesc = getCombinedProfileDescription(primaryType, secondaryType);
   const careers = getCareerRecommendations(primaryType, secondaryType);
 
-  const currentDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const currentDate = assessmentDate 
+    ? new Date(assessmentDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
   return (
     <>
-      <style jsx global>{`
-        @media print {
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .no-print {
-            display: none !important;
-          }
-          .print-break {
-            page-break-before: always;
-          }
-        }
-      `}</style>
-
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <header className="no-print relative top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
           <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-4">
@@ -223,14 +235,14 @@ export default function ReportPage() {
                     </>
                   )}
                 </Button>
-                <Link href={`/results/${sessionId}`}>
+                <Link href="/">
                   <Button
                     variant="ghost"
                     className="btn-press gap-1 rounded-full text-xs sm:text-sm"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    <span className="hidden sm:inline">Results</span>
-                    <span className="sm:hidden">Back</span>
+                    <span className="hidden sm:inline">Home</span>
+                    <span className="sm:hidden">Home</span>
                   </Button>
                 </Link>
               </div>
@@ -254,7 +266,7 @@ export default function ReportPage() {
               DCAS Behavioural Assessment Report
             </h1>
             <p className="text-sm text-slate-600 sm:text-base dark:text-slate-400">
-              Comprehensive Behavioural Analysis & Career Guidance
+              Comprehensive Behavioural Analysis & Career Guidance for <span className="font-semibold text-slate-900 dark:text-white">{studentName}</span>
             </p>
             <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm dark:text-slate-400">
               Generated on {currentDate}
@@ -306,10 +318,10 @@ export default function ReportPage() {
                         className="text-lg font-bold sm:text-2xl"
                         style={{ color: dcasColors[type].primary }}
                       >
-                        {scores[type]} / 30
+                        {scores[type]} / {maxScore}
                       </p>
                       <p className="text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                        {getScoreLevel(scores[type], 30)}
+                        {getScoreLevel(scores[type], maxScore)}
                       </p>
                     </div>
                   ))}
@@ -329,18 +341,49 @@ export default function ReportPage() {
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
               <Card className="border-0 shadow-xl">
                 <CardHeader className="px-4 py-4 sm:px-6">
-                  <CardTitle className="text-base sm:text-lg">
-                    DCAS Score Distribution
-                  </CardTitle>
+                    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                        <CardTitle className="text-base sm:text-lg">
+                            DCAS Score Distribution
+                        </CardTitle>
+                        <div className="flex gap-2">
+                            <Button
+                                variant={chartType === "bar" ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setChartType("bar")}
+                                className="btn-press rounded-full text-xs sm:text-sm"
+                            >
+                                Bar
+                            </Button>
+                            <Button
+                                variant={chartType === "radar" ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setChartType("radar")}
+                                className="btn-press rounded-full text-xs sm:text-sm"
+                            >
+                                Radar
+                            </Button>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
                   <div className="w-full overflow-x-auto">
-                    <DCASBarChart
-                      scores={scores}
-                      colors={dcasColors}
-                      names={dcasNames}
-                      symbols={dcasSymbols}
-                    />
+                    {chartType === "bar" ? (
+                        <DCASBarChart
+                        scores={scores}
+                        colors={dcasColors}
+                        names={dcasNames}
+                        symbols={dcasSymbols}
+                        maxScore={maxScore}
+                        />
+                    ) : (
+                        <DCASRadarChart
+                        scores={scores}
+                        colors={dcasColors}
+                        names={dcasNames}
+                        symbols={dcasSymbols}
+                        maxScore={maxScore}
+                        />
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -394,11 +437,11 @@ export default function ReportPage() {
                               className="py-2 text-center text-xs font-bold sm:py-3 sm:text-sm"
                               style={{ color: dcasColors[type].primary }}
                             >
-                              {scores[type]} / 30
+                              {scores[type]} / {maxScore}
                             </td>
                             <td className="hidden py-2 text-center sm:table-cell sm:py-3">
                               <Badge variant="outline" className="text-xs">
-                                {getScoreLevel(scores[type], 30)}
+                                {getScoreLevel(scores[type], maxScore)}
                               </Badge>
                             </td>
                             <td className="py-2 text-right text-xs text-slate-500 sm:py-3 sm:text-sm dark:text-slate-400">

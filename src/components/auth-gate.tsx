@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
@@ -22,6 +23,7 @@ interface AuthGateProps {
 }
 
 export function AuthGate({ onAuthenticated }: AuthGateProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -55,6 +57,13 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
       }
 
       const data = await res.json();
+
+      // If user has already completed an assessment, redirect to their results
+      if (data.hasCompletedAssessment && data.completedSessionId) {
+        router.push(`/results/${data.completedSessionId}`);
+        return;
+      }
+
       onAuthenticated(data.userId, data);
     } catch (err: any) {
       setError(err.message);
