@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { Session } from "@/lib/models/Session";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   const session = await getServerSession(authOptions);

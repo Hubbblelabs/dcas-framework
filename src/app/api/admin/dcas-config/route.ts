@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { defaultDCASNames } from "@/lib/dcas/scoring";
 
 export async function GET() {

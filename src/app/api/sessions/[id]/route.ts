@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
+import { authOptions } from "@/lib/auth";
+import { verifySessionToken } from "@/lib/session-token";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 import { Question } from "@/lib/models/Question";
@@ -20,8 +24,26 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await connectToDatabase();
     const { id } = await params;
+
+    const sessionAuth = await getServerSession(authOptions);
+    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
+
+    let isOwner = false;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session_token")?.value;
+    if (token) {
+      const decoded = await verifySessionToken(token);
+      if (decoded && decoded.sessionId === id) {
+        isOwner = true;
+      }
+    }
+
+    if (!isAdmin && !isOwner) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectToDatabase();
 
     // Ensure models registered
 
@@ -91,8 +113,26 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await connectToDatabase();
     const { id } = await params;
+
+    const sessionAuth = await getServerSession(authOptions);
+    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
+
+    let isOwner = false;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session_token")?.value;
+    if (token) {
+      const decoded = await verifySessionToken(token);
+      if (decoded && decoded.sessionId === id) {
+        isOwner = true;
+      }
+    }
+
+    if (!isAdmin && !isOwner) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectToDatabase();
     const body = await req.json();
     const { action, questionId, answer } = body;
 

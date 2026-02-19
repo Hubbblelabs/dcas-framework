@@ -221,21 +221,11 @@ function AssessmentContent({ userId }: { userId: string | null }) {
 
         router.push(`/results/${data.sessionId}`);
       } else {
-        // Fallback: use sessionStorage
-        sessionStorage.setItem("dcasScores", JSON.stringify(scores));
-        sessionStorage.setItem("dcasRankedTypes", JSON.stringify(rankedTypes));
-        sessionStorage.setItem("dcasAnswers", JSON.stringify(finalAnswers));
-        router.push("/results/local");
+        throw new Error("Failed to submit assessment");
       }
-    } catch {
-      // Fallback: use sessionStorage
-      sessionStorage.setItem("dcasScores", JSON.stringify(scores));
-      sessionStorage.setItem(
-        "dcasRankedTypes",
-        JSON.stringify(getRankedTypes(scores)),
-      );
-      sessionStorage.setItem("dcasAnswers", JSON.stringify(finalAnswers));
-      router.push("/results/local");
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("There was an error saving your results. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
