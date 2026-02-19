@@ -105,13 +105,20 @@ export async function POST(request: NextRequest) {
         { error: "User already exists" },
         { status: 409 },
       );
+
+    // SECURITY: Explicitly destruct only allowed fields to prevent mass assignment
+    const { name, email, phone, institution, batch, meta } = body;
+
     const user = await User.create({
-      ...body,
+      name,
+      email,
+      phone,
+      institution: institution || undefined,
       role: "student",
-      institution: body.institution || undefined,
       meta: {
-        batch: body.batch || body.meta?.batch || undefined,
-        institution: body.institution || body.meta?.institution || undefined,
+        ...(meta || {}),
+        batch: batch || meta?.batch || undefined,
+        institution: institution || meta?.institution || undefined,
       },
     });
     return NextResponse.json(user, { status: 201 });
@@ -133,17 +140,35 @@ export async function PUT(request: Request) {
   try {
     await connectToDatabase();
     const body = await request.json();
-    const { _id, ...updateData } = body;
+    const { _id, ...rest } = body;
     if (!_id)
       return NextResponse.json({ error: "Missing User ID" }, { status: 400 });
 
-    // If institution is being updated, sync to both top-level and meta
-    if (updateData.institution !== undefined) {
-      updateData["meta.institution"] = updateData.institution;
+    // SECURITY: Explicitly construct update object to prevent mass assignment
+    // Only allow updating safe fields
+    const { name, email, phone, institution, batch, meta } = rest;
+
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (meta !== undefined && typeof meta === "object") {
+      // Allow updating meta fields individually
+      // Process meta first so top-level fields can override specific ones if needed
+      for (const [key, value] of Object.entries(meta)) {
+        if (key && value !== undefined) {
+          updateData[`meta.${key}`] = value;
+        }
+      }
     }
-    // If batch is being updated, sync to meta.batch
-    if (updateData.batch !== undefined) {
-      updateData["meta.batch"] = updateData.batch;
+    if (institution !== undefined) {
+      updateData.institution = institution;
+      // Sync to meta.institution
+      updateData["meta.institution"] = institution;
+    }
+    if (batch !== undefined) {
+      // Sync to meta.batch
+      updateData["meta.batch"] = batch;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
