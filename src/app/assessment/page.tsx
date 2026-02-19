@@ -73,8 +73,29 @@ function AssessmentContent({ userId }: { userId: string | null }) {
 
   // Fetch questions and settings from the live assessment template
   useEffect(() => {
+    if (!userId) return;
+
     setLoadingQuestions(true);
     setLoadError(null);
+
+    // Try to restore from localStorage first
+    const savedState = localStorage.getItem(`dcas_assessment_${userId}`);
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        if (parsed.shuffledQuestions && parsed.shuffledQuestions.length > 0) {
+          setShuffledQuestions(parsed.shuffledQuestions);
+          setCurrentQuestion(parsed.currentQuestion || 0);
+          setAnswers(parsed.answers || {});
+          setShuffleOptions(!!parsed.shuffleOptions);
+          setLoadingQuestions(false);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to restore saved assessment state:", e);
+      }
+    }
+
     fetch("/api/assessment/settings")
       .then((r) => r.json())
       .then((data) => {
@@ -100,7 +121,27 @@ function AssessmentContent({ userId }: { userId: string | null }) {
         setLoadError("Failed to load assessment. Please try again.");
         setLoadingQuestions(false);
       });
-  }, []);
+  }, [userId]);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (userId && shuffledQuestions.length > 0 && !isSubmitting) {
+      const state = {
+        currentQuestion,
+        answers,
+        shuffledQuestions,
+        shuffleOptions,
+      };
+      localStorage.setItem(`dcas_assessment_${userId}`, JSON.stringify(state));
+    }
+  }, [
+    userId,
+    currentQuestion,
+    answers,
+    shuffledQuestions,
+    shuffleOptions,
+    isSubmitting,
+  ]);
 
   const question = shuffledQuestions[currentQuestion];
   const totalQuestions = shuffledQuestions.length;
@@ -199,6 +240,9 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       if (res.ok) {
         const data = await res.json();
         sessionId = data.sessionId;
+
+        // Clear local storage on success
+        if (userId) localStorage.removeItem(`dcas_assessment_${userId}`);
 
         // Trigger Email Report
         if (sessionId) {

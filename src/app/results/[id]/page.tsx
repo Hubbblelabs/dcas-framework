@@ -101,6 +101,7 @@ export default function ResultsPage() {
   const primaryInterp = interpretations[primaryType];
   const careers = getCareerRecommendations(primaryType, secondaryType);
   const profileDesc = getCombinedProfileDescription(primaryType, secondaryType);
+  const totalQuestions = scores.D + scores.C + scores.A + scores.S;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
@@ -207,7 +208,7 @@ export default function ResultsPage() {
                     className="rounded-full text-xs sm:text-sm"
                   >
                     Score: {scores[primaryType]} (
-                    {getScoreLevel(scores[primaryType], 30)})
+                    {getScoreLevel(scores[primaryType], totalQuestions)})
                   </Badge>
                 </div>
               </div>
@@ -294,8 +295,8 @@ export default function ResultsPage() {
             <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
               <div className="space-y-3 sm:space-y-4">
                 {rankedTypes.map((type, index) => {
-                  const level = getScoreLevel(scores[type], 30);
-                  const percentage = (scores[type] / 30) * 100;
+                  const level = getScoreLevel(scores[type], totalQuestions);
+                  const percentage = (scores[type] / totalQuestions) * 100;
                   return (
                     <div key={type} className="space-y-1.5 sm:space-y-2">
                       <div className="flex items-center justify-between">
@@ -336,7 +337,7 @@ export default function ResultsPage() {
                           </span>
                           <span className="text-xs text-slate-500 sm:text-sm dark:text-slate-400">
                             {" "}
-                            / 30
+                            / {totalQuestions}
                           </span>
                           <p className="hidden text-xs text-slate-500 sm:block dark:text-slate-400">
                             {level}
