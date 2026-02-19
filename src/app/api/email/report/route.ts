@@ -128,7 +128,7 @@ function generateEmailContent(user: any, session: any) {
   const html = `
         <div style="${styles.container}">
             <div style="${styles.header}">
-                <div style="font-size: 48px; margin-bottom: 16px;">💎</div>
+                <div style="font-size: 48px; margin-bottom: 16px;"></div>
                 <h1 style="${styles.headerTitle}">Your DCAS Profile</h1>
                 <p style="${styles.headerSubtitle}">Assessment Report for ${user.name}</p>
             </div>

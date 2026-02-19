@@ -28,6 +28,7 @@ import { Logo } from "@/components/Logo";
 import { CareerIcon } from "@/components/career-icon";
 import { Download, ArrowRight, Sparkles } from "lucide-react";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
+import { Footer } from "@/components/Footer";
 
 export default function ResultsPage() {
   const { dcasColors, dcasNames, dcasSymbols, getDCASTypeSymbol } =
@@ -54,32 +55,32 @@ export default function ResultsPage() {
       .then((data) => {
         console.log("Session data:", data);
         if (data.session?.score) {
-            setScores(data.session.score.raw);
-            const ranked: DCASType[] = [];
-            if (data.session.score.primary)
-              ranked.push(data.session.score.primary);
-            if (data.session.score.secondary)
-              ranked.push(data.session.score.secondary);
-            const types: DCASType[] = ["D", "C", "A", "S"];
-            types.sort(
-              (a, b) =>
-                (data.session.score.raw[b] || 0) -
-                (data.session.score.raw[a] || 0),
-            );
-            const fullRanked = [
-              ...new Set([...ranked, ...types]),
-            ] as DCASType[];
-            setRankedTypes(fullRanked);
-            setIsLoaded(true);
-          } else {
-            console.error("No score in session data");
-            router.push("/assessment");
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching session:", err);
+          setScores(data.session.score.raw);
+          const ranked: DCASType[] = [];
+          if (data.session.score.primary)
+            ranked.push(data.session.score.primary);
+          if (data.session.score.secondary)
+            ranked.push(data.session.score.secondary);
+          const types: DCASType[] = ["D", "C", "A", "S"];
+          types.sort(
+            (a, b) =>
+              (data.session.score.raw[b] || 0) -
+              (data.session.score.raw[a] || 0),
+          );
+          const fullRanked = [
+            ...new Set([...ranked, ...types]),
+          ] as DCASType[];
+          setRankedTypes(fullRanked);
+          setIsLoaded(true);
+        } else {
+          console.error("No score in session data");
           router.push("/assessment");
-        });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching session:", err);
+        router.push("/assessment");
+      });
   }, [sessionId, router]);
 
   if (!isLoaded || !scores) {
@@ -528,27 +529,7 @@ export default function ResultsPage() {
         </div>
       </section>
 
-      <footer className="safe-area-inset relative z-10 mt-8 border-t border-slate-200 py-6 sm:mt-12 sm:py-8 dark:border-slate-800">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6">
-          <div className="flex flex-col items-center justify-center gap-1">
-            <p className="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-              © {new Date().getFullYear()} DCAS Behavioural Assessment. Results
-              are for guidance purposes only.
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-500">
-              Designed and developed by{" "}
-              <a
-                href="https://teammistake.com"
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium hover:text-slate-900 dark:hover:text-slate-300"
-              >
-                TeamMistake
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

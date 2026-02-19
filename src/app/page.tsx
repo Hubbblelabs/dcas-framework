@@ -11,6 +11,7 @@ import { GraduationCap, BookOpen, Compass, ArrowRight } from "lucide-react";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 import { Logo } from "@/components/Logo";
+import { Footer } from "@/components/Footer";
 
 async function getDCASConfig() {
   try {
@@ -444,34 +445,8 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="safe-area-inset border-t border-slate-200 py-8 sm:py-12 dark:border-slate-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <Logo
-              size="sm"
-              showText
-              textClassName="text-sm font-semibold text-slate-900 sm:text-base dark:text-white"
-            />
-            <div className="flex flex-col items-center gap-1 sm:items-end">
-              <p className="text-center text-xs text-slate-600 sm:text-right sm:text-sm dark:text-slate-400">
-                © {new Date().getFullYear()} DCAS Behavioural Assessment. All
-                rights reserved.
-              </p>
-              <p className="text-center text-xs text-slate-500 sm:text-right dark:text-slate-500">
-                Designed and developed by{" "}
-                <a
-                  href="https://teammistake.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium hover:text-slate-900 dark:hover:text-slate-300"
-                >
-                  TeamMistake
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
