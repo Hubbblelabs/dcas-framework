@@ -120,12 +120,32 @@ export function getDCASColor(type: DCASType): string {
 
 export const dcasColors: Record<
   DCASType,
-  { primary: string; light: string; bg: string }
+  { primary: string; light: string; bg: string; base: string }
 > = {
-  D: { primary: "#DC2626", light: "#FEE2E2", bg: "bg-red-500" },
-  C: { primary: "#F59E0B", light: "#FEF3C7", bg: "bg-yellow-500" },
-  A: { primary: "#10B981", light: "#D1FAE5", bg: "bg-green-500" },
-  S: { primary: "#3B82F6", light: "#DBEAFE", bg: "bg-blue-500" },
+  D: {
+    primary: "#6E2A8C",
+    light: "#F3E8FF",
+    bg: "bg-purple-500",
+    base: "purple",
+  },
+  C: {
+    primary: "#F08A24",
+    light: "#FFEDD5",
+    bg: "bg-orange-500",
+    base: "orange",
+  },
+  A: {
+    primary: "#1B2D4F",
+    light: "#E0E7FF",
+    bg: "bg-indigo-900",
+    base: "indigo",
+  },
+  S: {
+    primary: "#2F8F83",
+    light: "#CCFBF1",
+    bg: "bg-teal-500",
+    base: "teal",
+  },
 };
 
 export function getScoreLevel(score: number, total: number): string {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { buildAuthOptions } from "@/lib/auth";
 import { defaultDCASNames } from "@/lib/dcas/scoring";
 
 export async function GET() {
@@ -22,6 +22,8 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    const host = request.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

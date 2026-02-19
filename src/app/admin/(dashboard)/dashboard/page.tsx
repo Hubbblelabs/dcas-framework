@@ -58,10 +58,13 @@ export default function DashboardPage() {
     if (isRefresh) setRefreshing(true);
     try {
       const res = await fetch("/api/admin/stats");
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(`Failed to fetch stats: ${res.status} ${res.statusText} - ${JSON.stringify(errorData)}`);
+      }
       setStats(await res.json());
     } catch (err) {
-      console.error("Failed to fetch stats", err);
+      console.error("Failed to fetch stats:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);

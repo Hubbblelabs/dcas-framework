@@ -3,10 +3,12 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { buildAuthOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const host = request.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
     if (
       !session ||
@@ -59,6 +61,8 @@ export async function GET() {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const host = request.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { buildAuthOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 import { User } from "@/lib/models/User";
@@ -18,10 +18,16 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const host = request.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== "admin") {
+    if (
+      !session ||
+      !session.user?.role ||
+      !["admin", "superadmin"].includes(session.user.role)
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

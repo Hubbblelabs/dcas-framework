@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
-import { authOptions } from "@/lib/auth";
+import { buildAuthOptions } from "@/lib/auth";
 import { verifySessionToken } from "@/lib/session-token";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
@@ -31,8 +31,12 @@ export async function GET(
   try {
     const { id } = await params;
 
+    const host = _req.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
-    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
+    const isAdmin = ["admin", "superadmin"].includes(
+      (sessionAuth?.user as any)?.role
+    );
 
     let isOwner = false;
     const cookieStore = await cookies();
@@ -120,8 +124,12 @@ export async function POST(
   try {
     const { id } = await params;
 
+    const host = req.headers.get("host") ?? undefined;
+    const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
-    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
+    const isAdmin = ["admin", "superadmin"].includes(
+      (sessionAuth?.user as any)?.role
+    );
 
     let isOwner = false;
     const cookieStore = await cookies();

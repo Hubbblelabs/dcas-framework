@@ -12,7 +12,7 @@ type DCASNames = Record<DCASType, string>;
 type DCASSymbols = Record<DCASType, string>;
 type DCASColorConfig = Record<
   DCASType,
-  { primary: string; light: string; bg: string }
+  { primary: string; light: string; bg: string; base: string }
 >;
 
 function hexToLightVariant(hex: string): string {
@@ -58,10 +58,12 @@ export function useDCASConfig() {
                   primary: custom[type],
                   light: hexToLightVariant(custom[type]),
                   bg: defaultDcasColors[type].bg,
+                  base: defaultDcasColors[type].base,
                 };
               }
             });
             setDcasColors(colors);
+
           }
         }
       } catch {

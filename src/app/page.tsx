@@ -232,36 +232,36 @@ export default async function Home() {
                   gradientFrom: string;
                 }
               > = {
-                red: {
-                  bg: "from-red-500/5",
-                  textAccent: "text-red-600 dark:text-red-400",
-                  tagBg: "bg-red-100 dark:bg-red-900/30",
-                  tagText: "text-red-700 dark:text-red-300",
-                  gradientFrom: "from-red-500/5",
+                purple: {
+                  bg: "from-purple-500/5",
+                  textAccent: "text-purple-600 dark:text-purple-400",
+                  tagBg: "bg-purple-100 dark:bg-purple-900/30",
+                  tagText: "text-purple-700 dark:text-purple-300",
+                  gradientFrom: "from-purple-500/5",
                 },
-                amber: {
-                  bg: "from-amber-500/5",
-                  textAccent: "text-amber-600 dark:text-amber-400",
-                  tagBg: "bg-amber-100 dark:bg-amber-900/30",
-                  tagText: "text-amber-700 dark:text-amber-300",
-                  gradientFrom: "from-amber-500/5",
+                orange: {
+                  bg: "from-orange-500/5",
+                  textAccent: "text-orange-600 dark:text-orange-400",
+                  tagBg: "bg-orange-100 dark:bg-orange-900/30",
+                  tagText: "text-orange-700 dark:text-orange-300",
+                  gradientFrom: "from-orange-500/5",
                 },
-                emerald: {
-                  bg: "from-emerald-500/5",
-                  textAccent: "text-emerald-600 dark:text-emerald-400",
-                  tagBg: "bg-emerald-100 dark:bg-emerald-900/30",
-                  tagText: "text-emerald-700 dark:text-emerald-300",
-                  gradientFrom: "from-emerald-500/5",
+                indigo: {
+                  bg: "from-indigo-500/5",
+                  textAccent: "text-indigo-600 dark:text-indigo-400",
+                  tagBg: "bg-indigo-100 dark:bg-indigo-900/30",
+                  tagText: "text-indigo-700 dark:text-indigo-300",
+                  gradientFrom: "from-indigo-500/5",
                 },
-                blue: {
-                  bg: "from-blue-500/5",
-                  textAccent: "text-blue-600 dark:text-blue-400",
-                  tagBg: "bg-blue-100 dark:bg-blue-900/30",
-                  tagText: "text-blue-700 dark:text-blue-300",
-                  gradientFrom: "from-blue-500/5",
+                teal: {
+                  bg: "from-teal-500/5",
+                  textAccent: "text-teal-600 dark:text-teal-400",
+                  tagBg: "bg-teal-100 dark:bg-teal-900/30",
+                  tagText: "text-teal-700 dark:text-teal-300",
+                  gradientFrom: "from-teal-500/5",
                 },
               };
-              const c = colorMap[info.colorClass];
+              const c = colorMap[effectiveColors[type].base];
               return (
                 <Card
                   key={type}
