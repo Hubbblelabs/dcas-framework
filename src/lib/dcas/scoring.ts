@@ -28,46 +28,40 @@ export function getScoreRange(score: number): ScoreRange {
   return "High";
 }
 
-export function getDCASTypes(scores: DCASScores): {
-  primaryType: DCASType;
-  secondaryType: DCASType;
-} {
-  const sortedTypes = (Object.entries(scores) as [DCASType, number][]).sort(
-    (a, b) => b[1] - a[1],
-  );
-
-  return {
-    primaryType: sortedTypes[0][0],
-    secondaryType: sortedTypes[1][0],
-  };
-}
-
 export function getRankedTypes(scores: DCASScores): DCASType[] {
   return (Object.entries(scores) as [DCASType, number][])
     .sort((a, b) => b[1] - a[1])
     .map(([type]) => type);
 }
 
-export function calculateDCASResult(
-  responses: Array<{ questionId: number; answer: "A" | "B" | "C" | "D" }>,
-  questions: Array<{
-    id: number;
-    options: Record<string, { text: string; type: DCASType }>;
-  }>,
-): DCASResult {
+export function calculateScores(
+  answers: Record<string | number, DCASType> | (DCASType | undefined | null)[],
+): DCASScores {
   const scores: DCASScores = { D: 0, C: 0, A: 0, S: 0 };
+  const values = Array.isArray(answers) ? answers : Object.values(answers);
 
-  responses.forEach((response) => {
-    const question = questions.find((q) => q.id === response.questionId);
-    if (question) {
-      const option = question.options[response.answer];
-      if (option) {
-        scores[option.type]++;
-      }
+  values.forEach((type) => {
+    if (type && scores[type] !== undefined) {
+      scores[type]++;
     }
   });
+  return scores;
+}
 
-  const { primaryType, secondaryType } = getDCASTypes(scores);
+export function calculatePercentages(
+  scores: DCASScores,
+  total: number,
+): Record<DCASType, number> {
+  return {
+    D: total ? Math.round((scores.D / total) * 100) : 0,
+    C: total ? Math.round((scores.C / total) * 100) : 0,
+    A: total ? Math.round((scores.A / total) * 100) : 0,
+    S: total ? Math.round((scores.S / total) * 100) : 0,
+  };
+}
+
+export function calculateDCASResult(scores: DCASScores): DCASResult {
+  const ranked = getRankedTypes(scores);
 
   const scoreRanges: DCASScoreRanges = {
     D: getScoreRange(scores.D),
@@ -79,8 +73,8 @@ export function calculateDCASResult(
   return {
     scores,
     scoreRanges,
-    primaryType,
-    secondaryType,
+    primaryType: ranked[0],
+    secondaryType: ranked[1],
   };
 }
 
@@ -139,12 +133,4 @@ export function getScoreLevel(score: number, total: number): string {
   if (percentage >= 70) return "High";
   if (percentage >= 40) return "Moderate";
   return "Low";
-}
-
-export function calculateScores(answers: Record<number, DCASType>): DCASScores {
-  const scores: DCASScores = { D: 0, C: 0, A: 0, S: 0 };
-  Object.values(answers).forEach((type) => {
-    scores[type]++;
-  });
-  return scores;
 }

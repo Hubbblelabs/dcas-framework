@@ -10,6 +10,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   DCASType,
   getRankedTypes,
+  calculateScores,
+  calculatePercentages,
 } from "@/lib/dcas/scoring";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
 import { AuthGate } from "@/components/auth-gate";
@@ -164,15 +166,8 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       ...(question ? { [question._id]: selectedOption as DCASType } : {}),
     };
 
-    // Build a scores map from the DB question options
-    const scores = { D: 0, C: 0, A: 0, S: 0 };
-    shuffledQuestions.forEach((q) => {
-      const selectedType = finalAnswers[q._id];
-      if (selectedType) {
-        scores[selectedType]++;
-      }
-    });
-
+    // Build a scores map from the final answers
+    const scores = calculateScores(finalAnswers);
     const rankedTypes = getRankedTypes(scores);
 
     try {
@@ -193,12 +188,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
           }),
           score: {
             raw: scores,
-            percent: {
-              D: Math.round((scores.D / totalQuestions) * 100),
-              C: Math.round((scores.C / totalQuestions) * 100),
-              A: Math.round((scores.A / totalQuestions) * 100),
-              S: Math.round((scores.S / totalQuestions) * 100),
-            },
+            percent: calculatePercentages(scores, totalQuestions),
             primary: rankedTypes[0],
             secondary: rankedTypes[1],
           },

@@ -3,7 +3,12 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 import { Question } from "@/lib/models/Question";
 import { User } from "@/lib/models/User";
-import { getScoreRange } from "@/lib/dcas/scoring";
+import {
+  getScoreRange,
+  calculateScores,
+  calculatePercentages,
+  getRankedTypes,
+} from "@/lib/dcas/scoring";
 import { getCareerRecommendations } from "@/lib/dcas/careers";
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -137,33 +142,17 @@ export async function POST(
       await session.save();
       return NextResponse.json({ success: true });
     } else if (action === "complete") {
-      const counts = { D: 0, C: 0, A: 0, S: 0 };
-      session.responses.forEach((r: any) => {
-        if (
-          r.dcas_type &&
-          counts[r.dcas_type as keyof typeof counts] !== undefined
-        ) {
-          counts[r.dcas_type as keyof typeof counts]++;
-        }
-      });
-
+      const types = session.responses.map((r: any) => r.dcas_type);
+      const counts = calculateScores(types);
       const total = Object.values(counts).reduce((a, b) => a + b, 0);
-      const percents = {
-        D: total ? (counts.D / total) * 100 : 0,
-        C: total ? (counts.C / total) * 100 : 0,
-        A: total ? (counts.A / total) * 100 : 0,
-        S: total ? (counts.S / total) * 100 : 0,
-      };
-
-      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-      const primary = sorted[0][0];
-      const secondary = sorted[1][0];
+      const percents = calculatePercentages(counts, total);
+      const ranked = getRankedTypes(counts);
 
       session.score = {
         raw: counts,
         percent: percents,
-        primary: primary as "D" | "C" | "A" | "S",
-        secondary: secondary as "D" | "C" | "A" | "S",
+        primary: ranked[0],
+        secondary: ranked[1],
       };
       session.status = "completed";
       session.completed_at = new Date();
