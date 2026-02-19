@@ -41,12 +41,18 @@ export default function ResultsPage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/sessions/${sessionId}`)
+    fetch(`/api/sessions/${sessionId}`, {
+      credentials: 'include',
+    })
       .then((res) => {
-        if (!res.ok) throw new Error("Unauthorized");
+        if (!res.ok) {
+          console.error("Failed to fetch session:", res.status, res.statusText);
+          throw new Error("Unauthorized");
+        }
         return res.json();
       })
       .then((data) => {
+        console.log("Session data:", data);
         if (data.session?.score) {
             setScores(data.session.score.raw);
             const ranked: DCASType[] = [];
@@ -66,10 +72,14 @@ export default function ResultsPage() {
             setRankedTypes(fullRanked);
             setIsLoaded(true);
           } else {
+            console.error("No score in session data");
             router.push("/assessment");
           }
         })
-        .catch(() => router.push("/assessment"));
+        .catch((err) => {
+          console.error("Error fetching session:", err);
+          router.push("/assessment");
+        });
   }, [sessionId, router]);
 
   if (!isLoaded || !scores) {

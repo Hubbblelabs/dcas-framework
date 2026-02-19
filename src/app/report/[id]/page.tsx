@@ -52,9 +52,18 @@ export default function ReportPage() {
         router.push("/assessment");
       }
     } else {
-      fetch(`/api/sessions/${sessionId}`)
-        .then((res) => res.json())
+      fetch(`/api/sessions/${sessionId}`, {
+        credentials: 'include',
+      })
+        .then((res) => {
+          if (!res.ok) {
+            console.error("Failed to fetch session:", res.status, res.statusText);
+            throw new Error("Failed to fetch session");
+          }
+          return res.json();
+        })
         .then((data) => {
+          console.log("Session data:", data);
           if (data.session?.score) {
             setScores(data.session.score.raw);
             const ranked: DCASType[] = [];
@@ -74,10 +83,14 @@ export default function ReportPage() {
             setRankedTypes(fullRanked);
             setIsLoaded(true);
           } else {
+            console.error("No score in session data");
             router.push("/assessment");
           }
         })
-        .catch(() => router.push("/assessment"));
+        .catch((err) => {
+          console.error("Error fetching session:", err);
+          router.push("/assessment");
+        });
     }
   }, [sessionId, router]);
 

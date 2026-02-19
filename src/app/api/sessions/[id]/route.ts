@@ -48,14 +48,9 @@ export async function GET(
       }
     }
 
-    if (!isAdmin && !isOwner) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     await connectToDatabase();
 
-    // Ensure models registered
-
+    // First, check if the session exists and is completed
     const session = await Session.findById(id)
       .populate("template_id")
       .populate("user_id")
@@ -64,6 +59,14 @@ export async function GET(
 
     if (!session) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    // Allow public access to completed sessions (results viewing)
+    // Restrict in-progress sessions to admin or owner only
+    const isCompleted = session.status === "completed";
+    
+    if (!isCompleted && !isAdmin && !isOwner) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     let result = session.toObject();
