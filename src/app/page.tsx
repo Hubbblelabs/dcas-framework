@@ -116,7 +116,7 @@ export default async function Home() {
         </nav>
 
         {/* Hero Content */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:py-24">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:py-32">
           <div className="mx-auto max-w-4xl text-center">
             {/* Badge */}
             <div className="animate-fade-in mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 sm:mb-8 sm:px-4 sm:py-2 sm:text-sm dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
@@ -169,7 +169,7 @@ export default async function Home() {
             </div>
 
             {/* Stats */}
-            <div className="animate-fade-in-up stagger-3 mt-10 grid grid-cols-3 gap-4 border-t border-slate-200 pt-6 sm:mt-14 sm:gap-8 sm:pt-8 dark:border-slate-800">
+            <div className="animate-fade-in-up stagger-3 mt-12 grid grid-cols-3 gap-4 border-t border-slate-200 pt-8 sm:mt-16 sm:gap-8 sm:pt-10 dark:border-slate-800">
               <div className="text-center">
                 <p className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
                   30
@@ -200,9 +200,9 @@ export default async function Home() {
       </header>
 
       {/* DCAS Types Section */}
-      <section id="learn-more" className="py-12 sm:py-16 lg:py-20">
+      <section id="learn-more" className="py-16 sm:py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
+          <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-16">
             <h2 className="animate-fade-in mb-3 text-2xl font-bold tracking-tight text-slate-900 sm:mb-4 sm:text-3xl lg:text-4xl dark:text-white">
               The Four DCAS Behavioural Styles
             </h2>
@@ -306,9 +306,9 @@ export default async function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="bg-linear-to-b from-slate-50 to-white py-12 sm:py-16 lg:py-20 dark:from-slate-900 dark:to-slate-950">
+      <section className="bg-linear-to-b from-slate-50 to-white py-16 sm:py-20 lg:py-32 dark:from-slate-900 dark:to-slate-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
+          <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-16">
             <h2 className="mb-3 text-2xl font-bold tracking-tight text-slate-900 sm:mb-4 sm:text-3xl lg:text-4xl dark:text-white">
               How It Works
             </h2>
@@ -318,7 +318,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="relative grid gap-6 sm:gap-8 md:grid-cols-3">
+          <div className="relative grid gap-8 sm:gap-10 md:grid-cols-3">
             <div className="absolute top-12 right-1/6 left-1/6 hidden h-0.5 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30 md:block" />
 
             {[
@@ -365,7 +365,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="mt-10 text-center sm:mt-14">
+          <div className="mt-12 text-center sm:mt-16">
             <Link href="/assessment">
               <Button
                 size="lg"
@@ -380,9 +380,9 @@ export default async function Home() {
       </section>
 
       {/* Target Audience Section */}
-      <section className="py-12 sm:py-16 lg:py-20">
+      <section className="py-16 sm:py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
+          <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-16">
             <h2 className="mb-3 text-2xl font-bold tracking-tight text-slate-900 sm:mb-4 sm:text-3xl lg:text-4xl dark:text-white">
               Who Is This For?
             </h2>
