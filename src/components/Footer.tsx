@@ -6,9 +6,9 @@ export function Footer() {
 
     return (
         <footer className="w-full border-t border-slate-200 bg-white py-8 dark:border-slate-800 dark:bg-slate-950">
-            <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-6 lg:flex-row lg:justify-between lg:gap-4 lg:px-8">
                 {/* Brand */}
-                <div className="flex items-center gap-2 sm:flex-1 sm:justify-start">
+                <div className="flex items-center justify-center lg:justify-start">
                     <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
                         <Logo
                             size="sm"
@@ -19,8 +19,8 @@ export function Footer() {
                 </div>
 
                 {/* Credits - Center */}
-                <div className="order-last flex items-center gap-1.5 text-sm text-slate-500 sm:order-none sm:flex-1 sm:justify-center dark:text-slate-500">
-                    <span>Designed and developed by</span>
+                <div className="flex flex-col items-center justify-center gap-1 text-sm text-slate-500 sm:flex-row sm:gap-1.5 lg:absolute lg:left-1/2 lg:-translate-x-1/2 dark:text-slate-500">
+                    <span className="whitespace-nowrap text-center">Designed and developed by</span>
                     <a
                         href="https://teammistake.com"
                         target="_blank"
@@ -32,8 +32,8 @@ export function Footer() {
                 </div>
 
                 {/* Copyright - Right */}
-                <div className="flex items-center sm:flex-1 sm:justify-end">
-                    <p className="text-center text-sm text-slate-500 sm:text-right dark:text-slate-400">
+                <div className="flex items-center justify-center lg:justify-end">
+                    <p className="text-center text-sm text-slate-500 lg:text-right dark:text-slate-400">
                         &copy; {currentYear} DCAS Behavioural Assessment.
                     </p>
                 </div>
