@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Session } from "@/lib/models/Session";
 import { User } from "@/lib/models/User";
 import { AssessmentTemplate } from "@/lib/models/AssessmentTemplate";
 import { Question } from "@/lib/models/Question";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
+import { createSessionToken } from "@/lib/session-token";
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -17,6 +20,11 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any).role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const sessions = await Session.find({})
       .populate("user_id")
@@ -99,10 +107,18 @@ export async function POST(req: Request) {
         });
       }
 
-      return NextResponse.json({
+      const token = await createSessionToken(session._id.toString());
+      const response = NextResponse.json({
         sessionId: session._id,
         message: "Session saved",
       });
+      response.cookies.set("session_token", token, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      });
+      return response;
     }
 
     // Full mode - template-based session creation
@@ -164,12 +180,20 @@ export async function POST(req: Request) {
       return { ...questionObj, options: shuffleArray(questionObj.options) };
     });
 
-    return NextResponse.json({
+    const token = await createSessionToken(session._id.toString());
+    const response = NextResponse.json({
       sessionId: session._id,
       questions: randomizedQuestions,
       template: template,
       message: "Session created successfully",
     });
+    response.cookies.set("session_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+    });
+    return response;
   } catch (error) {
     console.error("Error creating session:", error);
     return NextResponse.json(

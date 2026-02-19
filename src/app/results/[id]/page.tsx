@@ -41,22 +41,13 @@ export default function ResultsPage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (sessionId === "local") {
-      const storedScores = sessionStorage.getItem("dcasScores");
-      const storedRankedTypes = sessionStorage.getItem("dcasRankedTypes");
-      if (storedScores && storedRankedTypes) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setScores(JSON.parse(storedScores));
-        setRankedTypes(JSON.parse(storedRankedTypes));
-        setIsLoaded(true);
-      } else {
-        router.push("/assessment");
-      }
-    } else {
-      fetch(`/api/sessions/${sessionId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.session?.score) {
+    fetch(`/api/sessions/${sessionId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.session?.score) {
             setScores(data.session.score.raw);
             const ranked: DCASType[] = [];
             if (data.session.score.primary)
@@ -79,7 +70,6 @@ export default function ResultsPage() {
           }
         })
         .catch(() => router.push("/assessment"));
-    }
   }, [sessionId, router]);
 
   if (!isLoaded || !scores) {

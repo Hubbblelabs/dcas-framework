@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { AssessmentTemplate } from "@/lib/models/AssessmentTemplate";
 import "@/lib/models/Question";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {

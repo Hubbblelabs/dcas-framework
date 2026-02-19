@@ -15,13 +15,9 @@ export async function POST(req: Request) {
     let user = await User.findOne({ email: email.toLowerCase() });
 
     if (user) {
-      // Update user details if provided
-      if (name) user.name = name;
-      if (phone) user.phone = phone;
-      if (institution) user.institution = institution;
-      if (batch) user.meta = { ...user.meta, batch };
-      if (institution) user.meta = { ...user.meta, institution };
-      await user.save();
+      // Security fix: Do not update existing users to prevent unauthorized changes/impersonation.
+      // We simply return the existing user's ID.
+      // If a student needs to update details, they should contact admin or we need a proper auth flow.
     } else {
       // Create new user
       if (!name) {
