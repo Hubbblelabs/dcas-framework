@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -76,6 +76,10 @@ export function EditAssessmentDialog({
   const [questionCount, setQuestionCount] = useState(30);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const activeQuestions = useMemo(
+    () => allQuestions.filter((q) => q.active),
+    [allQuestions],
+  );
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
@@ -111,11 +115,9 @@ export function EditAssessmentDialog({
       prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id],
     );
   const handleSelectAll = () =>
-    selectedQuestions.length === allQuestions.filter((q) => q.active).length
+    selectedQuestions.length === activeQuestions.length
       ? setSelectedQuestions([])
-      : setSelectedQuestions(
-          allQuestions.filter((q) => q.active).map((q) => q._id),
-        );
+      : setSelectedQuestions(activeQuestions.map((q) => q._id));
 
   const handleSave = async () => {
     if (!assessment || !name.trim()) return;
@@ -152,7 +154,6 @@ export function EditAssessmentDialog({
   };
 
   if (!assessment) return null;
-  const activeQuestions = allQuestions.filter((q) => q.active);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
