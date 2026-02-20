@@ -8,6 +8,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
+import { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
   Mail,
@@ -27,9 +30,12 @@ interface User {
   institution?: string;
   createdAt?: string;
   latestReportId?: string;
+  latestSessionId?: string;
   score?: { primary: string; secondary?: string } | null;
   completedAt?: string | null;
   status: "Completed" | "Not Attempted";
+  followup_status?: "none" | "needs_followup" | "in_progress" | "completed";
+  last_followup_at?: string | null;
 }
 
 interface UserDetailsDialogProps {
@@ -44,6 +50,11 @@ export function UserDetailsDialog({
   onOpenChange,
 }: UserDetailsDialogProps) {
   const { getDCASTypeName, dcasColors: configColors } = useDCASConfig();
+  useEffect(() => {
+    if (user) {
+      // Intentionally left side effects out; clean up unused states
+    }
+  }, [user]);
 
   if (!user) return null;
 

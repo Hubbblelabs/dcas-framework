@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import type { QuestionTranslations } from "@/lib/translation";
 
 export interface IQuestionOption {
   label: string;
@@ -15,6 +16,7 @@ export interface IQuestion extends Document {
   org_id?: string;
   created_by?: mongoose.Types.ObjectId;
   updated_by?: mongoose.Types.ObjectId;
+  translations?: QuestionTranslations;
 }
 
 const QuestionSchema = new Schema<IQuestion>(
@@ -37,6 +39,23 @@ const QuestionSchema = new Schema<IQuestion>(
     org_id: { type: String, index: true },
     created_by: { type: Schema.Types.ObjectId, ref: "User" },
     updated_by: { type: Schema.Types.ObjectId, ref: "User" },
+    translations: {
+      type: Map,
+      of: new Schema(
+        {
+          text: { type: String, required: true },
+          options: [
+            {
+              label: { type: String, required: true },
+              text: { type: String, required: true },
+            },
+          ],
+          updatedAt: { type: Date, default: Date.now },
+        },
+        { _id: false },
+      ),
+      default: undefined,
+    },
   },
   {
     timestamps: true,

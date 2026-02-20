@@ -46,6 +46,13 @@ interface DashboardStats {
     completedAt: string;
   }>;
   lastUpdated: string;
+  followupStatusCounts: {
+    none: number;
+    needs_followup: number;
+    in_progress: number;
+    completed: number;
+  };
+  followupsThisWeek: number;
 }
 
 export default function DashboardPage() {
@@ -223,6 +230,22 @@ export default function DashboardPage() {
             <p className="text-muted-foreground mt-1 text-xs">Last 7 days</p>
           </CardContent>
         </Card>
+        <Card className="transition-shadow hover:shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Follow-ups This Week
+            </CardTitle>
+            <Target className="h-4 w-4 text-teal-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-teal-600">
+              {stats.followupsThisWeek}
+            </div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Logged follow-up interactions
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -296,6 +319,26 @@ export default function DashboardPage() {
                 <span className="text-sm">This Month</span>
               </div>
               <span className="font-bold">{stats.completedThisMonth}</span>
+            </div>
+            <div className="bg-muted/50 space-y-2 rounded-lg p-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span>Needs follow-up</span>
+                <span className="font-semibold text-amber-600">
+                  {stats.followupStatusCounts.needs_followup}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>In progress</span>
+                <span className="font-semibold text-blue-600">
+                  {stats.followupStatusCounts.in_progress}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Completed</span>
+                <span className="font-semibold text-emerald-600">
+                  {stats.followupStatusCounts.completed}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>

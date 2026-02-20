@@ -55,9 +55,11 @@ import {
   GraduationCap,
   CheckCircle,
   Clock,
+  MessageSquare,
 } from "lucide-react";
 import { EditUserDialog } from "@/components/admin/EditUserDialog";
 import { UserDetailsDialog } from "@/components/admin/UserDetailsDialog";
+import { FollowupDialog } from "@/components/admin/FollowupDialog";
 import { useDCASConfig } from "@/hooks/useDCASConfig";
 
 interface User {
@@ -72,6 +74,9 @@ interface User {
   score?: { primary: string; secondary?: string } | null;
   completedAt?: string | null;
   status: "Completed" | "Not Attempted";
+  preferred_language?: string;
+  followup_status?: "none" | "needs_followup" | "in_progress" | "completed";
+  last_followup_at?: string | null;
 }
 
 type FilterStatus = "all" | "completed" | "not_attempted";
@@ -88,6 +93,9 @@ export default function UsersAssessmentsPage() {
 
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+
+  const [followupUser, setFollowupUser] = useState<User | null>(null);
+  const [isFollowupOpen, setIsFollowupOpen] = useState(false);
 
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -144,6 +152,16 @@ export default function UsersAssessmentsPage() {
   };
 
   // ---------- Actions ----------
+  const handleFollowupUpdate = (userId: string, status: string, lastDate: string) => {
+    setUsers((prev) =>
+      prev.map((user) => {
+        if (user._id === userId) {
+          return { ...user, followup_status: status as any, last_followup_at: lastDate };
+        }
+        return user;
+      }),
+    );
+  };
   const handleSaveUser = async (updatedUser: any) => {
     try {
       const res = await fetch("/api/users", {
@@ -429,6 +447,7 @@ export default function UsersAssessmentsPage() {
                       <TableHead>Batch</TableHead>
                       <TableHead>Institution</TableHead>
                       <TableHead>Profile Result</TableHead>
+                      <TableHead>Follow-up</TableHead>
                       <TableHead className="pr-6 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -486,6 +505,42 @@ export default function UsersAssessmentsPage() {
                             </span>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {u.followup_status && u.followup_status !== "none" ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-medium capitalize">
+                                      {u.followup_status.replace("_", " ")}
+                                    </span>
+                                    {u.last_followup_at && (
+                                      <span className="text-muted-foreground text-[11px]">
+                                        {new Date(
+                                          u.last_followup_at,
+                                        ).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    Last follow-up:{" "}
+                                    {u.last_followup_at
+                                      ? new Date(
+                                          u.last_followup_at,
+                                        ).toLocaleString()
+                                      : "N/A"}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">
+                              No follow-up
+                            </span>
+                          )}
+                        </TableCell>
                         <TableCell
                           className="pr-6 text-right"
                           onClick={(e) => e.stopPropagation()}
@@ -539,6 +594,29 @@ export default function UsersAssessmentsPage() {
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>View Assessment Report</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+
+                            {u.status === "Completed" && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30"
+                                      onClick={() => {
+                                        setFollowupUser(u);
+                                        setIsFollowupOpen(true);
+                                      }}
+                                    >
+                                      <MessageSquare className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Manage Follow-up</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -619,6 +697,14 @@ export default function UsersAssessmentsPage() {
         user={viewingUser}
         open={isViewOpen}
         onOpenChange={setIsViewOpen}
+      />
+
+      {/* Followup Dialog */}
+      <FollowupDialog
+        user={followupUser}
+        open={isFollowupOpen}
+        onOpenChange={setIsFollowupOpen}
+        onFollowupUpdate={handleFollowupUpdate}
       />
 
       {/* Delete Confirmation */}

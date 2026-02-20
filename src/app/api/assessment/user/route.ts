@@ -5,7 +5,8 @@ import { Session } from "@/lib/models/Session";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, phone, batch, institution } = await req.json();
+    const { name, email, phone, batch, institution, preferred_language } =
+      await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
         email: user.email,
         phone: user.phone,
         institution: user.institution,
+        preferred_language: user.preferred_language || "en",
         hasCompletedAssessment: !!completedSessionId,
         completedSessionId: completedSessionId || null,
       });
@@ -56,6 +58,7 @@ export async function POST(req: Request) {
         phone,
         institution: institution || undefined,
         role: "student",
+        preferred_language: preferred_language || "en",
         meta: {
           batch: batch || undefined,
           institution: institution || undefined,
@@ -69,6 +72,7 @@ export async function POST(req: Request) {
       email: user.email,
       phone: user.phone,
       institution: user.institution,
+      preferred_language: user.preferred_language || "en",
       hasCompletedAssessment: false,
       completedSessionId: null,
     });

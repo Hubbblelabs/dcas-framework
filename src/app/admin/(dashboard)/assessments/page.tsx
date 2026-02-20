@@ -191,6 +191,12 @@ export default function AssessmentsPage() {
                       {new Date(a.createdAt).toLocaleDateString()}
                     </span>
                   </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Language</span>
+                    <span className="font-medium">
+                      {a.settings?.language || "en"}
+                    </span>
+                  </div>
                   <div className="border-border/40 flex gap-2 border-t pt-2">
                     <Button
                       variant="outline"

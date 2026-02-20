@@ -75,7 +75,11 @@ export async function GET(request: Request) {
           phone: u.phone || "",
           batch: u.meta?.batch || u.batch || "",
           institution: u.institution || u.meta?.institution || "",
+          preferred_language: u.preferred_language || "en",
+          followup_status: u.followup_status || "none",
+          last_followup_at: u.last_followup_at || null,
           latestReportId,
+          latestSessionId: u.result?.session_id || latestReportId || null,
           score,
           completedAt,
           status,
@@ -153,7 +157,16 @@ export async function PUT(request: Request) {
 
     // SECURITY: Explicitly construct update object to prevent mass assignment
     // Only allow updating safe fields
-    const { name, email, phone, institution, batch, meta } = rest;
+    const {
+      name,
+      email,
+      phone,
+      institution,
+      batch,
+      meta,
+      preferred_language,
+      followup_status,
+    } = rest;
 
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
@@ -176,6 +189,13 @@ export async function PUT(request: Request) {
     if (batch !== undefined) {
       // Sync to meta.batch
       updateData["meta.batch"] = batch;
+    }
+    if (preferred_language !== undefined) {
+      updateData.preferred_language = preferred_language;
+    }
+    if (followup_status !== undefined) {
+      updateData.followup_status = followup_status;
+      updateData.last_followup_at = new Date();
     }
 
     const updatedUser = await User.findByIdAndUpdate(

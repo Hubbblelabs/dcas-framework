@@ -8,6 +8,8 @@ import { AssessmentTemplate } from "@/lib/models/AssessmentTemplate";
 import { Question } from "@/lib/models/Question";
 import { Settings, SETTINGS_KEYS } from "@/lib/models/Settings";
 import { createSessionToken } from "@/lib/session-token";
+import { translateQuestion } from "@/lib/translation";
+import { DEFAULT_LANGUAGE, type LanguageCode } from "@/lib/i18n/config";
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -128,7 +130,7 @@ export async function POST(req: Request) {
     }
 
     // Full mode - template-based session creation
-    const { studentName, email, institution, templateId } = body;
+    const { studentName, email, institution, templateId, language } = body;
 
     // Ensure models are loaded
     if (!Question) throw new Error("Question model not loaded");
@@ -181,10 +183,21 @@ export async function POST(req: Request) {
       assigned_questions: assignedQuestionIds,
     });
 
-    const randomizedQuestions = questions.map((q: any) => {
-      const questionObj = q.toObject ? q.toObject() : q;
-      return { ...questionObj, options: shuffleArray(questionObj.options) };
-    });
+    const resolvedLanguage: LanguageCode =
+      (language as LanguageCode) ||
+      (template.settings?.language as LanguageCode) ||
+      DEFAULT_LANGUAGE;
+
+    const randomizedQuestions = await Promise.all(
+      questions.map(async (q: any) => {
+        const questionObj = q.toObject ? q.toObject() : q;
+        const translated = await translateQuestion(questionObj, resolvedLanguage);
+        return {
+          ...translated,
+          options: shuffleArray(translated.options),
+        };
+      }),
+    );
 
     const token = await createSessionToken(session._id.toString());
     const response = NextResponse.json({

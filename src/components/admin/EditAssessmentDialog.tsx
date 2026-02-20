@@ -13,13 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
@@ -67,7 +61,6 @@ export function EditAssessmentDialog({
   onUpdated,
 }: EditAssessmentDialogProps) {
   const [name, setName] = useState("");
-  const [language, setLanguage] = useState("en");
   const [isLive, setIsLive] = useState(false);
   const [selectionMethod, setSelectionMethod] = useState<"manual" | "random">(
     "manual",
@@ -97,7 +90,6 @@ export function EditAssessmentDialog({
         })
         .catch(() => setLoading(false));
       setName(assessment.name);
-      setLanguage(assessment.settings?.language || "en");
       setTimeLimit(assessment.settings?.time_limit || 0);
       setIsLive(assessment.isLive || false);
       setSelectionMethod(assessment.selection_method || "manual");
@@ -137,7 +129,7 @@ export function EditAssessmentDialog({
           question_count: questionCount,
           settings: {
             ...assessment.settings,
-            language,
+            language: "en",
             time_limit: timeLimit,
             shuffle_options: shuffleOptions,
             shuffle_questions: shuffleQuestions,
@@ -172,7 +164,7 @@ export function EditAssessmentDialog({
         </SheetHeader>
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
           <div className="grid gap-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">Template Name *</Label>
                 <Input
@@ -180,19 +172,6 @@ export function EditAssessmentDialog({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label>Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English (en)</SelectItem>
-                    <SelectItem value="es">Spanish (es)</SelectItem>
-                    <SelectItem value="fr">French (fr)</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
             <div className="grid gap-2">

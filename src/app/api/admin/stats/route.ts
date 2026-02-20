@@ -47,6 +47,8 @@ export async function GET(req: Request) {
       liveTemplate,
       recentSessions,
       dcasDistribution,
+      followupCounts,
+      recentFollowups,
     ] = await Promise.all([
       User.countDocuments({ role: "student" }),
       Session.countDocuments({ status: "in_progress" }),
@@ -75,6 +77,24 @@ export async function GET(req: Request) {
         { $match: { status: "completed", "score.primary": { $exists: true } } },
         { $group: { _id: "$score.primary", count: { $sum: 1 } } },
       ]),
+      User.aggregate([
+        {
+          $group: {
+            _id: "$followup_status",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      Session.aggregate([
+        { $unwind: "$followups" },
+        { $match: { "followups.date": { $gte: startOfWeek } } },
+        {
+          $group: {
+            _id: null,
+            count: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
 
     const dcasCounts = { D: 0, C: 0, A: 0, S: 0 };
@@ -99,6 +119,22 @@ export async function GET(req: Request) {
       completedAt: session.completed_at,
     }));
 
+    const followupStatusCounts: Record<string, number> = {
+      none: 0,
+      needs_followup: 0,
+      in_progress: 0,
+      completed: 0,
+    };
+
+    followupCounts.forEach((item: any) => {
+      if (item._id && followupStatusCounts.hasOwnProperty(item._id)) {
+        followupStatusCounts[item._id] = item.count;
+      }
+    });
+
+    const followupsThisWeek =
+      recentFollowups.length > 0 ? recentFollowups[0].count : 0;
+
     return NextResponse.json({
       totalUsers,
       activeSessions,
@@ -116,6 +152,8 @@ export async function GET(req: Request) {
       dcasDistribution: dcasCounts,
       dcasPercentages,
       recentSessions: formattedRecentSessions,
+      followupStatusCounts,
+      followupsThisWeek,
       lastUpdated: new Date().toISOString(),
     });
   } catch (error) {

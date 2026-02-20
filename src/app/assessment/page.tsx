@@ -67,6 +67,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
+  const [language, setLanguage] = useState<string>("en");
   const [shuffledQuestions, setShuffledQuestions] = useState<DBQuestion[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -78,9 +79,19 @@ function AssessmentContent({ userId }: { userId: string | null }) {
     setLoadingQuestions(true);
     setLoadError(null);
 
-    // Try to restore from localStorage first
+    // Get saved state to check language and preserve question index
     const savedState = localStorage.getItem(`dcas_assessment_${userId}`);
-    if (savedState) {
+    const savedLanguage = savedState
+      ? JSON.parse(savedState)?.language
+      : null;
+    
+    // Preserve current question index when language changes
+    const currentQuestionIndex = savedState 
+      ? JSON.parse(savedState)?.currentQuestion || 0
+      : 0;
+
+    // Only restore from localStorage if language hasn't changed AND we have saved questions
+    if (savedLanguage && savedLanguage === language && savedState) {
       try {
         const parsed = JSON.parse(savedState);
         if (parsed.shuffledQuestions && parsed.shuffledQuestions.length > 0) {
@@ -96,7 +107,13 @@ function AssessmentContent({ userId }: { userId: string | null }) {
       }
     }
 
-    fetch("/api/assessment/settings")
+    // Always fetch fresh questions when language changes or on initial load
+    const params = new URLSearchParams();
+    if (language) {
+      params.set("lang", language);
+    }
+
+    fetch(`/api/assessment/settings?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         const questions: DBQuestion[] = data.questions || [];
@@ -110,18 +127,53 @@ function AssessmentContent({ userId }: { userId: string | null }) {
 
         if (data?.shuffle_options) setShuffleOptions(true);
 
-        if (data?.shuffle_questions) {
-          setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
+        let finalQuestions: DBQuestion[];
+        // Only shuffle on initial load, not when language changes
+        const isLanguageChange = savedLanguage && savedLanguage !== language;
+        const savedQuestions = savedState ? JSON.parse(savedState)?.shuffledQuestions : null;
+        
+        if (data?.shuffle_questions && !isLanguageChange) {
+          // Shuffle only on initial load
+          finalQuestions = [...questions].sort(() => Math.random() - 0.5);
+        } else if (data?.shuffle_questions && isLanguageChange && savedQuestions && Array.isArray(savedQuestions)) {
+          // Language changed - maintain the same order by matching question IDs from saved state
+          const existingOrder = savedQuestions.map((q: any) => q._id);
+          finalQuestions = existingOrder
+            .map((id: string) => questions.find(q => q._id === id))
+            .filter((q): q is DBQuestion => q !== undefined);
+          // Add any new questions that weren't in the original set
+          const existingIds = new Set(existingOrder);
+          const newQuestions = questions.filter(q => !existingIds.has(q._id));
+          finalQuestions = [...finalQuestions, ...newQuestions];
         } else {
-          setShuffledQuestions(questions);
+          finalQuestions = [...questions]; // Create new array reference
         }
+        
+        setShuffledQuestions(finalQuestions);
+        
+        // If language changed, preserve question index but clear selected option for current question
+        if (isLanguageChange) {
+          // Keep current question index, but clear the selected option
+          const currentQId = finalQuestions[currentQuestionIndex]?._id;
+          if (currentQId && answers[currentQId]) {
+            setSelectedOption("");
+          }
+          // Ensure we don't go beyond the array bounds
+          if (currentQuestionIndex >= finalQuestions.length) {
+            setCurrentQuestion(0);
+          } else {
+            setCurrentQuestion(currentQuestionIndex);
+          }
+        }
+        
         setLoadingQuestions(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Failed to load assessment:", error);
         setLoadError("Failed to load assessment. Please try again.");
         setLoadingQuestions(false);
       });
-  }, [userId]);
+  }, [userId, language]);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -131,6 +183,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
         answers,
         shuffledQuestions,
         shuffleOptions,
+        language,
       };
       localStorage.setItem(`dcas_assessment_${userId}`, JSON.stringify(state));
     }
@@ -140,6 +193,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
     answers,
     shuffledQuestions,
     shuffleOptions,
+    language,
     isSubmitting,
   ]);
 
@@ -159,7 +213,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
     } else {
       setSelectedOption("");
     }
-  }, [currentQuestion, answers, question]);
+  }, [currentQuestion, answers, question, shuffledQuestions]);
 
   const handleOptionSelect = (value: string) => {
     setSelectedOption(value);
@@ -478,6 +532,30 @@ function AssessmentContent({ userId }: { userId: string | null }) {
               />
             </Link>
             <div className="flex items-center gap-2">
+              <select
+                value={language}
+                onChange={(e) => {
+                  const newLang = e.target.value;
+                  setLanguage(newLang);
+                  // Force a re-fetch by clearing current questions temporarily
+                  setShuffledQuestions([]);
+                }}
+                disabled={loadingQuestions}
+                className="h-8 rounded-full border border-slate-200 bg-white px-2 text-xs text-slate-700 shadow-sm disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+              >
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="pa">Punjabi</option>
+                <option value="gu">Gujarati</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="ml">Malayalam</option>
+                <option value="mr">Marathi</option>
+                <option value="bn">Bengali</option>
+                <option value="kn">Kannada</option>
+                <option value="or">Odia</option>
+                <option value="as">Assamese</option>
+              </select>
               <ModeToggle />
               <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800">
                 <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
@@ -524,6 +602,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
 
       <main className="relative z-10 mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
         <Card
+          key={`question-card-${currentQuestion}-${language}`}
           className={`border-0 shadow-xl transition-all duration-300 ${isAnimating ? "translate-y-4 transform opacity-0" : "translate-y-0 transform opacity-100"}`}
         >
           <CardHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
@@ -544,7 +623,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 ))}
               </div>
             </div>
-            <CardTitle className="text-lg leading-tight font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">
+            <CardTitle 
+              key={`question-${question._id}-${language}`}
+              className="text-lg leading-tight font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white"
+            >
               {question.text}
             </CardTitle>
           </CardHeader>
@@ -574,7 +656,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                     }}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-sm text-slate-700 sm:text-base dark:text-slate-300">
+                      <span 
+                        key={`option-${option.label}-${language}`}
+                        className="text-sm text-slate-700 sm:text-base dark:text-slate-300"
+                      >
                         {option.text}
                       </span>
                     </div>

@@ -34,6 +34,9 @@ import {
   AlertTriangle,
   Pin,
   Sparkles,
+  MessageSquare,
+  User,
+  Clock,
 } from "lucide-react";
 import { CareerIcon } from "@/components/career-icon";
 import { Logo } from "@/components/Logo";
@@ -57,6 +60,7 @@ export default function ReportPage() {
   const [studentName, setStudentName] = useState<string>("Student");
   const [assessmentDate, setAssessmentDate] = useState<string>("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [followups, setFollowups] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch logo
@@ -139,6 +143,12 @@ export default function ReportPage() {
               ...new Set([...ranked, ...types]),
             ] as DCASType[];
             setRankedTypes(fullRanked);
+            
+            // Set follow-ups if available
+            if (data.followups && Array.isArray(data.followups)) {
+              setFollowups(data.followups);
+            }
+            
             setIsLoaded(true);
           } else {
             console.error("No score in session data");
@@ -755,6 +765,69 @@ export default function ReportPage() {
               </CardContent>
             </Card>
           </section>
+
+          {/* Follow-up History Section */}
+          {followups.length > 0 && (
+            <section className="no-print">
+              <Card className="border-0 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                    <MessageSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                    Follow-up History
+                  </CardTitle>
+                  <CardDescription>
+                    Counselor notes and follow-up interactions for this assessment
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {followups.map((followup: any, index: number) => (
+                      <div
+                        key={index}
+                        className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900"
+                      >
+                        <div className="mb-2 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={
+                                followup.status === "completed"
+                                  ? "default"
+                                  : followup.status === "in_progress"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                              className="text-xs"
+                            >
+                              {followup.status === "needs_followup"
+                                ? "Needs Follow-up"
+                                : followup.status === "in_progress"
+                                  ? "In Progress"
+                                  : "Completed"}
+                            </Badge>
+                            {followup.created_by?.name && (
+                              <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+                                <User className="h-3 w-3" />
+                                <span>{followup.created_by.name}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                            <Clock className="h-3 w-3" />
+                            <span>
+                              {new Date(followup.date).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                          {followup.note}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          )}
 
           {/* Footer */}
           <div className="border-t border-slate-200 pt-6 text-center sm:pt-8 dark:border-slate-800">

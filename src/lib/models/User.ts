@@ -25,6 +25,9 @@ export interface IUser extends Document {
   institution?: string;
   role: "student" | "admin" | "superadmin";
   org_id?: string;
+  preferred_language?: string;
+  followup_status?: "none" | "needs_followup" | "in_progress" | "completed";
+  last_followup_at?: Date;
   meta: {
     batch?: string;
     roll_no?: string;
@@ -53,6 +56,17 @@ const UserSchema = new Schema<IUser>(
       trim: true,
       index: true,
     },
+    preferred_language: {
+      type: String,
+      default: undefined,
+    },
+    followup_status: {
+      type: String,
+      enum: ["none", "needs_followup", "in_progress", "completed"],
+      default: "none",
+      index: true,
+    },
+    last_followup_at: Date,
     password: { type: String, select: false },
     name: { type: String, required: true, trim: true },
     phone: { type: String, trim: true },

@@ -29,6 +29,12 @@ export interface ISession extends Document {
   fraud_flags?: string[];
   report_id?: mongoose.Types.ObjectId;
   assigned_questions: mongoose.Types.ObjectId[];
+  followups?: {
+    date: Date;
+    created_by: mongoose.Types.ObjectId;
+    note: string;
+    status: "needs_followup" | "in_progress" | "completed";
+  }[];
 }
 
 const SessionSchema = new Schema<ISession>(
@@ -84,6 +90,18 @@ const SessionSchema = new Schema<ISession>(
     fraud_flags: [String],
     report_id: { type: Schema.Types.ObjectId, ref: "Report" },
     assigned_questions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
+    followups: [
+      {
+        date: { type: Date, default: Date.now },
+        created_by: { type: Schema.Types.ObjectId, ref: "Admin", required: true },
+        note: { type: String, required: true },
+        status: {
+          type: String,
+          enum: ["needs_followup", "in_progress", "completed"],
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
