@@ -18,18 +18,7 @@ export function Footer() {
                     </Link>
                 </div>
 
-                {/* Credits - Center */}
-                <div className="flex flex-col items-center justify-center gap-1 text-sm text-slate-500 sm:flex-row sm:gap-1.5 lg:absolute lg:left-1/2 lg:-translate-x-1/2 dark:text-slate-500">
-                    <span className="whitespace-nowrap text-center">Designed and developed by</span>
-                    <a
-                        href="https://teammistake.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-medium text-slate-700 transition-colors hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400"
-                    >
-                        TeamMistake
-                    </a>
-                </div>
+              {/* Credits - Center */}
 
                 {/* Copyright - Right */}
                 <div className="flex items-center justify-center lg:justify-end">
