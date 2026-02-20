@@ -113,16 +113,19 @@ export async function DELETE(request: NextRequest) {
 
     if (affectedTemplates.length > 0 && !force) {
       // Return warning with affected template info
-      return NextResponse.json({
-        warning: true,
-        message: `This question is used in ${affectedTemplates.length} assessment template(s).`,
-        affectedTemplates: affectedTemplates.map((t: any) => ({
-          _id: t._id,
-          name: t.name,
-          isLive: t.isLive,
-          questionCount: t.questions?.length || 0,
-        })),
-      }, { status: 200 });
+      return NextResponse.json(
+        {
+          warning: true,
+          message: `This question is used in ${affectedTemplates.length} assessment template(s).`,
+          affectedTemplates: affectedTemplates.map((t: any) => ({
+            _id: t._id,
+            name: t.name,
+            isLive: t.isLive,
+            questionCount: t.questions?.length || 0,
+          })),
+        },
+        { status: 200 },
+      );
     }
 
     // Delete the question

@@ -17,9 +17,9 @@ export async function GET(req: Request) {
       !session.user?.role ||
       !["admin", "superadmin"].includes(session.user.role)
     ) {
-      console.error("Unauthorized access attempt to /api/admin/stats", { 
-        hasSession: !!session, 
-        role: session?.user ? (session.user as any).role : 'no-user' 
+      console.error("Unauthorized access attempt to /api/admin/stats", {
+        hasSession: !!session,
+        role: session?.user ? (session.user as any).role : "no-user",
       });
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

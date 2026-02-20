@@ -63,7 +63,6 @@ export function useDCASConfig() {
               }
             });
             setDcasColors(colors);
-
           }
         }
       } catch {

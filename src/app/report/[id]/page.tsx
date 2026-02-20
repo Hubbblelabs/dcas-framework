@@ -4,9 +4,19 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DCASBarChart, DCASRadarChart, ScoreCard } from "@/components/charts/dcas-charts";
+import {
+  DCASBarChart,
+  DCASRadarChart,
+  ScoreCard,
+} from "@/components/charts/dcas-charts";
 import { DCASScores, DCASType, getScoreLevel } from "@/lib/dcas/scoring";
 import {
   interpretations,
@@ -60,7 +70,7 @@ export default function ReportPage() {
 
   useEffect(() => {
     if (!sessionId || sessionId === "undefined") {
-        return;
+      return;
     }
 
     if (sessionId === "local") {
@@ -72,11 +82,14 @@ export default function ReportPage() {
         setRankedTypes(JSON.parse(storedRankedTypes));
         setStudentName("Local User");
         setAssessmentDate(new Date().toISOString());
-        
+
         // Calculate maxScore from scores
-        const total = Object.values(parsedScores).reduce((a: number, b: any) => a + b, 0);
+        const total = Object.values(parsedScores).reduce(
+          (a: number, b: any) => a + b,
+          0,
+        );
         setMaxScore(total);
-        
+
         setIsLoaded(true);
       } else {
         router.push("/assessment");
@@ -102,10 +115,13 @@ export default function ReportPage() {
             setScores(data.session.score.raw);
             if (data.studentName) setStudentName(data.studentName);
             if (data.createdAt) setAssessmentDate(data.createdAt);
-            
+
             // Calculate maxScore from scores
             const raw = data.session.score.raw;
-            const total = Object.values(raw).reduce((a: number, b: any) => a + b, 0);
+            const total = Object.values(raw).reduce(
+              (a: number, b: any) => a + b,
+              0,
+            );
             setMaxScore(total);
 
             const ranked: DCASType[] = [];
@@ -150,12 +166,12 @@ export default function ReportPage() {
           studentName={studentName}
           assessmentDate={assessmentDate}
           logoUrl={logoUrl}
-        />
+        />,
       ).toBlob();
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `DCAS-Behavioural-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+      link.download = `DCAS-Behavioural-Report-${new Date().toISOString().split("T")[0]}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -188,7 +204,7 @@ export default function ReportPage() {
   const profileDesc = getCombinedProfileDescription(primaryType, secondaryType);
   const careers = getCareerRecommendations(primaryType, secondaryType);
 
-  const currentDate = assessmentDate 
+  const currentDate = assessmentDate
     ? new Date(assessmentDate).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -266,7 +282,10 @@ export default function ReportPage() {
               DCAS Behavioural Assessment Report
             </h1>
             <p className="text-sm text-slate-600 sm:text-base dark:text-slate-400">
-              Comprehensive Behavioural Analysis & Career Guidance for <span className="font-semibold text-slate-900 dark:text-white">{studentName}</span>
+              Comprehensive Behavioural Analysis & Career Guidance for{" "}
+              <span className="font-semibold text-slate-900 dark:text-white">
+                {studentName}
+              </span>
             </p>
             <p className="mt-3 text-xs text-slate-500 sm:mt-4 sm:text-sm dark:text-slate-400">
               Generated on {currentDate}
@@ -341,48 +360,48 @@ export default function ReportPage() {
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
               <Card className="border-0 shadow-xl">
                 <CardHeader className="px-4 py-4 sm:px-6">
-                    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-                        <CardTitle className="text-base sm:text-lg">
-                            DCAS Score Distribution
-                        </CardTitle>
-                        <div className="flex gap-2">
-                            <Button
-                                variant={chartType === "bar" ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setChartType("bar")}
-                                className="btn-press rounded-full text-xs sm:text-sm"
-                            >
-                                Bar
-                            </Button>
-                            <Button
-                                variant={chartType === "radar" ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setChartType("radar")}
-                                className="btn-press rounded-full text-xs sm:text-sm"
-                            >
-                                Radar
-                            </Button>
-                        </div>
+                  <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <CardTitle className="text-base sm:text-lg">
+                      DCAS Score Distribution
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={chartType === "bar" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setChartType("bar")}
+                        className="btn-press rounded-full text-xs sm:text-sm"
+                      >
+                        Bar
+                      </Button>
+                      <Button
+                        variant={chartType === "radar" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setChartType("radar")}
+                        className="btn-press rounded-full text-xs sm:text-sm"
+                      >
+                        Radar
+                      </Button>
                     </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="px-2 pb-4 sm:px-6 sm:pb-6">
                   <div className="w-full overflow-x-auto">
                     {chartType === "bar" ? (
-                        <DCASBarChart
+                      <DCASBarChart
                         scores={scores}
                         colors={dcasColors}
                         names={dcasNames}
                         symbols={dcasSymbols}
                         maxScore={maxScore}
-                        />
+                      />
                     ) : (
-                        <DCASRadarChart
+                      <DCASRadarChart
                         scores={scores}
                         colors={dcasColors}
                         names={dcasNames}
                         symbols={dcasSymbols}
                         maxScore={maxScore}
-                        />
+                      />
                     )}
                   </div>
                 </CardContent>

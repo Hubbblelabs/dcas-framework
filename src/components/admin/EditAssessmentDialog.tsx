@@ -259,9 +259,13 @@ export function EditAssessmentDialog({
                   setQuestionCount(Math.min(val, max));
                 }}
               />
-              <p className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+              <p
+                className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}
+              >
                 {activeQuestions.length} total active questions available in
-                bank. Saving will regenerate the random selection.{questionCount > activeQuestions.length && " Cannot exceed available questions."}
+                bank. Saving will regenerate the random selection.
+                {questionCount > activeQuestions.length &&
+                  " Cannot exceed available questions."}
               </p>
             </div>
           )}
@@ -383,7 +387,8 @@ export function EditAssessmentDialog({
               saving ||
               (selectionMethod === "manual" &&
                 selectedQuestions.length === 0) ||
-              (selectionMethod === "random" && (questionCount <= 0 || questionCount > activeQuestions.length))
+              (selectionMethod === "random" &&
+                (questionCount <= 0 || questionCount > activeQuestions.length))
             }
           >
             {saving ? (

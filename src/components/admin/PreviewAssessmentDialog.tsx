@@ -91,9 +91,7 @@ export function PreviewAssessmentDialog({
                     className="flex items-start space-x-3 transition-colors"
                   >
                     <span className="font-bold">{opt.label}.</span>
-                    <span className="flex-1 font-normal">
-                      {opt.text}
-                    </span>
+                    <span className="flex-1 font-normal">{opt.text}</span>
                   </div>
                 ))}
               </div>

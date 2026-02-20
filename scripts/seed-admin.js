@@ -9,8 +9,7 @@ try {
   console.warn("Failed to set DNS servers for SRV resolution:", e);
 }
 
-const MONGODB_URI =
-  process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const AdminSchema = new mongoose.Schema(
   {

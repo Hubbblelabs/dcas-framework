@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Loader2, Pencil, Eye, Radio, Trash2 } from "lucide-react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -58,6 +57,7 @@ export default function AssessmentsPage() {
   const [deleteAssessment, setDeleteAssessment] =
     useState<AssessmentTemplate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const fetchAssessments = useCallback(async () => {
     try {
@@ -94,6 +94,7 @@ export default function AssessmentsPage() {
   const handleDelete = async () => {
     if (!deleteAssessment) return;
     setIsDeleting(true);
+    setDeleteError(null);
     try {
       const res = await fetch(`/api/assessments/${deleteAssessment._id}`, {
         method: "DELETE",
@@ -103,16 +104,25 @@ export default function AssessmentsPage() {
           assessments.filter((a) => a._id !== deleteAssessment._id),
         );
         setDeleteAssessment(null);
+      } else {
+        const data = await res.json();
+        setDeleteError(data.error || "Failed to delete assessment");
       }
     } catch (e) {
       console.error("Delete failed", e);
+      setDeleteError("An unexpected error occurred");
     } finally {
       setIsDeleting(false);
     }
   };
 
   const handleCreated = (newAssessment: AssessmentTemplate) => {
-    setAssessments([newAssessment, ...assessments]);
+    if (newAssessment.isLive) {
+      // Re-fetch so any previously-live assessment gets its isLive flag cleared in the UI
+      fetchAssessments();
+    } else {
+      setAssessments([newAssessment, ...assessments]);
+    }
   };
   const handleUpdated = () => {
     fetchAssessments();
@@ -255,7 +265,12 @@ export default function AssessmentsPage() {
       />
       <AlertDialog
         open={!!deleteAssessment}
-        onOpenChange={(open) => !open && setDeleteAssessment(null)}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) {
+            setDeleteAssessment(null);
+            setDeleteError(null);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -265,12 +280,17 @@ export default function AssessmentsPage() {
               &quot;? This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {deleteError && (
+            <p className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm">
+              {deleteError}
+            </p>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-destructive hover:bg-destructive/90"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             >
               {isDeleting ? (
                 <>
@@ -280,7 +300,7 @@ export default function AssessmentsPage() {
               ) : (
                 "Delete"
               )}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

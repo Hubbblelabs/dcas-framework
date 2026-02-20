@@ -379,7 +379,7 @@ export default function UsersAssessmentsPage() {
                   setSelected(new Set());
                 }}
               >
-                <SelectTrigger className="h-9 w-[170px] text-sm">
+                <SelectTrigger className="h-9 w-42.5 text-sm">
                   <SelectValue placeholder="Filter Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -411,10 +411,10 @@ export default function UsersAssessmentsPage() {
           ) : (
             <div className="border-t">
               <div className="overflow-x-auto">
-                <Table className="min-w-[1000px]">
+                <Table className="min-w-250">
                   <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
                     <TableRow>
-                      <TableHead className="w-[40px] pl-4">
+                      <TableHead className="w-10 pl-4">
                         <Checkbox
                           checked={
                             selected.size === filteredUsers.length &&

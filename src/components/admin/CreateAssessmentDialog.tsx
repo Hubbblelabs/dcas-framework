@@ -240,9 +240,13 @@ export function CreateAssessmentDialog({
                   setQuestionCount(Math.min(val, max));
                 }}
               />
-              <p className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+              <p
+                className={`text-xs ${questionCount > activeQuestions.length ? "text-destructive font-medium" : "text-muted-foreground"}`}
+              >
                 {activeQuestions.length} total active questions available in
-                bank.{questionCount > activeQuestions.length && " Cannot exceed available questions."}
+                bank.
+                {questionCount > activeQuestions.length &&
+                  " Cannot exceed available questions."}
               </p>
             </div>
           )}
@@ -357,7 +361,8 @@ export function CreateAssessmentDialog({
               saving ||
               (selectionMethod === "manual" &&
                 selectedQuestions.length === 0) ||
-              (selectionMethod === "random" && (questionCount <= 0 || questionCount > activeQuestions.length))
+              (selectionMethod === "random" &&
+                (questionCount <= 0 || questionCount > activeQuestions.length))
             }
           >
             {saving ? (

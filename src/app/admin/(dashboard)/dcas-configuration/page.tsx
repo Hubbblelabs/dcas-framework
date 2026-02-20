@@ -131,39 +131,39 @@ export default function DCASConfigurationPage() {
     placeholder: string;
     description: string;
   }[] = [
-      {
-        type: "D",
-        label: "D - Driver",
-        colorText: "text-purple-500",
-        bgClass: "bg-purple-50/50 dark:bg-purple-900/20",
-        placeholder: "e.g. Driver",
-        description: "Active, forceful, and result-oriented.",
-      },
-      {
-        type: "C",
-        label: "C - Connector",
-        colorText: "text-orange-500",
-        bgClass: "bg-orange-50/50 dark:bg-orange-900/20",
-        placeholder: "e.g. Connector",
-        description: "Outgoing, enthusiastic, and people-oriented.",
-      },
-      {
-        type: "A",
-        label: "A - Anchor",
-        colorText: "text-indigo-500",
-        bgClass: "bg-indigo-50/50 dark:bg-indigo-900/20",
-        placeholder: "e.g. Anchor",
-        description: "Patient, humble, and team-oriented.",
-      },
-      {
-        type: "S",
-        label: "S - Strategist",
-        colorText: "text-teal-500",
-        bgClass: "bg-teal-50/50 dark:bg-teal-900/20",
-        placeholder: "e.g. Strategist",
-        description: "Analytical, precise, and detail-oriented.",
-      },
-    ];
+    {
+      type: "D",
+      label: "D - Driver",
+      colorText: "text-purple-500",
+      bgClass: "bg-purple-50/50 dark:bg-purple-900/20",
+      placeholder: "e.g. Driver",
+      description: "Active, forceful, and result-oriented.",
+    },
+    {
+      type: "C",
+      label: "C - Connector",
+      colorText: "text-orange-500",
+      bgClass: "bg-orange-50/50 dark:bg-orange-900/20",
+      placeholder: "e.g. Connector",
+      description: "Outgoing, enthusiastic, and people-oriented.",
+    },
+    {
+      type: "A",
+      label: "A - Anchor",
+      colorText: "text-indigo-500",
+      bgClass: "bg-indigo-50/50 dark:bg-indigo-900/20",
+      placeholder: "e.g. Anchor",
+      description: "Patient, humble, and team-oriented.",
+    },
+    {
+      type: "S",
+      label: "S - Strategist",
+      colorText: "text-teal-500",
+      bgClass: "bg-teal-50/50 dark:bg-teal-900/20",
+      placeholder: "e.g. Strategist",
+      description: "Analytical, precise, and detail-oriented.",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -235,7 +235,9 @@ export default function DCASConfigurationPage() {
                       <input
                         type="color"
                         value={colors[type]}
-                        onChange={(e) => handleColorChange(type, e.target.value)}
+                        onChange={(e) =>
+                          handleColorChange(type, e.target.value)
+                        }
                         className="h-6 w-6 cursor-pointer rounded-full border-0 p-0"
                       />
                       <span className="font-mono text-[10px] opacity-70">

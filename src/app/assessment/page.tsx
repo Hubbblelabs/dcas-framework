@@ -146,9 +146,11 @@ function AssessmentContent({ userId }: { userId: string | null }) {
   const question = shuffledQuestions[currentQuestion];
   const totalQuestions = shuffledQuestions.length;
   const answeredCount = Object.keys(answers).length;
-  const progress = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+  const progress =
+    totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
   const displayAnsweredCount =
-    answeredCount + (selectedOption && question && !answers[question._id] ? 1 : 0);
+    answeredCount +
+    (selectedOption && question && !answers[question._id] ? 1 : 0);
 
   useEffect(() => {
     if (!question) return;
@@ -397,7 +399,9 @@ function AssessmentContent({ userId }: { userId: string | null }) {
             </h2>
             <p className="mb-4 text-sm text-slate-600 sm:text-base dark:text-slate-400">
               You have{" "}
-              <span className="font-bold text-amber-600">{unansweredCount}</span>{" "}
+              <span className="font-bold text-amber-600">
+                {unansweredCount}
+              </span>{" "}
               unanswered question{unansweredCount !== 1 ? "s" : ""}. Please
               complete all questions to get accurate results.
             </p>
@@ -432,9 +436,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                   const firstUnanswered = shuffledQuestions.findIndex(
                     (q) =>
                       !answers[q._id] &&
-                      (!question ||
-                        q._id !== question._id ||
-                        !selectedOption),
+                      (!question || q._id !== question._id || !selectedOption),
                   );
                   if (firstUnanswered !== -1)
                     setCurrentQuestion(firstUnanswered);

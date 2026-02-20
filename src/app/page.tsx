@@ -138,9 +138,9 @@ export default async function Home() {
             </h1>
 
             <p className="animate-fade-in-up stagger-1 mx-auto mb-8 max-w-2xl px-2 text-base leading-relaxed text-slate-600 sm:mb-10 sm:text-lg dark:text-slate-400">
-              Take our comprehensive assessment to understand your
-              behavioral style, unlock your strengths, and discover career paths
-              that align with your natural tendencies.
+              Take our comprehensive assessment to understand your behavioral
+              style, unlock your strengths, and discover career paths that align
+              with your natural tendencies.
             </p>
 
             {/* CTA Buttons */}

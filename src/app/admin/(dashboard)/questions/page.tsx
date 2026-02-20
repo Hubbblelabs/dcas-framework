@@ -58,7 +58,12 @@ export default function QuestionsPage() {
   const [deleteWarning, setDeleteWarning] = useState<{
     question: Question;
     message: string;
-    affectedTemplates: Array<{ _id: string; name: string; isLive: boolean; questionCount: number }>;
+    affectedTemplates: Array<{
+      _id: string;
+      name: string;
+      isLive: boolean;
+      questionCount: number;
+    }>;
   } | null>(null);
 
   const handleEdit = (question: Question) => {
@@ -126,11 +131,16 @@ export default function QuestionsPage() {
     if (!deleteWarning) return;
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/questions?id=${deleteWarning.question._id}&force=true`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/questions?id=${deleteWarning.question._id}&force=true`,
+        {
+          method: "DELETE",
+        },
+      );
       if (res.ok) {
-        setQuestions(questions.filter((q) => q._id !== deleteWarning.question._id));
+        setQuestions(
+          questions.filter((q) => q._id !== deleteWarning.question._id),
+        );
         setDeleteWarning(null);
       }
     } catch (e) {
@@ -319,25 +329,35 @@ export default function QuestionsPage() {
             <AlertDialogDescription asChild>
               <div className="space-y-3">
                 <p>{deleteWarning?.message}</p>
-                <p className="font-medium text-foreground">
+                <p className="text-foreground font-medium">
                   &quot;{deleteWarning?.question.text}&quot;
                 </p>
-                <div className="rounded-lg border p-3 space-y-2">
-                  <p className="text-xs font-semibold text-foreground">Affected Assessment Templates:</p>
+                <div className="space-y-2 rounded-lg border p-3">
+                  <p className="text-foreground text-xs font-semibold">
+                    Affected Assessment Templates:
+                  </p>
                   {deleteWarning?.affectedTemplates.map((t) => (
-                    <div key={t._id} className="flex items-center justify-between text-xs">
+                    <div
+                      key={t._id}
+                      className="flex items-center justify-between text-xs"
+                    >
                       <span className="font-medium">{t.name}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{t.questionCount} questions</span>
+                        <span className="text-muted-foreground">
+                          {t.questionCount} questions
+                        </span>
                         {t.isLive && (
-                          <Badge className="bg-green-500 text-xs px-1.5 py-0">Live</Badge>
+                          <Badge className="bg-green-500 px-1.5 py-0 text-xs">
+                            Live
+                          </Badge>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
                 <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Deleting this question will remove it from all affected templates and update their question counts.
+                  Deleting this question will remove it from all affected
+                  templates and update their question counts.
                 </p>
               </div>
             </AlertDialogDescription>

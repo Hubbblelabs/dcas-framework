@@ -35,7 +35,7 @@ export async function GET(
     const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
     const isAdmin = ["admin", "superadmin"].includes(
-      (sessionAuth?.user as any)?.role
+      (sessionAuth?.user as any)?.role,
     );
 
     let isOwner = false;
@@ -64,7 +64,7 @@ export async function GET(
     // Allow public access to completed sessions (results viewing)
     // Restrict in-progress sessions to admin or owner only
     const isCompleted = session.status === "completed";
-    
+
     if (!isCompleted && !isAdmin && !isOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -131,7 +131,7 @@ export async function POST(
     const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
     const isAdmin = ["admin", "superadmin"].includes(
-      (sessionAuth?.user as any)?.role
+      (sessionAuth?.user as any)?.role,
     );
 
     let isOwner = false;

@@ -16,8 +16,7 @@ export async function proxy(request: NextRequest) {
 
   // ─── Detect admin subdomain ────────────────────────────────────────────────
 
-  const isLocalhost =
-    host.includes("localhost") || host.includes("127.0.0.1");
+  const isLocalhost = host.includes("localhost") || host.includes("127.0.0.1");
 
   let isAdminSubdomain = false;
   let tenant: string | null = null;
@@ -60,7 +59,11 @@ export async function proxy(request: NextRequest) {
   //
   // admin.dcas.teammistake.com/dashboard  →  internal: /admin/dashboard
   // admin.dcas.teammistake.com/login      →  internal: /admin/login
-  if (isAdminSubdomain && !pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
+  if (
+    isAdminSubdomain &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/api")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = `/admin${pathname}`;
     if (tenant) {

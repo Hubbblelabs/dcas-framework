@@ -107,7 +107,5 @@ export function buildAuthOptions(host?: string): NextAuthOptions {
 }
 
 export const authOptions: NextAuthOptions = buildAuthOptions(
-  process.env.NEXTAUTH_URL
-    ? new URL(process.env.NEXTAUTH_URL).host
-    : undefined,
+  process.env.NEXTAUTH_URL ? new URL(process.env.NEXTAUTH_URL).host : undefined,
 );

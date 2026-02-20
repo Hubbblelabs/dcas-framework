@@ -54,10 +54,13 @@ export async function POST(req: Request) {
       },
     });
 
-    const settingsMap = settings.reduce((acc, curr) => {
-      acc[curr.key] = curr.value;
-      return acc;
-    }, {} as Record<string, any>);
+    const settingsMap = settings.reduce(
+      (acc, curr) => {
+        acc[curr.key] = curr.value;
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     const { subject, html } = generateEmailContent(user, session, settingsMap);
 
@@ -88,9 +91,12 @@ function generateEmailContent(
   const scores = session.score?.raw || {}; // Use raw scores for display
   const rawScores = session.score?.raw || {};
   const percentScores = session.score?.percent || {};
-  const maxScore = 
-    Object.values(rawScores).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) || 
-    settings[SETTINGS_KEYS.TOTAL_QUESTIONS] || 
+  const maxScore =
+    Object.values(rawScores).reduce(
+      (a: number, b: any) => a + (typeof b === "number" ? b : 0),
+      0,
+    ) ||
+    settings[SETTINGS_KEYS.TOTAL_QUESTIONS] ||
     30;
   const customColors = settings[SETTINGS_KEYS.DCAS_COLORS] || {};
 
