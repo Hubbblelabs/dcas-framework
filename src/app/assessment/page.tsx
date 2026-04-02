@@ -81,12 +81,10 @@ function AssessmentContent({ userId }: { userId: string | null }) {
 
     // Get saved state to check language and preserve question index
     const savedState = localStorage.getItem(`dcas_assessment_${userId}`);
-    const savedLanguage = savedState
-      ? JSON.parse(savedState)?.language
-      : null;
-    
+    const savedLanguage = savedState ? JSON.parse(savedState)?.language : null;
+
     // Preserve current question index when language changes
-    const currentQuestionIndex = savedState 
+    const currentQuestionIndex = savedState
       ? JSON.parse(savedState)?.currentQuestion || 0
       : 0;
 
@@ -130,27 +128,34 @@ function AssessmentContent({ userId }: { userId: string | null }) {
         let finalQuestions: DBQuestion[];
         // Only shuffle on initial load, not when language changes
         const isLanguageChange = savedLanguage && savedLanguage !== language;
-        const savedQuestions = savedState ? JSON.parse(savedState)?.shuffledQuestions : null;
-        
+        const savedQuestions = savedState
+          ? JSON.parse(savedState)?.shuffledQuestions
+          : null;
+
         if (data?.shuffle_questions && !isLanguageChange) {
           // Shuffle only on initial load
           finalQuestions = [...questions].sort(() => Math.random() - 0.5);
-        } else if (data?.shuffle_questions && isLanguageChange && savedQuestions && Array.isArray(savedQuestions)) {
+        } else if (
+          data?.shuffle_questions &&
+          isLanguageChange &&
+          savedQuestions &&
+          Array.isArray(savedQuestions)
+        ) {
           // Language changed - maintain the same order by matching question IDs from saved state
           const existingOrder = savedQuestions.map((q: any) => q._id);
           finalQuestions = existingOrder
-            .map((id: string) => questions.find(q => q._id === id))
+            .map((id: string) => questions.find((q) => q._id === id))
             .filter((q): q is DBQuestion => q !== undefined);
           // Add any new questions that weren't in the original set
           const existingIds = new Set(existingOrder);
-          const newQuestions = questions.filter(q => !existingIds.has(q._id));
+          const newQuestions = questions.filter((q) => !existingIds.has(q._id));
           finalQuestions = [...finalQuestions, ...newQuestions];
         } else {
           finalQuestions = [...questions]; // Create new array reference
         }
-        
+
         setShuffledQuestions(finalQuestions);
-        
+
         // If language changed, preserve question index but clear selected option for current question
         if (isLanguageChange) {
           // Keep current question index, but clear the selected option
@@ -165,7 +170,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
             setCurrentQuestion(currentQuestionIndex);
           }
         }
-        
+
         setLoadingQuestions(false);
       })
       .catch((error) => {
@@ -623,7 +628,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                 ))}
               </div>
             </div>
-            <CardTitle 
+            <CardTitle
               key={`question-${question._id}-${language}`}
               className="text-lg leading-tight font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white"
             >
@@ -656,7 +661,7 @@ function AssessmentContent({ userId }: { userId: string | null }) {
                     }}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <span 
+                      <span
                         key={`option-${option.label}-${language}`}
                         className="text-sm text-slate-700 sm:text-base dark:text-slate-300"
                       >

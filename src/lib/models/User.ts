@@ -23,7 +23,7 @@ export interface IUser extends Document {
   name: string;
   phone?: string;
   institution?: string;
-  role: "student" | "admin" | "superadmin";
+  role: "student" | "admin";
   org_id?: string;
   preferred_language?: string;
   followup_status?: "none" | "needs_followup" | "in_progress" | "completed";
@@ -73,7 +73,7 @@ const UserSchema = new Schema<IUser>(
     institution: { type: String, trim: true },
     role: {
       type: String,
-      enum: ["student", "admin", "superadmin"],
+      enum: ["student", "admin"],
       default: "student",
       index: true,
     },

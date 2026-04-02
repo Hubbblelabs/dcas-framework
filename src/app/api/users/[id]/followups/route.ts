@@ -12,7 +12,7 @@ export async function GET(
   const host = request.headers.get("host") ?? undefined;
   const authOptions = buildAuthOptions(host);
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -10,25 +10,19 @@ export async function GET(request: Request) {
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     await connectToDatabase();
 
-    const query: any = {};
-    if (session.user.role === "admin") {
-      // Admins cannot see superadmins
-      query.role = { $ne: "superadmin" };
-    }
-
-    const admins = await Admin.find(query)
+    const admins = await Admin.find({})
       .select("-password")
       .sort({ createdAt: -1 });
-    return NextResponse.json({ admins });
+    const normalizedAdmins = admins.map((admin: any) => ({
+      ...admin.toObject(),
+      role: "admin",
+    }));
+    return NextResponse.json({ admins: normalizedAdmins });
   } catch (error) {
     console.error("Error fetching admins:", error);
     return NextResponse.json(
@@ -43,21 +37,10 @@ export async function POST(request: NextRequest) {
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { email, password, name, role } = await request.json();
-
-    if (session.user.role === "admin" && role === "superadmin") {
-      return NextResponse.json(
-        { error: "Admins cannot create superadmins" },
-        { status: 403 },
-      );
-    }
+    const { email, password, name } = await request.json();
 
     if (!email || !password || !name) {
       return NextResponse.json(
@@ -77,7 +60,7 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
       password: hashedPassword,
       name,
-      role: role || "admin",
+      role: "admin",
     });
     await admin.save();
     const adminResponse = admin.toObject();

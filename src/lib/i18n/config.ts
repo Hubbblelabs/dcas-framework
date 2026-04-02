@@ -31,4 +31,3 @@ export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
 };
 
 export const DEFAULT_LANGUAGE: LanguageCode = "en";
-

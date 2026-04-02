@@ -93,7 +93,11 @@ const SessionSchema = new Schema<ISession>(
     followups: [
       {
         date: { type: Date, default: Date.now },
-        created_by: { type: Schema.Types.ObjectId, ref: "Admin", required: true },
+        created_by: {
+          type: Schema.Types.ObjectId,
+          ref: "Admin",
+          required: true,
+        },
         note: { type: String, required: true },
         status: {
           type: String,

@@ -25,11 +25,7 @@ export async function GET(request: Request) {
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -191,7 +187,10 @@ export async function POST(req: Request) {
     const randomizedQuestions = await Promise.all(
       questions.map(async (q: any) => {
         const questionObj = q.toObject ? q.toObject() : q;
-        const translated = await translateQuestion(questionObj, resolvedLanguage);
+        const translated = await translateQuestion(
+          questionObj,
+          resolvedLanguage,
+        );
         return {
           ...translated,
           options: shuffleArray(translated.options),

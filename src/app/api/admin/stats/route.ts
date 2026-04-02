@@ -12,11 +12,7 @@ export async function GET(req: Request) {
     const host = req.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       console.error("Unauthorized access attempt to /api/admin/stats", {
         hasSession: !!session,
         role: session?.user ? (session.user as any).role : "no-user",

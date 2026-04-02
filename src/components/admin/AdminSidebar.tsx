@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   KeyRound,
   Shield,
-  ShieldAlert,
   Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -125,9 +124,8 @@ export function AdminSidebar({
     }
   };
 
-  const roleLabel =
-    session?.user?.role === "superadmin" ? "Super Admin" : "Admin";
-  const RoleIcon = session?.user?.role === "superadmin" ? ShieldAlert : Shield;
+  const roleLabel = "Admin";
+  const RoleIcon = Shield;
 
   return (
     <div
@@ -183,9 +181,7 @@ export function AdminSidebar({
               <span
                 className={cn(
                   "mt-0.5 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium",
-                  session.user.role === "superadmin"
-                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+                  "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
                 )}
               >
                 {roleLabel}

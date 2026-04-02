@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const dns = require("dns");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 // Fix for SRV resolution issues in some environments (like Cloudflare WARP)
 try {
@@ -16,7 +19,7 @@ const AdminSchema = new mongoose.Schema(
     name: String,
     email: { type: String, unique: true },
     password: String,
-    role: { type: String, enum: ["admin", "superadmin"], default: "admin" },
+    role: { type: String, enum: ["admin"], default: "admin" },
   },
   { timestamps: true },
 );
@@ -40,7 +43,7 @@ async function seedAdmin() {
       name: "DCAS Admin",
       email: "admin@dcas.com",
       password: hashedPassword,
-      role: "superadmin",
+      role: "admin",
     });
 
     console.log("Admin created successfully!");

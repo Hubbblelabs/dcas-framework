@@ -54,7 +54,7 @@ export function buildAuthOptions(host?: string): NextAuthOptions {
                 id: admin._id.toString(),
                 email: admin.email,
                 name: admin.name,
-                role: admin.role,
+                role: "admin",
               };
             }
             return null;

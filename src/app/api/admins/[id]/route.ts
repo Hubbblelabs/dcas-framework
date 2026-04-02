@@ -13,11 +13,7 @@ export async function GET(
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { id } = await params;
@@ -26,11 +22,12 @@ export async function GET(
     if (!admin)
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
 
-    if (session.user.role === "admin" && admin.role === "superadmin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
-    return NextResponse.json({ admin });
+    return NextResponse.json({
+      admin: {
+        ...admin.toObject(),
+        role: "admin",
+      },
+    });
   } catch (error) {
     console.error("Error fetching admin:", error);
     return NextResponse.json(
@@ -48,11 +45,7 @@ export async function PUT(
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email, password, name, role } = await request.json();
@@ -62,24 +55,10 @@ export async function PUT(
     if (!admin)
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
 
-    if (session.user.role === "admin") {
-      if (admin.role === "superadmin") {
-        return NextResponse.json(
-          { error: "Unauthorized to update superadmin" },
-          { status: 403 },
-        );
-      }
-      if (role === "superadmin") {
-        return NextResponse.json(
-          { error: "Unauthorized to promote to superadmin" },
-          { status: 403 },
-        );
-      }
-    }
-
     if (email) admin.email = email.toLowerCase();
     if (name) admin.name = name;
-    if (role) admin.role = role;
+    if (role) admin.role = "admin";
+    if (admin.role !== "admin") admin.role = "admin";
     if (password) admin.password = await bcrypt.hash(password, 10);
     await admin.save();
     const adminResponse = admin.toObject();
@@ -105,11 +84,7 @@ export async function DELETE(
     const host = request.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const session = await getServerSession(authOptions);
-    if (
-      !session ||
-      !session.user?.role ||
-      !["admin", "superadmin"].includes(session.user.role)
-    ) {
+    if (!session || !session.user?.role || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { id } = await params;
@@ -124,13 +99,6 @@ export async function DELETE(
     const admin = await Admin.findById(id);
     if (!admin)
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
-
-    if (session.user.role === "admin" && admin.role === "superadmin") {
-      return NextResponse.json(
-        { error: "Unauthorized to delete superadmin" },
-        { status: 403 },
-      );
-    }
 
     await Admin.findByIdAndDelete(id);
     return NextResponse.json({ message: "Admin deleted" });

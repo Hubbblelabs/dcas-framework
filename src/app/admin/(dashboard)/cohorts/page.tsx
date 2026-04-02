@@ -152,11 +152,19 @@ export default function UsersAssessmentsPage() {
   };
 
   // ---------- Actions ----------
-  const handleFollowupUpdate = (userId: string, status: string, lastDate: string) => {
+  const handleFollowupUpdate = (
+    userId: string,
+    status: string,
+    lastDate: string,
+  ) => {
     setUsers((prev) =>
       prev.map((user) => {
         if (user._id === userId) {
-          return { ...user, followup_status: status as any, last_followup_at: lastDate };
+          return {
+            ...user,
+            followup_status: status as any,
+            last_followup_at: lastDate,
+          };
         }
         return user;
       }),

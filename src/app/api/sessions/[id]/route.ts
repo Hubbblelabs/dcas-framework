@@ -35,9 +35,7 @@ export async function GET(
     const host = _req.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
-    const isAdmin = ["admin", "superadmin"].includes(
-      (sessionAuth?.user as any)?.role,
-    );
+    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
 
     let isOwner = false;
     const cookieStore = await cookies();
@@ -136,9 +134,7 @@ export async function POST(
     const host = req.headers.get("host") ?? undefined;
     const authOptions = buildAuthOptions(host);
     const sessionAuth = await getServerSession(authOptions);
-    const isAdmin = ["admin", "superadmin"].includes(
-      (sessionAuth?.user as any)?.role,
-    );
+    const isAdmin = (sessionAuth?.user as any)?.role === "admin";
 
     let isOwner = false;
     const cookieStore = await cookies();
@@ -237,12 +233,11 @@ export async function POST(
         );
       }
 
-      const adminUser = await Admin.findById((sessionAuth?.user as any)?.id) || await Admin.findOne({ email: sessionAuth?.user?.email });
+      const adminUser =
+        (await Admin.findById((sessionAuth?.user as any)?.id)) ||
+        (await Admin.findOne({ email: sessionAuth?.user?.email }));
       if (!adminUser) {
-        return NextResponse.json(
-          { error: "Admin not found" },
-          { status: 400 },
-        );
+        return NextResponse.json({ error: "Admin not found" }, { status: 400 });
       }
 
       const finalStatus = status === "none" ? "needs_followup" : status;
@@ -274,7 +269,7 @@ export async function POST(
           { status: 400 },
         );
       }
-      
+
       const finalStatus = status === "none" ? "needs_followup" : status;
 
       if (session.user_id) {

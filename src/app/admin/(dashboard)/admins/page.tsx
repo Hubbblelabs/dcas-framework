@@ -44,22 +44,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Pencil,
-  Trash2,
-  Search,
-  Plus,
-  Loader2,
-  Shield,
-  ShieldAlert,
-} from "lucide-react";
+import { Pencil, Trash2, Search, Plus, Loader2, Shield } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 interface AdminUser {
   _id: string;
   name: string;
   email: string;
-  role: "admin" | "superadmin";
+  role: "admin";
   createdAt: string;
 }
 
@@ -210,8 +202,6 @@ export default function AdminsPage() {
       admin.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const canManageSuperAdmin = session?.user?.role === "superadmin";
-
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -297,18 +287,8 @@ export default function AdminsPage() {
                     </TableCell>
                     <TableCell>{admin.email}</TableCell>
                     <TableCell>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          admin.role === "superadmin"
-                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
-                            : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                        }`}
-                      >
-                        {admin.role === "superadmin" ? (
-                          <ShieldAlert className="mr-1 h-3 w-3" />
-                        ) : (
-                          <Shield className="mr-1 h-3 w-3" />
-                        )}
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        <Shield className="mr-1 h-3 w-3" />
                         {admin.role}
                       </span>
                     </TableCell>
@@ -321,9 +301,6 @@ export default function AdminsPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEdit(admin)}
-                          disabled={
-                            !canManageSuperAdmin && admin.role === "superadmin"
-                          }
                           className="hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           <Pencil className="h-4 w-4" />
@@ -333,11 +310,7 @@ export default function AdminsPage() {
                           size="icon"
                           className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                           onClick={() => setDeleteAdmin(admin)}
-                          disabled={
-                            (!canManageSuperAdmin &&
-                              admin.role === "superadmin") ||
-                            session?.user?.id === admin._id
-                          }
+                          disabled={session?.user?.id === admin._id}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -402,16 +375,12 @@ export default function AdminsPage() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, role: value })
                   }
-                  disabled={!canManageSuperAdmin}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
-                    {canManageSuperAdmin && (
-                      <SelectItem value="superadmin">Super Admin</SelectItem>
-                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -493,16 +462,12 @@ export default function AdminsPage() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, role: value })
                   }
-                  disabled={!canManageSuperAdmin}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
-                    {canManageSuperAdmin && (
-                      <SelectItem value="superadmin">Super Admin</SelectItem>
-                    )}
                   </SelectContent>
                 </Select>
               </div>

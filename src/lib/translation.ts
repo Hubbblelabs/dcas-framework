@@ -127,10 +127,7 @@ export async function translateQuestion<T extends QuestionLike>(
     };
   }
 
-  const baseTexts = [
-    question.text,
-    ...question.options.map((opt) => opt.text),
-  ];
+  const baseTexts = [question.text, ...question.options.map((opt) => opt.text)];
 
   const translatedTexts = await callExternalTranslationAPI(
     baseTexts,
@@ -163,4 +160,3 @@ export async function translateQuestion<T extends QuestionLike>(
     },
   };
 }
-

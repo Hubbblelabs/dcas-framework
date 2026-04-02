@@ -26,7 +26,11 @@ interface FollowupDialogProps {
   user: User | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onFollowupUpdate: (userId: string, status: string, last_followup_at: string) => void;
+  onFollowupUpdate: (
+    userId: string,
+    status: string,
+    last_followup_at: string,
+  ) => void;
 }
 
 export function FollowupDialog({
@@ -48,7 +52,9 @@ export function FollowupDialog({
     if (user && open) {
       const currentStatus = user.followup_status;
       setFollowupStatus(
-        (currentStatus && currentStatus !== "none" ? currentStatus : "needs_followup") as any,
+        (currentStatus && currentStatus !== "none"
+          ? currentStatus
+          : "needs_followup") as any,
       );
       setFollowupNote("");
       // Use latestSessionId if available, otherwise fallback to latestReportId
@@ -111,9 +117,7 @@ export function FollowupDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            Follow-ups: {user.name}
-          </DialogTitle>
+          <DialogTitle className="text-xl">Follow-ups: {user.name}</DialogTitle>
           <DialogDescription>
             Manage and view follow-up history for this user.
           </DialogDescription>
@@ -122,7 +126,8 @@ export function FollowupDialog({
         <div className="grid gap-6 py-4">
           {user.status !== "Completed" && (
             <div className="text-muted-foreground text-sm italic">
-              User has not completed the assessment yet. Follow-ups can only be tracked for completed assessments.
+              User has not completed the assessment yet. Follow-ups can only be
+              tracked for completed assessments.
             </div>
           )}
 
@@ -144,17 +149,24 @@ export function FollowupDialog({
                   onChange={(e) => setFollowupNote(e.target.value)}
                   className="min-h-[100px]"
                 />
-                <div className="flex items-center justify-between mt-2">
+                <div className="mt-2 flex items-center justify-between">
                   <select
-                    className="h-9 rounded-md border border-input bg-transparent px-2 text-xs shadow-sm dark:bg-slate-900 dark:text-slate-100"
+                    className="border-input h-9 rounded-md border bg-transparent px-2 text-xs shadow-sm dark:bg-slate-900 dark:text-slate-100"
                     value={followupStatus}
-                    onChange={(e) =>
-                      setFollowupStatus(e.target.value as any)
-                    }
+                    onChange={(e) => setFollowupStatus(e.target.value as any)}
                   >
-                    <option value="needs_followup" className="dark:bg-slate-900">Needs follow-up</option>
-                    <option value="in_progress" className="dark:bg-slate-900">In progress</option>
-                    <option value="completed" className="dark:bg-slate-900">Completed</option>
+                    <option
+                      value="needs_followup"
+                      className="dark:bg-slate-900"
+                    >
+                      Needs follow-up
+                    </option>
+                    <option value="in_progress" className="dark:bg-slate-900">
+                      In progress
+                    </option>
+                    <option value="completed" className="dark:bg-slate-900">
+                      Completed
+                    </option>
                   </select>
                   <Button
                     size="sm"

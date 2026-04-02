@@ -143,12 +143,12 @@ export default function ReportPage() {
               ...new Set([...ranked, ...types]),
             ] as DCASType[];
             setRankedTypes(fullRanked);
-            
+
             // Set follow-ups if available
             if (data.followups && Array.isArray(data.followups)) {
               setFollowups(data.followups);
             }
-            
+
             setIsLoaded(true);
           } else {
             console.error("No score in session data");
@@ -776,7 +776,8 @@ export default function ReportPage() {
                     Follow-up History
                   </CardTitle>
                   <CardDescription>
-                    Counselor notes and follow-up interactions for this assessment
+                    Counselor notes and follow-up interactions for this
+                    assessment
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
